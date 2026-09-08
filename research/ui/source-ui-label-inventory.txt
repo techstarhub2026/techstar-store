@@ -1,0 +1,2669 @@
+########## 126.7c18678d.js ##########
+Friend Payment
+PAYMENT METHODS
+Payment Number(E.g 255655XXXXXX)
+Order Details
+Loading...
+Sub Total:
+Shipping Cost:
+TOTAL
+FriendPaymentView
+Enter a payment number
+Phone must be a number
+Payment number must be 12 characters long
+Please select a payment method
+POST
+Order placed
+Failed to place order
+MAKE PAYMENT
+Quantity:
+
+########## 1356.eaa20da0.js ##########
+Loading...
+EmailVerificationView
+Success
+Email verification successful
+Failed
+
+########## 1657.59ccb844.js ##########
+ConfirmationModel
+Cancel
+CLIENT DETAILS
+Client Name
+Client Email
+Your Order
+TOTAL
+line mt-2
+Loading...
+SingleInvoiceView
+Client name is required
+Email is required
+Enter a valid email
+DELETE
+Failed to delete invoice
+Quantity:
+Delete Invoice
+Print Invoice
+Are you sure you want to proceed with this action?
+Confirm
+
+########## 1688.8405fd29.js ##########
+PATCH
+SettingsPageImageUploader
+POST
+DELETE
+Failed to delete image
+Drag & Drop your image
+GENERAL SITE SETTINGS
+About Us Page Image
+PREVIEW
+Loading...
+Privacy Policy Page Image
+Terms and Conditions Page Image
+SettingsView
+About Us image page is required
+Success
+Image successfully updated
+Failed
+Privacy policy image page is required
+Terms & Conditions page is required
+UPDATE
+
+########## 1743.20655efc.js ##########
+CREATE A NEW SMS CAMPAIGN
+Campaign Name
+Send To
+Select contacts to send to
+Specific contacts
+All contacts
+Message
+Chars. Remaining ( 0 ) 0/160
+Additional contacts
+Tags
+0 0 14 14
+m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6
+Include contacts
+When to send :
+Immediately
+Later
+Loading...
+CreateSMSCampaignView
+Campaign name is required
+Send To is required
+Message is required
+Date and time are required for sending the campaign later
+Contacts are required for a specific audience
+Invalid phone number. Please enter a 12-digit number.
+Error
+Success
+Campaign created successfully
+SMS campaign scheduled for a later time
+Failed
+campaign name
+Press Space key to add additional numbers e.g 255729XXXXXX,255729YYYYYY
+Select contacts to include
+SUBMIT
+
+########## 1834.ab9741dc.js ##########
+PaginationCopy
+SEARCHES
+h3 my-5
+Search Query
+Keyword
+Number Of Searches
+No Searches found
+SearchesView
+
+########## 2008.2a563c65.js ##########
+No value provided for variable
+RequestAnimationFrame
+CancelAnimationFrame
+CancelRequestAnimationFrame
+Deprecated include of L.Mixin.Events: this property will be removed in future releases, please inherit from L.Evented instead.
+wrong listener type:
+Invalid LatLng object: (
+Point(
+LatLng(
+EPSG:3857
+EPSG:900913
+M0 0
+ActiveXObject
+android 2
+android 3
+Google
+AudioNode
+OTransition
+WebKitCSSMatrix
+MozPerspective
+Linux
+MSPointerDown
+MSPointerMove
+MSPointerUp
+MSPointerCancel
+wrong event specified:
+OTransform
+MozTransform
+MozTransition
+DXImageTransform.Microsoft.Alpha
+WebkitUserSelect
+OUserSelect
+MozUserSelect
+mousedown touchstart dblclick contextmenu
+Bounds are not valid.
+Geolocation not supported.
+permission denied
+Geolocation error:
+Map container is being reused by another instance
+Pane
+Map container not found.
+Map container is already initialized.
+Set map center and zoom first.
+click dblclick mousedown mouseup mouseover mouseout mousemove contextmenu keypress keydown keyup
+leaflet-proxy leaflet-zoom-animated
+load moveend
+add remove
+Layers
+Zoom in
+Zoom out
+0 0 12 8
+M0 0h12v4H0z
+M0 4h12v3H0z
+M0 7h12v1H0z
+A JavaScript library for interactive maps
+touchstart mousedown
+touchend touchcancel
+mousemove touchmove
+mouseup touchend touchcancel
+Deprecated use of _flat, please use L.LineUtil.isFlat instead.
+latlngs not passed
+latlngs are not flat! Only the first ring will be used
+EPSG:3395
+EPSG:4326
+The provided object is not a Layer.
+iconUrl not set in Icon options (see the docs).
+Size
+RetinaUrl
+,pane:void 0,content:
+):n.dashArray.replace(/( *, *)/g,
+
+########## 2219.b73edfd6.js ##########
+ServiceCard
+Success
+Service Deleted
+Failed
+SERVICES
+NO SERVICES
+ServicesView
+New Service
+
+########## 2420.aaa4130c.js ##########
+INVOICES
+No Invoices
+Order
+h3 my-5
+Customer Name
+Price
+Date
+InvoicesView
+Search
+Create Invoice
+, ...
+
+########## 2665.0962aa09.js ##########
+CURRENCY FORMATTING
+small fw-bold text-success mb-1
+DISPLAY CURRENCY
+h1 fw-bolder mt-3
+FRACTION DIGITS
+Bafredo electronics
+Update Currency
+CURRENCY TYPE
+MAXIMUM FRACTION DIGITS
+Loading...
+Failed To Update Currency
+Update Currency Format
+auth-header text-center bg-success text-white py-3
+Update
+
+########## 3104.7ecb38c2.js ##########
+PATCH
+banner-breadcum section mb-4
+TERMS AND CONDITIONS
+lead fw-normal mb-4 text-start
+SHIPPING AND HANDLING
+col d-flex align-items-start mt-2 ms-4
+BAFREDO Savings, which is more suitable for customers outside Dar es Salaam.
+TermsAndConditions
+Home
+About us
+
+########## 3242.6fdcedfc.js ##########
+auth-header text-center bg-success text-white py-3
+Close
+PREVIEW MODAL
+xl-font mb-lg-3
+PreviewBannerModal
+Bafredo electronics
+Loading...
+EditBannerImageModal
+Failed
+CANCEL
+EDIT IMAGE
+EDIT BANNER
+Title
+Title Color
+Subtitle
+Subtitle Color
+Link
+Background
+Image
+Upload Image
+Button Text
+Button Background
+Button Text Color
+EditBannerView
+Banner title is required
+An image is required
+Success
+Banner edited
+Enter Title
+Choose your background color
+Enter Subtitle
+Where does the banner redirect to
+Enter Button text
+Preview
+SUBMIT
+
+########## 3422.e2b50e01.js ##########
+CREATE A NEW EMAIL CAMPAIGN
+Subject
+Send To
+Select contacts to send to
+Specific contacts
+All contacts
+Message
+Additional contacts
+Tags
+0 0 14 14
+m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6
+Include contacts
+When to send :
+Immediately
+Later
+Loading...
+CreateEmailCampaignView
+Subject is required
+Content is required
+Send To is required
+Date and time are required for sending the campaign later
+Contacts are required for a specific audience
+Invalid email. Please enter a valid email.
+Error
+Success
+Campaign created successfully
+Failed
+Email subject
+Press Space key to add additional emails e.g person1@gmail.com, person2@gmail.com, ...
+Select contacts to include
+SUBMIT
+
+########## 3481.52d10878.js ##########
+No value provided for variable
+RequestAnimationFrame
+CancelAnimationFrame
+CancelRequestAnimationFrame
+Deprecated include of L.Mixin.Events: this property will be removed in future releases, please inherit from L.Evented instead.
+wrong listener type:
+Invalid LatLng object: (
+Point(
+LatLng(
+EPSG:3857
+EPSG:900913
+M0 0
+ActiveXObject
+android 2
+android 3
+Google
+AudioNode
+OTransition
+WebKitCSSMatrix
+MozPerspective
+Linux
+MSPointerDown
+MSPointerMove
+MSPointerUp
+MSPointerCancel
+wrong event specified:
+OTransform
+MozTransform
+MozTransition
+DXImageTransform.Microsoft.Alpha
+WebkitUserSelect
+OUserSelect
+MozUserSelect
+mousedown touchstart dblclick contextmenu
+Bounds are not valid.
+Geolocation not supported.
+permission denied
+Geolocation error:
+Map container is being reused by another instance
+Pane
+Map container not found.
+Map container is already initialized.
+Set map center and zoom first.
+click dblclick mousedown mouseup mouseover mouseout mousemove contextmenu keypress keydown keyup
+leaflet-proxy leaflet-zoom-animated
+load moveend
+add remove
+Layers
+Zoom in
+Zoom out
+0 0 12 8
+M0 0h12v4H0z
+M0 4h12v3H0z
+M0 7h12v1H0z
+A JavaScript library for interactive maps
+touchstart mousedown
+touchend touchcancel
+mousemove touchmove
+mouseup touchend touchcancel
+Deprecated use of _flat, please use L.LineUtil.isFlat instead.
+latlngs not passed
+latlngs are not flat! Only the first ring will be used
+EPSG:3395
+EPSG:4326
+The provided object is not a Layer.
+iconUrl not set in Icon options (see the docs).
+Size
+RetinaUrl
+,pane:void 0,content:
+):n.dashArray.replace(/( *, *)/g,
+
+########## 3569.203dc755.js ##########
+BaseColumn
+Column
+DELETE
+ConfirmationModel
+Cancel
+Close
+ViewDetailsModel
+CAMPAIGNS
+Total campaigns
+0 0 20 19
+Total Contacts
+0 0 20 20
+SMS Sent
+0 0 20 18
+M16 5h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-2v3l-4-3H8m4-13H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h2v3l4-3h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z
+Emails Sent
+0 0 20 16
+m19 2-8.4 7.05a1 1 0 0 1-1.2 0L1 2m18 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1m18 0v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2
+Campaign Name:
+Audience:
+Scheduled:
+Date:
+Contacts:
+Tags
+Message:
+Loading...
+CampaignsView
+Email
+Success
+Campaign Deleted
+Failed
+New SMS Campaign
+New Email Campaign
+Keyword Search
+No campaigns found.
+Name
+Category
+Audience
+Scheduled
+Actions
+Campaign Details
+Are you sure you want to delete this Campaign?
+Confirm
+
+########## 3710.ebf41c68.js ##########
+PATCH
+banner-breadcum section mb-4
+PRIVACY POLICY
+lead fw-normal mb-4 text-start
+How and why we use your personal information
+col d-flex align-items-start mt-2 ms-4
+To help us develop, deliver, and improve our products, services, contents, and advertisements.
+To administer special programs, including sweepstake, contest, or similar promotion.
+Collection and use of non-personal information
+fst-italic fw-normal
+PrivacyPolicy
+Home
+FAQ's
+
+########## 3734.5a822ac2.js ##########
+faq_area section_padding_130
+section_heading text-center wow fadeInUp
+Frequently Asked Questions
+support-button text-center d-flex align-items-center justify-content-center mt-4
+Can't find your answers?
+Contact us
+
+########## 395.e98c8ee2.js ##########
+DELETE
+PATCH
+ConfirmationModel
+Cancel
+Loading...
+ArticleCard
+Success
+Article Deleted
+Failed
+Are you sure you want to delete this Article?
+Confirm
+ARTICLES
+NO ARTICLES
+BlogsView
+New Article
+
+########## 4003.dc586126.js ##########
+ConfirmationModel
+Cancel
+CLIENT DETAILS
+Client Name
+Client Email
+Your Order
+search-bar mt-3 position-relative
+Products
+TOTAL
+line mt-2
+Loading...
+CreateInvoiceView
+Client name is required
+Email is required
+Enter a valid email
+POST
+Failed to create invoice
+Please search here ...
+Quantity:
+Create Invoice
+Are you sure you want to proceed with this action?
+Confirm
+
+########## 4058.c5754756.js ##########
+ServiceImageUploader
+POST
+DELETE
+Failed to delete image
+Drag & Drop your image
+CREATE NEW SERVICE
+Add service Details
+Heading
+Upload Service image
+Loading...
+CreateServicesView
+Service heading is required
+Heading should not exceed 15 words
+Service content is required
+Image is required
+Success
+Service published successfully
+Failed
+Enter Heading
+Service details...
+SUBMIT
+
+########## 4317.6377562b.js ##########
+DELETE
+required, but only
+weekStartsOn must be between 0 and 6 inclusively
+firstWeekContainsDate must be between 1 and 7 inclusively
+GGGGG
+GGGG
+QQQQQ
+QQQQ
+MMMMM
+MMMM
+LLLLL
+LLLL
+EEEEE
+EEEEEE
+EEEE
+BBBBB
+BBBB
+XXXX
+XXXXX
+OOOO
+PPPP
+YYYY
+Use `yyyy` instead of `YYYY` (in `
+`) for formatting years to the input `
+Use `yy` instead of `YY` (in `
+Use `d` instead of `D` (in `
+`) for formatting days of the month to the input `
+Use `dd` instead of `DD` (in `
+less than a second
+1 second
+half a minute
+less than a minute
+1 minute
+about 1 hour
+1 hour
+1 day
+about 1 week
+1 week
+about 1 month
+1 month
+about 1 year
+1 year
+over 1 year
+almost 1 year
+EEEE, MMMM do, y
+MMMM do, y
+MMM d, y
+MM/dd/yyyy
+h:mm:ss a zzzz
+h:mm:ss a z
+h:mm:ss a
+h:mm a
+'last' eeee 'at' p
+'yesterday at' p
+'today at' p
+'tomorrow at' p
+eeee 'at' p
+Before Christ
+Anno Domini
+1st quarter
+2nd quarter
+3rd quarter
+4th quarter
+January
+February
+March
+April
+June
+July
+August
+September
+October
+November
+December
+Sunday
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+in the morning
+in the afternoon
+in the evening
+at night
+locale must contain localize property
+locale must contain formatLong property
+Invalid time value
+Format string contains an unescaped latin alphabet character `
+Object
+Arguments
+assign requires that input parameter not be null or undefined
+this hasn't been initialised - super() hasn't been called
+Super expression must either be null or a function
+Derived constructors may only return object or undefined
+Cannot call a class as a function
+@@toPrimitive must return a primitive value.
+locale must contain match property
+The format string mustn't contain `
+` and `
+` at the same time
+` and any other token at the same time
+values parameter must be an object
+additionalDigits must be 0, 1 or 2
+Invalid interval
+`options.step` must be a number greater than 1
+0 0 32 32
+M20 2.667v5.333c0 0.736 0.597 1.333 1.333 1.333s1.333-0.597 1.333-1.333v-5.333c0-0.736-0.597-1.333-1.333-1.333s-1.333 0.597-1.333 1.333z
+M9.333 2.667v5.333c0 0.736 0.597 1.333 1.333 1.333s1.333-0.597 1.333-1.333v-5.333c0-0.736-0.597-1.333-1.333-1.333s-1.333 0.597-1.333 1.333z
+M4 14.667h24c0.736 0 1.333-0.597 1.333-1.333s-0.597-1.333-1.333-1.333h-24c-0.736 0-1.333 0.597-1.333 1.333s0.597 1.333 1.333 1.333z
+M23.057 7.057l-16 16c-0.52 0.52-0.52 1.365 0 1.885s1.365 0.52 1.885 0l16-16c0.52-0.52 0.52-1.365 0-1.885s-1.365-0.52-1.885 0z
+M7.057 8.943l16 16c0.52 0.52 1.365 0.52 1.885 0s0.52-1.365 0-1.885l-16-16c-0.52-0.52-1.365-0.52-1.885 0s-0.52 1.365 0 1.885z
+America/New_York
+06/25/2014, 00:00:00
+‎06‎/‎25‎/‎2014‎ ‎00‎:‎00‎:‎00
+1 argument required, but only
+Toggle overlay
+Datepicker menu
+Datepicker input
+Calendar wrapper
+Calendar days
+Open time picker
+Close time Picker
+Switch AM/PM mode
+Open years overlay
+Open months overlay
+Next month
+Previous month
+Next year
+Previous year
+MM/yyyy
+translate(-50%, -50%)
+Select
+Cancel
+DatepickerInput
+dp__input_icon dp__input_icons
+dp__clear_icon dp__input_icons
+ActionRow
+dp__action_button dp__action_cancel
+dp__action_button dp__action_select
+SelectionOverlay
+InstanceWrap
+ArrowBtn
+dp__btn dp--arrow-btn-nav
+MonthPicker
+YearPicker
+dp__tp_inline_btn_bar dp__tp_btn_in_l
+dp__tp_inline_btn_bar dp__tp_btn_in_r
+TimeInput
+TimePicker
+dp__overlay_container dp__container_flex dp__time_picker_overlay_container
+dp__overlay_row dp__flex_row
+TimePickerSolo
+DpHeader
+dp__btn dp__month_year_select
+dp__calendar_item dp__week_num
+DpCalendar
+DatePicker
+DatepickerMenu
+VueDatePicker
+Vue3DatePicker
+Module
+
+########## 4718.396648a3.js ##########
+ImageUploader
+POST
+DELETE
+Failed to delete image
+EDIT PARTNER
+Add your Partner Details
+Partner Name
+Partner's Website Link
+Upload partner image
+Loading...
+EditPartnerView
+Partner name is required
+Partner's Website Link is required
+Image is required
+Success
+Partner updated successfully
+Failed
+Enter Name
+Enter Link
+SUBMIT
+
+########## 4983.f725be48.js ##########
+Email: info@bafredo.co.tz
+P. O. Box 33761, Dar es Salaam, Tanzania
+Mobile: +255(0) 746 624 875
+Telephone/Fax: +255-22-246 0157
+CLIENT DETAILS
+Client Name:
+Email:
+Shipping Method:
+Name
+Quantity
+Unit Price
+Subtotal
+TOTAL
+Goods are shipped upon confirmation of 100% payment
+Terms & conditions shall apply in handling, processing and shipping of the purchased goods
+All payments should be made through the designated payment methods of BAFREDO Electronics limited.
+Sub Total:
+Shipping Cost:
+InvoiceView
+Anonymous
+Not specified
+Phone:
+Print Invoice
+
+########## 5008.58e530df.js ##########
+ImageUploader
+POST
+DELETE
+Failed to delete image
+CREATE NEW PARTNER
+Add Partner Details
+Partner Name
+Partner's Website Link
+Upload Partner image
+Loading...
+CreatePartnerVIew
+Partner name is required
+Heading should not exceed 15 words
+Link to partner's website is required
+Image is required
+Success
+Partner created successfully
+Failed
+Enter Name
+Enter Link
+SUBMIT
+
+########## 5464.b7b128df.js ##########
+@@toPrimitive must return a primitive value.
+BaseComponent
+Object
+Arguments
+BaseIcon
+BaseBadge
+Badge
+BaseButton
+Button
+SpinnerIcon
+0 0 14 14
+
+########## 5583.4788a5b7.js ##########
+display-1 fw-bold
+Opps!
+Page not found
+The page you’re looking for doesn’t exist.
+Go Home
+
+########## 5833.89c9c4cd.js ##########
+DELETE
+PATCH
+ConfirmationModel
+Cancel
+Loading...
+ArticleCard
+Success
+Article Deleted
+Failed
+Are you sure you want to delete this Article?
+Confirm
+ARTICLES
+NO ARTICLES
+BlogsView
+
+########## 5877.ca891481.js ##########
+Options passed to vue-multiselect do not contain groups, despite the config.
+Select option
+Press enter to create a tag
+Delete
+Enter
+Press enter to select
+Press enter to select group
+Selected
+Press enter to remove
+Press enter to deselect group
+No elements found. Consider changing the search query.
+List is empty.
+Maximum of
+options selected. First remove a selected option to select another.
+
+########## 5988.0962d1d9.js ##########
+Januarie_Februarie_Maart_April_Mei_Junie_Julie_Augustus_September_Oktober_November_Desember
+Jan_Feb_Mrt_Apr_Mei_Jun_Jul_Aug_Sep_Okt_Nov_Des
+Sondag_Maandag_Dinsdag_Woensdag_Donderdag_Vrydag_Saterdag
+Son_Maa_Din_Woe_Don_Vry_Sat
+So_Ma_Di_Wo_Do_Vr_Sa
+HH:mm
+HH:mm:ss
+DD/MM/YYYY
+D MMMM YYYY
+D MMMM YYYY HH:mm
+dddd, D MMMM YYYY HH:mm
+oor %s
+%s gelede
+'n paar sekondes
+%d sekondes
+'n minuut
+%d minute
+'n uur
+%d ure
+'n dag
+%d dae
+'n maand
+%d maande
+'n jaar
+%d jaar
+أقل من ثانية
+ثانية واحدة
+%d ثوان
+%d ثانية
+أقل من دقيقة
+دقيقة واحدة
+%d دقائق
+%d دقيقة
+أقل من ساعة
+ساعة واحدة
+%d ساعات
+%d ساعة
+أقل من يوم
+يوم واحد
+%d أيام
+%d يومًا
+%d يوم
+أقل من شهر
+شهر واحد
+%d أشهر
+%d شهرا
+%d شهر
+أقل من عام
+عام واحد
+%d أعوام
+%d عامًا
+%d عام
+D/‏M/‏YYYY
+dddd D MMMM YYYY HH:mm
+بعد %s
+منذ %s
+في %s
+%d سنوات
+Bazar_Bazar ertəsi_Çərşənbə axşamı_Çərşənbə_Cümə axşamı_Cümə_Şənbə
+Baz_BzE_ÇAx_Çər_CAx_Cüm_Şən
+Bz_BE_ÇA_Çə_CA_Cü_Şə
+DD.MM.YYYY
+%s sonra
+%s əvvəl
+bir neçə saniyə
+%d saniyə
+bir dəqiqə
+%d dəqiqə
+bir saat
+%d saat
+bir gün
+%d gün
+bir ay
+%d ay
+bir il
+%d il
+D MMMM YYYY г.
+D MMMM YYYY г., HH:mm
+dddd, D MMMM YYYY г., HH:mm
+праз %s
+%s таму
+некалькі секунд
+H:mm
+H:mm:ss
+D.MM.YYYY
+D MMMM YYYY H:mm
+dddd, D MMMM YYYY H:mm
+след %s
+преди %s
+няколко секунди
+%d секунди
+%d минути
+%d часа
+%d дена
+%d седмици
+%d месеца
+%d години
+Zanwuyekalo_Fewuruyekalo_Marisikalo_Awirilikalo_Mɛkalo_Zuwɛnkalo_Zuluyekalo_Utikalo_Sɛtanburukalo_ɔkutɔburukalo_Nowanburukalo_Desanburukalo
+Zan_Few_Mar_Awi_Mɛ_Zuw_Zul_Uti_Sɛt_ɔku_Now_Des
+Kari_Ntɛnɛn_Tarata_Araba_Alamisa_Juma_Sibiri
+Kar_Ntɛ_Tar_Ara_Ala_Jum_Sib
+Ka_Nt_Ta_Ar_Al_Ju_Si
+%s kɔnɔ
+a bɛ %s bɔ
+sanga dama dama
+sekondi %d
+miniti kelen
+miniti %d
+lɛrɛ kelen
+lɛrɛ %d
+tile kelen
+tile %d
+kalo kelen
+kalo %d
+san kelen
+san %d
+A h:mm সময়
+A h:mm:ss সময়
+D MMMM YYYY, A h:mm সময়
+dddd, D MMMM YYYY, A h:mm সময়
+dddd, LT
+%s পরে
+%s আগে
+কয়েক সেকেন্ড
+%d সেকেন্ড
+এক মিনিট
+%d মিনিট
+এক ঘন্টা
+%d ঘন্টা
+এক দিন
+%d দিন
+এক মাস
+%d মাস
+এক বছর
+%d বছর
+A h:mm
+A h:mm:ss
+D MMMM YYYY, A h:mm
+dddd, D MMMM YYYY, A h:mm
+%s ལ་
+%s སྔན་ལ
+%d སྐར་ཆ།
+%d སྐར་མ
+%d ཆུ་ཚོད
+%d ཉིན་
+%d ཟླ་བ
+%d ལོ
+Genver_Cʼhwevrer_Meurzh_Ebrel_Mae_Mezheven_Gouere_Eost_Gwengolo_Here_Du_Kerzu
+Gen_Cʼhwe_Meu_Ebr_Mae_Eve_Gou_Eos_Gwe_Her_Du_Ker
+Sul_Lun_Meurzh_Mercʼher_Yaou_Gwener_Sadorn
+Sul_Lun_Meu_Mer_Yao_Gwe_Sad
+Su_Lu_Me_Mer_Ya_Gw_Sa
+a-benn %s
+%s ʼzo
+un nebeud segondennoù
+%d eilenn
+ur vunutenn
+un eur
+%d eur
+un devezh
+ur miz
+ur bloaz
+jedna minuta
+jedne minute
+jedan sat
+jednog sata
+D. MMMM YYYY
+D. MMMM YYYY H:mm
+dddd, D. MMMM YYYY H:mm
+za %s
+prije %s
+par sekundi
+de gener_de febrer_de març_d'abril_de maig_de juny_de juliol_d'agost_de setembre_d'octubre_de novembre_de desembre
+D MMM YYYY
+D MMM YYYY, H:mm
+ddd D MMM YYYY, H:mm
+d'aquí %s
+fa %s
+uns segons
+%d segons
+un minut
+%d minuts
+una hora
+%d hores
+un dia
+%d dies
+un mes
+%d mesos
+un any
+%d anys
+pár sekund
+pár sekundami
+dddd D. MMMM YYYY H:mm
+D. M. YYYY
+před %s
+DD-MM-YYYY
+%s каялла
+пӗр-ик ҫеккунт
+%d ҫеккунт
+пӗр минут
+%d минут
+пӗр сехет
+%d сехет
+пӗр кун
+%d кун
+пӗр уйӑх
+%d уйӑх
+пӗр ҫул
+%d ҫул
+Ionawr_Chwefror_Mawrth_Ebrill_Mai_Mehefin_Gorffennaf_Awst_Medi_Hydref_Tachwedd_Rhagfyr
+Ion_Chwe_Maw_Ebr_Mai_Meh_Gor_Aws_Med_Hyd_Tach_Rhag
+Dydd Sul_Dydd Llun_Dydd Mawrth_Dydd Mercher_Dydd Iau_Dydd Gwener_Dydd Sadwrn
+Sul_Llun_Maw_Mer_Iau_Gwe_Sad
+Su_Ll_Ma_Me_Ia_Gw_Sa
+mewn %s
+%s yn ôl
+ychydig eiliadau
+%d eiliad
+%d munud
+%d awr
+%d diwrnod
+%d mis
+%d flynedd
+D. MMMM YYYY HH:mm
+om %s
+%s siden
+få sekunder
+%d sekunder
+et minut
+%d minutter
+en time
+%d timer
+en dag
+%d dage
+en måned
+%d måneder
+et år
+%d år
+eine Minute
+einer Minute
+eine Stunde
+einer Stunde
+ein Tag
+einem Tag
+Tage
+Tagen
+eine Woche
+einer Woche
+ein Monat
+einem Monat
+Monate
+Monaten
+ein Jahr
+einem Jahr
+Jahre
+Jahren
+Jänner_Februar_März_April_Mai_Juni_Juli_August_September_Oktober_November_Dezember
+Jän._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.
+Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag
+So._Mo._Di._Mi._Do._Fr._Sa.
+So_Mo_Di_Mi_Do_Fr_Sa
+dddd, D. MMMM YYYY HH:mm
+in %s
+vor %s
+ein paar Sekunden
+%d Sekunden
+%d Minuten
+%d Stunden
+%d Wochen
+Januar_Februar_März_April_Mai_Juni_Juli_August_September_Oktober_November_Dezember
+Jan._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.
+D/M/YYYY
+dddd LT
+ތެރޭގައި %s
+ކުރިން %s
+d% ސިކުންތު
+މިނިޓު %d
+ގަޑިއިރު %d
+ދުވަސް %d
+މަސް %d
+އަހަރު %d
+Ιανουάριος_Φεβρουάριος_Μάρτιος_Απρίλιος_Μάιος_Ιούνιος_Ιούλιος_Αύγουστος_Σεπτέμβριος_Οκτώβριος_Νοέμβριος_Δεκέμβριος
+Ιανουαρίου_Φεβρουαρίου_Μαρτίου_Απριλίου_Μαΐου_Ιουνίου_Ιουλίου_Αυγούστου_Σεπτεμβρίου_Οκτωβρίου_Νοεμβρίου_Δεκεμβρίου
+MMMM
+Ιαν_Φεβ_Μαρ_Απρ_Μαϊ_Ιουν_Ιουλ_Αυγ_Σεπ_Οκτ_Νοε_Δεκ
+Κυριακή_Δευτέρα_Τρίτη_Τετάρτη_Πέμπτη_Παρασκευή_Σάββατο
+Κυρ_Δευ_Τρι_Τετ_Πεμ_Παρ_Σαβ
+Κυ_Δε_Τρ_Τε_Πε_Πα_Σα
+h:mm A
+h:mm:ss A
+D MMMM YYYY h:mm A
+dddd, D MMMM YYYY h:mm A
+σε %s
+%s πριν
+λίγα δευτερόλεπτα
+%d δευτερόλεπτα
+ένα λεπτό
+%d λεπτά
+μία ώρα
+%d ώρες
+μία μέρα
+%d μέρες
+ένας μήνας
+%d μήνες
+ένας χρόνος
+%d χρόνια
+January_February_March_April_May_June_July_August_September_October_November_December
+Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec
+Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday
+Sun_Mon_Tue_Wed_Thu_Fri_Sat
+Su_Mo_Tu_We_Th_Fr_Sa
+%s ago
+a few seconds
+%d seconds
+a minute
+%d minutes
+an hour
+%d hours
+a day
+%d days
+a month
+%d months
+a year
+%d years
+YYYY-MM-DD
+MMMM D, YYYY
+MMMM D, YYYY h:mm A
+dddd, MMMM D, YYYY h:mm A
+P.T.M.
+A.T.M.
+post %s
+antaŭ %s
+kelkaj sekundoj
+%d sekundoj
+unu minuto
+%d minutoj
+unu horo
+%d horoj
+unu tago
+%d tagoj
+unu monato
+%d monatoj
+unu jaro
+%d jaroj
+en %s
+hace %s
+unos segundos
+%d segundos
+un minuto
+%d minutos
+%d horas
+un día
+%d días
+una semana
+%d semanas
+%d meses
+un año
+%d años
+Fecha inválida
+MM/DD/YYYY
+mõne sekundi
+mõni sekund
+paar sekundit
+ühe minuti
+üks minut
+ühe tunni
+tund aega
+üks tund
+ühe päeva
+üks päev
+kuu aja
+kuu aega
+üks kuu
+ühe aasta
+üks aasta
+P_E_T_K_N_R_L
+%s pärast
+%s tagasi
+%d päeva
+YYYY-M-D
+%s barru
+duela %s
+segundo batzuk
+%d segundo
+minutu bat
+%d minutu
+ordu bat
+%d ordu
+egun bat
+%d egun
+hilabete bat
+%d hilabete
+urte bat
+%d urte
+قبل از ظهر
+بعد از ظهر
+در %s
+%s پیش
+چند ثانیه
+%d ثانیه
+یک دقیقه
+%d دقیقه
+یک ساعت
+%d ساعت
+یک روز
+%d روز
+یک ماه
+%d ماه
+یک سال
+%d سال
+nolla yksi kaksi kolme neljä viisi kuusi seitsemän kahdeksan yhdeksän
+muutaman sekunnin
+muutama sekunti
+HH.mm
+HH.mm.ss
+D.M.YYYY
+Do MMM YYYY
+%s päästä
+%s sitten
+Enero_Pebrero_Marso_Abril_Mayo_Hunyo_Hulyo_Agosto_Setyembre_Oktubre_Nobyembre_Disyembre
+Ene_Peb_Mar_Abr_May_Hun_Hul_Ago_Set_Okt_Nob_Dis
+Linggo_Lunes_Martes_Miyerkules_Huwebes_Biyernes_Sabado
+Lin_Lun_Mar_Miy_Huw_Biy_Sab
+Li_Lu_Ma_Mi_Hu_Bi_Sab
+MM/D/YYYY
+MMMM D, YYYY HH:mm
+dddd, MMMM DD, YYYY HH:mm
+sa loob ng %s
+%s ang nakalipas
+ilang segundo
+isang minuto
+%d minuto
+isang oras
+%d oras
+isang araw
+%d araw
+isang buwan
+%d buwan
+isang taon
+%d taon
+dddd D. MMMM, YYYY HH:mm
+um %s
+%s síðani
+fá sekund
+%d sekundir
+ein minuttur
+%d minuttir
+ein tími
+%d tímar
+ein dagur
+%d dagar
+ein mánaður
+%d mánaðir
+eitt ár
+%d ár
+dans %s
+il y a %s
+quelques secondes
+%d secondes
+une minute
+une heure
+%d heures
+un jour
+%d jours
+un mois
+%d mois
+un an
+%d ans
+une semaine
+%d semaines
+Si_Mo_Ti_Wo_To_Fr_So
+oer %s
+%s lyn
+in pear sekonden
+%d sekonden
+ien minút
+%d minuten
+ien oere
+%d oeren
+ien dei
+%d dagen
+ien moanne
+%d moannen
+ien jier
+%d jierren
+Eanáir
+Feabhra
+Márta
+Aibreán
+Bealtaine
+Meitheamh
+Iúil
+Lúnasa
+Meán Fómhair
+Deireadh Fómhair
+Samhain
+Nollaig
+Feabh
+Márt
+Beal
+Meith
+M.F.
+D.F.
+Samh
+Noll
+Dé Domhnaigh
+Dé Luain
+Dé Máirt
+Dé Céadaoin
+Déardaoin
+Dé hAoine
+Dé Sathairn
+Domh
+Luan
+Máirt
+Céad
+Déar
+Aoine
+Sath
+i %s
+%s ó shin
+cúpla soicind
+%d soicind
+%d nóiméad
+uair an chloig
+%d uair an chloig
+%d lá
+%d míonna
+%d bliain
+Am Faoilleach
+An Gearran
+Am Màrt
+An Giblean
+An Cèitean
+An t-Ògmhios
+An t-Iuchar
+An Lùnastal
+An t-Sultain
+An Dàmhair
+An t-Samhain
+An Dùbhlachd
+Faoi
+Gear
+Màrt
+Gibl
+Cèit
+Ògmh
+Iuch
+Sult
+Dàmh
+Dùbh
+Didòmhnaich
+Diluain
+Dimàirt
+Diciadain
+Diardaoin
+Dihaoine
+Disathairne
+ann an %s
+bho chionn %s
+beagan diogan
+%d diogan
+%d mionaidean
+%d uairean
+%d latha
+%d mìosan
+%d bliadhna
+hai %s
+uns segundos
+unha hora
+un ano
+%d anos
+थोडया सॅकंडांनी
+थोडे सॅकंड
+एका मिणटान
+एक मिनूट
+एका वरान
+एक वर
+एका दिसान
+एक दीस
+एका म्हयन्यान
+एक म्हयनो
+एका वर्सान
+एक वर्स
+%s आदीं
+thoddea sekondamni
+thodde sekond
+eka mintan
+ek minut
+eka voran
+ek vor
+eka disan
+ek dis
+eka mhoinean
+ek mhoino
+eka vorsan
+ek voros
+Janer_Febrer_Mars_Abril_Mai_Jun_Julai_Agost_Setembr_Otubr_Novembr_Dezembr
+Janerachea_Febrerachea_Marsachea_Abrilachea_Maiachea_Junachea_Julaiachea_Agostachea_Setembrachea_Otubrachea_Novembrachea_Dezembrachea
+Jan._Feb._Mars_Abr._Mai_Jun_Jul._Ago._Set._Otu._Nov._Dez.
+Aitar_Somar_Mongllar_Budhvar_Birestar_Sukrar_Son'var
+Ait._Som._Mon._Bud._Bre._Suk._Son.
+Ai_Sm_Mo_Bu_Br_Su_Sn
+%s adim
+A h:mm વાગ્યે
+A h:mm:ss વાગ્યે
+D MMMM YYYY, A h:mm વાગ્યે
+dddd, D MMMM YYYY, A h:mm વાગ્યે
+%s મા
+%s પહેલા
+અમુક પળો
+%d સેકંડ
+એક મિનિટ
+%d મિનિટ
+એક કલાક
+%d કલાક
+એક દિવસ
+%d દિવસ
+એક મહિનો
+%d મહિનો
+એક વર્ષ
+%d વર્ષ
+D MMM YYYY HH:mm
+ddd, D MMM YYYY HH:mm
+בעוד %s
+לפני %s
+מספר שניות
+%d שניות
+%d דקות
+לפני הצהריים
+:return t?
+:return a?
+:return t(e)?a?r+
+:return e+
+:return e+(t?
+:return n+(s(e)?
+:return s+
+):j(Date.prototype.toISOString)?t?this.toDate().toISOString():new Date(this.valueOf()+60*this.utcOffset()*1e3).toISOString().replace(
+YYYY
+YYYYYY
+
+########## 6066.1799a8e7.js ##########
+DELETE
+PATCH
+ArticleImageUploader
+POST
+Failed to delete image
+Drag & Drop your image
+EDIT ARTICLE
+Add your Article Details
+Heading
+Description
+Upload article image
+Loading...
+EditArticleView
+Article heading is required
+Article description is required
+Article content is required
+Image is required
+Success
+Article updated successfully
+Failed
+Enter Heading
+Enter article description
+SUBMIT
+
+########## 6176.f0b65369.js ##########
+Other Services
+overlay z-depth-1 mb-3
+font-weight-bold dark-grey-text
+ViewServiceView
+Date:
+dark-grey-text text-start
+ASK FOR DESIGN SERVICE
+Contact Us
+CONTACT DETAILS
+col d-flex align-items-start
+E-Mail:
+col d-flex align-items-start mt-2
+Tel:
++255 (0) 746 624 875
+GET IN TOUCH WITH US
+Your name
+Email
+Message
+Please check the box if you need to receive copy of your message
+ContactUs
+Name is required
+Email is required
+Email not valid
+Message is required
+Failed to send message
+Thank you for getting in touch with Bafredo electronics
+Submit another message
+Send Message
+
+########## 6499.0f99d690.js ##########
+ConfirmationModel
+Cancel
+Bafredo electronics
+auth-header text-center bg-success text-white py-3
+Loading...
+CreateCategoryModal
+Name is required
+SKU is required
+SKU should only contain digits
+Category is required
+Success
+Created New Category
+Failed
+Category edited
+Editing failed
+CATEGORY
+Category
+CREATE
+EDIT
+PRODUCT CATEGORIES
+h3 my-5
+Category Name
+Created
+Subcategories
+Actions
+CategoriesView
+Categories Deleted
+Category Deleted
+Search
+New Category
+Delete Categories
+EDIT CATEGORY
+CREATE CATEGORY
+All the subcategories and products within the selected categories will also be deleted. Are you sure you want to delete the selected categories
+All the subcategories and products within the selected category will also be deleted. Are you sure you want to delete this category?
+Confirm
+
+########## 6506.5cefa2bd.js ##########
+ServiceImageUploader
+POST
+DELETE
+Failed to delete image
+Drag & Drop your image
+EDIT SERVICE
+Add your Service Details
+Heading
+Upload service image
+Loading...
+EditServiceView
+Service heading is required
+Service content is required
+Image is required
+Success
+Service updated successfully
+Failed
+Enter Heading
+SUBMIT
+
+########## 6601.de98f1ed.js ##########
+ASK FOR DESIGN SERVICE
+Contact Us
+CONTACT DETAILS
+col d-flex align-items-start
+E-Mail:
+col d-flex align-items-start mt-2
+Tel:
++255 (0) 746 624 875
+GET IN TOUCH WITH US
+Your name
+Email
+Message
+Please check the box if you need to receive copy of your message
+ContactUs
+Name is required
+Email is required
+Email not valid
+Message is required
+Failed to send message
+Thank you for getting in touch with Bafredo electronics
+Submit another message
+Send Message
+
+########## 7239.8d331768.js ##########
+DELETE
+PATCH
+ConfirmationModel
+Cancel
+Bafredo electronics
+auth-header text-center bg-success text-white py-3
+Check the box if this shipping method requires client to provide shipping details.
+Check the box if this shipping method can receive mobile payments.
+Loading...
+CreateShippingMethodModal
+Shipping method is required
+Shipping cost is required
+Description is required
+Please enter a valid shipping cost
+Success
+Created new shipping method
+Failed
+Successfully edited shipping method
+Editing failed
+SHIPPING METHOD
+SHIPPING COST
+DESCRIPTION
+CREATE
+EDIT
+SHIPPING METHODS
+h3 my-5
+Shipping Method
+Shipping Cost
+Description
+Actions
+ShippingMethodsView
+Shipping Method Deleted
+Search
+Create Shipping Method
+EDIT SHIPPING METHOD
+CREATE SHIPPING METHOD
+Are you sure you want to delete this shipping method?
+Confirm
+
+########## 7286.99ce6727.js ##########
+Mpesa Lipa Namba QR Code
+Lipa Namba
+Cash
+PaymentMethodsCard
+
+########## 7454.6116cbe0.js ##########
+ORDERS MADE
+No orders
+Order
+h3 my-5
+Customer Name
+Price
+Date
+Status
+OrdersView
+Search
+All Orders
+Completed
+Pending
+Cancelled
+, ...
+
+########## 7472.0ab8a538.js ##########
+BreadCrumb
+Sort by:
+Bafredo electronics
+MIN PRICE
+MAX PRICE
+Loading...
+ProductsView
+Products
+Best Selling
+New Arrivals
+Price
+No products found
+No products found in the selected category
+Apply
+display-1 fw-bold
+Opps!
+Page not found
+The page you’re looking for doesn’t exist.
+Go Home
+
+########## 7556.8017c36f.js ##########
+ConfirmationModel
+Cancel
+PaginationCopy
+BANNERS
+h3 my-5
+Title
+Created
+Loading...
+BannerView
+Success
+Banner Deleted
+Failed
+Search
+New Banner
+Are you sure you want to delete this Banner?
+Confirm
+
+########## 7689.b60feb48.js ##########
+BaseColumn
+Column
+CONTACTS
+ContactsView
+Keyword Search
+No contacts found.
+Username
+Email
+Phone
+Joined At
+
+########## 7739.a6b1e177.js ##########
+ImageUploader
+POST
+DELETE
+Failed to delete image
+Add specifications to your product here. (Skip this step if product does not have any special specifications)
+Add Attributes
+Price
+Stock
+h3 bg-light-grey
+Values
+EditAttributesSection
+Attribute Name
+Delete Table
+h3 text-center
+Add New Values
+EDIT YOUR PRODUCT
+Subcategory
+Product Name
+Description of the Product
+Photos
+Edit product specifications
+Available Stock
+Loading...
+EditProductView
+SubCategory is required
+Product name is required
+Description is required
+Image is required
+Success
+Product Edited Successfully
+Failed
+Select one
+Enter Product Name
+Enter price
+Submit
+
+########## 7797.bc089646.js ##########
+ArrowDownIcon
+0 0 14 14
+ArrowUpIcon
+AngleDoubleLeftIcon
+ChevronDownIcon
+FilterIcon
+TimesIcon
+Portal
+BaseVirtualScroller
+@@toPrimitive must return a primitive value.
+VirtualScroller
+px, 0)
+SpinnerIcon
+BaseDropdown
+Object
+Arguments
+Dropdown
+ArrowDown
+ArrowUp
+ArrowLeft
+ArrowRight
+Delete
+Home
+PageDown
+PageUp
+Space
+Enter
+NumpadEnter
+Escape
+Backspace
+ShiftLeft
+ShiftRight
+INPUT
+AngleDownIcon
+AngleUpIcon
+BaseInputNumber
+InputNumber
+Text
+INInputText
+INButton
+AngleDoubleRightIcon
+AngleRightIcon
+AngleLeftIcon
+BasePaginator
+FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown
+CurrentPageReport
+Paginator
+FirstPageLink
+JumpToPageDropdown
+JTPDropdown
+JumpToPageInput
+JTPInput
+LastPageLink
+NextPageLink
+PageLinks
+PrevPageLink
+RowsPerPageDropdown
+RPPDropdown
+and (min-width:
+\n                            @media screen
+and (max-width:
+ChevronRightIcon
+BarsIcon
+CheckIcon
+PencilIcon
+FilterSlashIcon
+PlusIcon
+TrashIcon
+SortAltIcon
+SortAmountDownIcon
+SortAmountUpAltIcon
+BaseDataTable
+RowCheckbox
+DataTable
+RowRadioButton
+BodyCell
+DTRadioButton
+DTCheckbox
+TableBody
+DTBodyCell
+FooterCell
+TableFooter
+Column
+DTFooterCell
+ColumnFilter
+CFDropdown
+CFButton
+HeaderCheckbox
+HeaderCell
+DTHeaderCheckbox
+DTColumnFilter
+TableHeader
+DTHeaderCell
+KeyA
+
+########## 806.1f0f5911.js ##########
+ImageUploader
+POST
+DELETE
+Failed to delete image
+Add specifications to your product here. (Skip this step if product does not have any special specifications)
+Add Attributes
+Price
+Stock
+h3 bg-light-grey
+Values
+CreateAttributesSectionCopy
+Attribute Name
+Delete Table
+h3 text-center
+Add New Values
+CREATE YOUR PRODUCT
+Subcategory
+Product Name
+Description of the Product
+Photos
+Available Stock
+Loading...
+CreateProductView
+Subcategory is required
+Product name is required
+Description is required
+Image is required
+Success
+Product Added Successfully
+Failed
+Select one
+Enter Product Name
+Enter Stock
+Enter price
+Submit
+
+########## 8082.53033035.js ##########
+ForgotPasswordView
+
+########## 812.26b27b6e.js ##########
+BaseChart
+Chart
+@@toPrimitive must return a primitive value.
+BEST SELLING
+No products to diplay
+BestSellingProducts
+Bafredo electronics
+Customer Details
+small fw-bold mb-1 text-uppercase
+h5 mt-3
+CustomerCountModal
+auth-header text-center py-3
+Not Specifed
+Undetermined
+ANALYTICS
+small fw-bold mb-1 d-flex justify-content-between align-items-center text-white
+h5 mt-3 d-flex justify-content-between align-items-center text-white
+small fw-bold mb-1
+CUSTOMERS
+Last 30 days
+January
+February
+March
+April
+June
+July
+August
+September
+October
+November
+December
+Sales
+rgb(36 99 68)
+Orders
+Sunday
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Sarturday
+Last 7 days
+Week 1
+Week 2
+Week 3
+Week 4
+Last 12 months
+ORDERS (
+Last 12 Months
+Last 7 Days
+Last 30 Days
+SALES (
+Orders Analytics
+Sales Analytics
+
+########## 8243.f843222e.js ##########
+ORDERS MADE
+No orders
+Order
+h3 my-5
+Customer Name
+Price
+Date
+Status
+OrdersView
+Search
+All Orders
+Completed
+Pending
+Cancelled
+, ...
+
+########## 8270.022af5e1.js ##########
+auth-header text-center bg-success text-white py-3
+Close
+PREVIEW MODAL
+xl-font mb-lg-3
+PreviewBannerModal
+CREATE BANNER
+Title
+Title Color
+Subtitle
+Subtitle Color
+Link
+Background
+Image
+Upload Image
+Button Text
+Button Background
+Button Text Color
+Loading...
+CreateBannerView
+Banner title is required
+An image is required
+Success
+Created New Banner
+Failed
+Enter Title
+Choose your background color
+Enter Subtitle
+Where does the banner redirect to
+Enter Button text
+Preview
+CREATE
+
+########## 8293.e21296ed.js ##########
+rgba(255, 255, 255, 0.75)
+'Helvetica Neue', 'Helvetica', 'Arial', sans-serif
+Object
+Recursion detected:
+This method is not implemented: Check that a complete date adapter is provided.
+AxisID
+class does not have id:
+Canvas is already in use. Chart with ID '
+' must be destroyed before the canvas with ID '
+' can be reused.
+Failed to create chart: can't acquire context from the given item
+DatasetHoverStyle
+HoverStyle
+No dataset found at index
+rgb(54, 162, 235)
+rgb(255, 99, 132)
+rgb(255, 159, 64)
+rgb(255, 205, 86)
+rgb(75, 192, 192)
+rgb(153, 102, 255)
+rgb(201, 203, 207)
+, 0.5)
+Cannot find a dataset at index
+are too far apart with stepSize of
+
+########## 8354.eb9b8d15.js ##########
+SET_ATTRIBUTE_TO_OPTION_MAP
+ALLOW_HOPPER_ITEM
+GET_ALLOW_FILE_TYPE_VALIDATION
+GET_ACCEPTED_FILE_TYPES
+LOAD_FILE
+GET_FILE_VALIDATE_TYPE_DETECT_TYPE
+GET_FILE_VALIDATE_TYPE_LABEL_EXPECTED_TYPES_MAP
+GET_LABEL_FILE_TYPE_NOT_ALLOWED
+GET_FILE_VALIDATE_TYPE_LABEL_EXPECTED_TYPES
+File is of invalid type
+FilePond:pluginloaded
+Invalid attempt to destructure non-iterable instance
+xMidYMid meet
+xMidYMid slice
+GET_IMAGE_PREVIEW_MARKUP_FILTER
+GET_IMAGE_PREVIEW_TRANSPARENCY_INDICATOR
+GET_IMAGE_PREVIEW_HEIGHT
+GET_IMAGE_PREVIEW_MIN_HEIGHT
+GET_IMAGE_PREVIEW_MAX_HEIGHT
+GET_PANEL_ASPECT_RATIO
+GET_ALLOW_MULTIPLE
+0 0 500 200
+Anonymous
+GET_ITEM
+GET_IMAGE_TRANSFORM_CANVAS_BACKGROUND_COLOR
+GET_IMAGE_PREVIEW_MARKUP_SHOW
+DID_IMAGE_PREVIEW_SHOW
+DID_IMAGE_PREVIEW_CALCULATE_SIZE
+GET_IMAGE_PREVIEW_ZOOM_FACTOR
+GET_IMAGE_PREVIEW_CALCULATE_AVERAGE_IMAGE_COLOR
+CREATE_VIEW
+GET_ALLOW_IMAGE_PREVIEW
+GET_IMAGE_PREVIEW_FILTER_ITEM
+GET_IMAGE_PREVIEW_MAX_FILE_SIZE
+DID_UPDATE_PANEL_HEIGHT
+GET_IMAGE_PREVIEW_MAX_INSTANT_PREVIEW_FILE_SIZE
+DID_IMAGE_PREVIEW_CONTAINER_CREATE
+GET_ITEM_PANEL_ASPECT_RATIO
+GET_IMAGE_PREVIEW_UPSCALE
+KICK
+DID_FINISH_CALCULATE_PREVIEWSIZE
+px, 0)
+, 1)
+POST
+PATCH
+DELETE
+SET_
+DID_SET_
+GET_
+Invalid attempt to spread non-iterable instance
+Field contains invalid files
+Waiting for size
+Size not available
+file in list
+files in list
+Loading
+Added
+Error during load
+Removed
+Error during remove
+Uploading
+Upload complete
+Upload cancelled
+Error during upload
+Error during revert
+tap to cancel
+tap to retry
+tap to undo
+Remove
+Abort
+Retry
+Cancel
+Undo
+Upload
+0 0 26 26
+M18.293 9.293a1 1 0 0 1 1.414 1.414l-7.002 7a1 1 0 0 1-1.414 0l-3.998-4a1 1 0 1 1 1.414-1.414L12 15.586l6.294-6.293z
+Powered by PQINA
+hello world
+This_Works.txt
+GET_LABEL_FILE_SIZE_BYTES
+GET_LABEL_FILE_SIZE_KILOBYTES
+GET_LABEL_FILE_SIZE_MEGABYTES
+GET_LABEL_FILE_SIZE_GIGABYTES
+Can't load URL
+Timeout
+HEAD
+Upload-Offset
+Upload-Length
+Content-Type
+Upload-Name
+DID_UPDATE_ITEMS
+Item not found
+REMOVE_ITEM
+ADD_ITEM
+IS_ASYNC
+DID_LOAD_ITEM
+REQUEST_ITEM_PROCESSING
+GET_FORCE_REVERT
+SHOULD_PREPARE_OUTPUT
+GET_BEFORE_PREPARE_FILE
+REQUEST_PREPARE_OUTPUT
+DID_PREPARE_OUTPUT
+DID_SORT_ITEMS
+GET_ACTIVE_ITEMS
+GET_ITEM_INSERT_LOCATION
+GET_TOTAL_ITEMS
+GET_IGNORED_FILES
+No source
+Max files
+DID_THROW_MAX_FILES
+DID_CREATE_ITEM
+DID_INIT_ITEM
+DID_START_ITEM_LOAD
+DID_UPDATE_ITEM_META
+DID_UPDATE_ITEM_LOAD_PROGRESS
+DID_THROW_ITEM_INVALID
+DID_THROW_ITEM_LOAD_ERROR
+COMPLETE_LOAD_ITEM
+DID_UPDATE_ITEM_METADATA
+GET_BEFORE_ADD_FILE
+DID_START_ITEM_PROCESSING
+DID_UPDATE_ITEM_PROCESS_PROGRESS
+DID_THROW_ITEM_PROCESSING_ERROR
+DID_THROW_ITEM_PROCESSING_REVERT_ERROR
+DID_COMPLETE_ITEM_PROCESSING
+DID_DEFINE_VALUE
+DID_ABORT_ITEM_PROCESSING
+DID_REVERT_ITEM_PROCESSING
+DID_ADD_ITEM
+PREPARE_OUTPUT
+COMPLETE_PREPARE_OUTPUT
+DID_LOAD_LOCAL_ITEM
+DID_REQUEST_ITEM_PROCESSING
+PROCESS_ITEM
+GET_MAX_PARALLEL_UPLOADS
+GET_ITEMS_BY_STATUS
+DID_COMPLETE_ITEM_PROCESSING_ALL
+GET_ALLOW_MINIMUM_UPLOAD_DURATION
+GET_BEFORE_REMOVE_FILE
+DID_REMOVE_ITEM
+DID_START_ITEM_REMOVE
+DID_THROW_ITEM_REMOVE_ERROR
+REVERT_ITEM_PROCESSING
+GET_DISABLED
+GET_LABEL_FILE_WAITING_FOR_SIZE
+GET_ITEM_NAME
+GET_ITEM_SIZE
+GET_FILE_SIZE_BASE
+GET_FILE_SIZE_LABELS
+GET_LABEL_FILE_SIZE_NOT_AVAILABLE
+GET_LABEL_FILE_LOADING
+GET_LABEL_TAP_TO_CANCEL
+GET_LABEL_FILE_PROCESSING
+GET_LABEL_FILE_PROCESSING_ABORTED
+GET_LABEL_TAP_TO_RETRY
+GET_LABEL_FILE_PROCESSING_COMPLETE
+GET_LABEL_TAP_TO_UNDO
+GET_LABEL_BUTTON_ABORT_ITEM_LOAD
+ABORT_ITEM_LOAD
+LOAD_INDICATOR_POSITION
+GET_LABEL_BUTTON_RETRY_ITEM_LOAD
+RETRY_ITEM_LOAD
+GET_ICON_RETRY
+BUTTON_PROCESS_ITEM_POSITION
+GET_LABEL_BUTTON_REMOVE_ITEM
+REQUEST_REMOVE_ITEM
+GET_ICON_REMOVE
+BUTTON_REMOVE_ITEM_POSITION
+GET_LABEL_BUTTON_PROCESS_ITEM
+GET_ICON_PROCESS
+GET_LABEL_BUTTON_ABORT_ITEM_PROCESSING
+ABORT_ITEM_PROCESSING
+GET_LABEL_BUTTON_RETRY_ITEM_PROCESSING
+RETRY_ITEM_PROCESSING
+GET_LABEL_BUTTON_UNDO_ITEM_PROCESSING
+REQUEST_REVERT_ITEM_PROCESSING
+GET_ICON_UNDO
+GET_STYLE_LOAD_INDICATOR_POSITION
+GET_STYLE_PROGRESS_INDICATOR_POSITION
+GET_STYLE_BUTTON_REMOVE_ITEM_POSITION
+GET_ICON_DONE
+GET_ALLOW_REVERT
+GET_ALLOW_REMOVE
+GET_ALLOW_PROCESS
+GET_INSTANT_UPLOAD
+GET_STYLE_BUTTON_REMOVE_ITEM_ALIGN
+RevertItemProcessing
+RemoveItem
+GET_STYLE_
+GET_STYLE_BUTTON_PROCESS_ITEM_POSITION
+busy processing
+DID_ACTIVATE_ITEM
+GET_ALLOW_REORDER
+DID_GRAB_ITEM
+DID_DRAG_ITEM
+DID_DROP_ITEM
+RELEASE_ITEM
+GET_ITEM_INSERT_INTERVAL
+MOVE_ITEM
+DID_REORDER_ITEMS
+GET_ITEM_INSERT_LOCATION_FREEDOM
+GET_NAME
+GET_ALLOW_DIRECTORIES_ONLY
+GET_REQUIRED
+GET_CAPTURE_METHOD
+GET_ALLOW_SYNC_ACCEPT_ATTRIBUTE
+GET_ALLOW_BROWSE
+GET_CHECK_VALIDITY
+GET_LABEL_INVALID_FIELD
+SHOULD_UPDATE_FILE_INPUT
+GET_LABEL_FILE_COUNT_SINGULAR
+GET_LABEL_FILE_COUNT_PLURAL
+GET_LABEL_FILE_ADDED
+GET_LABEL_FILE_REMOVED
+GET_ID
+GET_CLASS_NAME
+GET_LABEL_IDLE
+GET_STYLES
+DID_RESIZE_ROOT
+(pointer: fine) and (hover: hover)
+PointerEvent
+GET_CREDITS
+noopener noreferrer
+GET_MAX_FILES
+GET_ALLOW_REPLACE
+GET_ALLOW_DROP
+GET_BEFORE_DROP_FILE
+GET_DROP_VALIDATION
+GET_DROP_ON_PAGE
+GET_DROP_ON_ELEMENT
+ADD_ITEMS
+DID_DROP
+DID_END_DRAG
+DID_START_DRAG
+DID_DRAG
+GET_ALLOW_PASTE
+SET_OPTIONS
+DID_STOP_RESIZE
+DID_START_RESIZE
+GET_ITEMS
+FilePond:
+GET_ON
+GET_ACTIVE_ITEM
+REQUEST_ITEM_PREPARE
+SORT
+ABORT_ALL
+DID_DESTROY
+GET_STATUS
+DID_INIT
+FIELDSET
+Promise
+FilePond:loaded
+DOMContentLoaded
+FilePond
+
+########## 8416.1fa2a709.js ##########
+PartnerCard
+Success
+Service Deleted
+Failed
+PARTNERS
+NO PARTNERS
+PartnersView
+New Partner
+
+########## 8527.2f2eca8f.js ##########
+ConfirmationModel
+Cancel
+Bafredo electronics
+auth-header text-center bg-success text-white py-3
+Loading...
+CreateSubcategoryModal
+Name is required
+SKU is required
+SKU should only contain digits
+Category is required
+Sub-category is required
+Success
+Successfully Created Subcategory
+Failed
+Sub Category edited
+Editing failed
+CATEGORY
+Select one
+SUB-CATEGORY NAME
+Subcategory
+SKU (4 digits)
+SKU (2 digits)
+CREATE
+EDIT
+PRODUCT SUBCATEGORIES
+h3 my-5
+Sub-category Name
+Category
+Number Of Products
+Actions
+SubcategoriesView
+Subcategories Deleted
+Sub-Category Deleted
+Search
+New Subcategory
+Delete Subcategories
+EDIT SUB-CATEGORY
+CREATE SUB-CATEGORY
+All the products within the selected subcategories will also be deleted. Are you sure you want to delete the selected subcategories
+All the products within this subcategory will also be deleted. Are you sure you want to delete this subcategory?
+Confirm
+
+########## 8577.3c176375.js ##########
+DELETE
+PATCH
+Profile image
+CommentCard
+Loading...
+Cancel
+CommentSection
+Comment body is required
+Success
+Thank you for your comment
+Failed
+Please create an account or login to comment
+Write something here
+Post comment
+Post Comment
+Latest Articles
+overlay z-depth-1 mb-3
+font-weight-bold dark-grey-text
+ViewBlogView
+img-fluid rounded
+Date:
+dark-grey-text text-start
+
+########## 8789.b90f6f8b.js ##########
+ConfirmationModel
+Cancel
+CLIENT DETAILS
+SHIPPING METHOD
+ESTIMATED COST
+SHIPPING DETAILS
+Your Order
+Status:
+Select
+Sub Total:
+Shipping Cost:
+TOTAL
+line mt-2
+Loading...
+SingleOrderView
+Payment status
+DELETE
+Order cancelled
+Order cancelled successfully
+Failed to cancel order
+PATCH
+Client:
+Anonymous
+Email:
+Not specified
+Phone:
+Receiver's name:
+Country:
+City/Town:
+Street Address:
+Postal Code:
+Quantity:
+Order again
+Print Invoice
+Cancel order
+Are you sure you want to proceed with this action?
+Confirm
+
+########## 894.fa392e0c.js ##########
+Loading...
+SearchProductView
+
+########## 8992.288fa8b6.js ##########
+ConfirmationModel
+Cancel
+Bafredo electronics
+auth-header text-center py-3
+Discount (%)
+Discount Start Date
+Discount End Date
+Loading...
+DiscountModal
+PATCH
+Discount
+Submit
+PRODUCTS
+h3 my-5
+Name
+h3 d-none d-md-table-cell
+Subcategory
+Price
+Actions
+No Products found
+AdminProductsView
+Success
+Products Deleted
+Failed
+Product Deleted
+Search
+Delete
+Are you sure you want to delete the selected products
+Are you sure you want to delete this product?
+Confirm
+ProductsView
+
+########## 9118.03c33d1d.js ##########
+PATCH
+Attempt to bind popup before bindPopup method available on layer.
+Attempt to bind tooltip before bindTooltip method available on layer.
+Symbol(Comment)
+Symbol(Text)
+LTooltip
+LPopup
+LMarker
+MapComponent
+OpenStreetMap
+banner-breadcum section mb-4
+Our Story
+jumbotron text-center
+About Us
+Vision
+To be a leading Local and international trading and manufacturing Company of electronic components and systems
+To be a leading Company in undertaking groundbreaking research in electronics, with a focus in addressing potential local and international problems
+Mission
+To grow together with customers exponentially by developing cost-effective, innovative, and creative solutions that simplify and improve human lives
+Core values
+Integrity
+Commitment
+Open-mindedness
+Quality
+AboutUs
+Read Less
+Read More
+Home
+FAQ's
+lead fw-normal mb-4 text-start
+
+########## 9370.deeb906e.js ##########
+toast-body bg-white mt-3 mx-3 mb-2
+Loading...
+ValidateEmailToast
+Please validate your email
+Email verification link sent
+Validate now
+Account Settings
+profile-tab-nav border-right
+img-circle text-center mb-3
+fa fa-home text-center mr-1
+fa fa-user text-center mr-1
+fa fa-key text-center mr-1
+tab-content p-4 p-md-5
+tab-pane fade show active
+ACCOUNT SETTINGS
+Select profile picture
+Preview
+Region
+District
+SHIPPING DETAILS
+Password Settings
+ProfileView
+Tanzania
+Email is required
+Enter a valid Email
+Username is required
+Phone is required
+Phone must be a number
+Phone number must be 12 characters long
+Receiver's name is required
+Region is required
+District is required
+Street Address is required
+Details updated
+Successfully updated shipping details
+Failed to upload image
+Successfully updated user account
+Failed to update details
+Profile image
+Account
+Shipping Address
+Change Password
+Upload image
+Email
+Username
+Phone Number (255655XXXXXX)
+Street Address
+Postal Code/ Zip Code
+Update
+Receiver's Name
+Details similar to my address
+Change password
+
+########## 949.cce20117.js ##########
+Loading...
+OAuthRedirect
+Token Not found
+Success
+Successfully signed in
+Failed to sign in
+
+########## 9585.77949cb1.js ##########
+DELETE
+PATCH
+SHIPPING METHOD
+ESTIMATED COST
+ShippingMethodsCard
+Getting your order
+line my-2
+CLIENT DETAILS
+Username
+Phone
+SHIPPING DETAILS
+Region
+District
+PAYMENT METHODS
+Payment Number(E.g 255655XXXXXX)
+Delegate payment to a friend.
+Enter your friend's email
+Your Order
+Loading...
+Sub Total:
+Shipping Cost:
+TOTAL
+line mt-2
+CheckoutView
+Username is required
+Phone is required
+Phone must be a number
+Phone number must be 12 characters long
+Email is required
+Enter a valid Email
+Receiver's name is required
+Region is required
+District is required
+Street Address is required
+Please select a shipping Method
+Enter a payment number
+Payment number must be 12 characters long
+Please select a payment method
+Order placed
+Failed to place order
+Returning Customer?
+Click Here to Login
+Do not have a Bafredo account?
+Click here to Create an account
+Email
+First Name
+Street Address
+Phone Number
+Postal Code/ Zip Code
+PLACE ORDER
+Quantity:
+
+########## 9720.ef63a87b.js ##########
+DELETE
+PATCH
+ArticleImageUploader
+POST
+Failed to delete image
+Drag & Drop your image
+CREATE YOUR ARTICLE
+Add your Article Details
+Heading
+Description
+Upload article image
+Loading...
+CreateArticleView
+Article heading is required
+Heading should not exceed 15 words
+Article description is required
+Article content is required
+Image is required
+Success
+Article published successfully
+Failed
+Enter Heading
+Enter article description
+Compose an epic article...
+SUBMIT
+
+########## 9933.c98e03ae.js ##########
+Incorrect 'index' type
+
+########## 9950.288dd5e9.js ##########
+QuillEditor
+return this
+Symbol(src)_1.
+DataView
+Promise
+WeakMap
+diff() called
+Unable to create
+Invalid definition
+Cannot register abstract class
+TYPE
+LEVEL
+ATTRIBUTE
+BLOT
+INLINE
+BLOCK
+BLOCK_BLOT
+INLINE_BLOT
+BLOCK_ATTRIBUTE
+INLINE_ATTRIBUTE
+Cannot call a class as a function
+this hasn't been initialised - super() hasn't been called
+Super expression must either be null or a function, not
+Invalid attempt to destructure non-iterable instance
+Invalid Quill container
+Cannot import
+. Are you sure it was registered?
+Overwriting
+Invalid theme
+. Did you register it?
+Cannot load
+module. Are you sure you registered it?
+,delete e.attributes.bullet)),
+SPAN
+Array.prototype.find called on null or undefined
+predicate must be a function
+DOMContentLoaded
+cursor_pos is out of bounds!
+STRONG
+button, select
+Container required for toolbar
+BUTTON
+ignoring attaching to disabled format
+ignoring attaching to nonexistent format
+SELECT
+Enter
+Enter link URL:
+0 0 18 18
+ql-even ql-stroke
+5 7 3 9 5 11
+13 7 15 9 13 11
+noopener noreferrer
+Embed URL
+IFRAME
+Formula module requires KaTeX.
+Syntax module requires highlight.js. Please include the library on the page before Quill.
+ql-fill ql-color-label
+6 6.868 6 6 5 6 5 7 5.942 7 6 6.868
+6.817 5 6 5 6 6 6.38 6 6.817 5
+4 11.439 4 11 3 11 3 12 3.755 12 4 11.439
+4.63 10 4 10 4 11 4.192 11 4.63 10
+13.447 10.174 13.469 10.225 13.472 10.232 13.808 11 14 11 14 10 13.37 10 13.447 10.174
+12 6.868 12 6 11.62 6 12 6.868
+12.933 9 13 9 13 8 12.495 8 12.933 9
+5.5 13 9 5 12.5 13
+ql-fill ql-stroke
+ql-even ql-fill ql-stroke
+ql-color-label ql-stroke ql-transparent
+5.5 11 9 3 12.5 11
+ql-stroke ql-fill
+3 11 5 9 3 7 3 11
+15 12 13 10 15 8 15 12
+translate(24 18) rotate(-180)
+ql-even ql-fill
+5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12
+3 7 3 11 5 9 3 7
+5 7 5 11 3 9 5 7
+ql-stroke ql-thin
+3 4 4 5 6 3
+3 14 4 15 6 13
+3 9 4 10 6 8
+7 11 9 13 11 11 7 11
+7 7 9 5 11 7 7 7
+

@@ -1,0 +1,136 @@
+<h1 class="part"><span class="num">Part Eight</span>Component Catalogue</h1>
+
+<p>Every component the platform needs, with its responsibility and its public contract. Components live in <code>packages/ui</code> when they are design-system primitives with no domain knowledge, and in <code>apps/web/src/components</code> when they know about products, orders or carts. That boundary is enforced by lint rule: nothing in <code>packages/ui</code> may import from <code>apps/web</code>.</p>
+
+<h2>8.1 Primitives</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Component</th><th style="width:56mm">Key props</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>Button</code></td><td><code>variant: primary|secondary|danger|ghost|link</code>, <code>size: sm|md|lg</code>, <code>loading</code>, <code>disabled</code>, <code>fullWidth</code>, <code>iconStart</code>, <code>iconEnd</code>, <code>as</code></td><td>Holds its width while loading so the layout never jumps. <code>as="a"</code> renders an anchor with button styling and correct roles.</td></tr>
+    <tr><td><code>IconButton</code></td><td><code>icon</code>, <code>label</code> (required), <code>size</code>, <code>variant</code>, <code>active</code></td><td><code>label</code> is required and becomes <code>aria-label</code>. An icon-only control with no accessible name fails review.</td></tr>
+    <tr><td><code>TextField</code></td><td><code>label</code>, <code>name</code>, <code>type</code>, <code>placeholder</code>, <code>hint</code>, <code>error</code>, <code>required</code>, <code>prefix</code>, <code>suffix</code>, <code>inputMode</code>, <code>maxLength</code>, <code>showCounter</code></td><td>Generates its own ids and wires <code>aria-describedby</code> to hint and error. Errors render with an icon and set <code>aria-invalid</code>.</td></tr>
+    <tr><td><code>TextArea</code></td><td>as <code>TextField</code> plus <code>rows</code>, <code>autoResize</code></td><td></td></tr>
+    <tr><td><code>Select</code></td><td><code>options</code>, <code>value</code>, <code>onChange</code>, <code>placeholder</code>, <code>disabled</code>, <code>loading</code>, <code>error</code></td><td>Native <code>&lt;select&gt;</code> for short lists — better on mobile than any custom widget.</td></tr>
+    <tr><td><code>SearchSelect</code></td><td><code>options</code>, <code>value</code>, <code>onChange</code>, <code>isMulti</code>, <code>onSearch</code>, <code>loading</code>, <code>createable</code></td><td>react-select, restyled to the token set. Used for subcategory pickers, campaign contacts and tag entry.</td></tr>
+    <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>RadioGroup</code>, <code>Switch</code></td><td><code>label</code>, <code>description</code>, <code>checked</code>, <code>onChange</code>, <code>error</code></td><td>44&nbsp;px minimum hit area on touch regardless of visual size.</td></tr>
+    <tr><td><code>QuantityStepper</code></td><td><code>value</code>, <code>min</code>, <code>max</code>, <code>onChange</code>, <code>size</code></td><td>Clamps on blur; disables its bounds; announces changes politely.</td></tr>
+    <tr><td><code>Badge</code>, <code>StatusPill</code></td><td><code>tone: neutral|success|warning|danger|info|accent</code>, <code>children</code></td><td><code>StatusPill</code> maps a domain status to a tone via one table, so order status colours are defined once (§5.2.3).</td></tr>
+    <tr><td><code>Price</code></td><td><code>amount</code>, <code>compareAt</code>, <code>from</code>, <code>size</code></td><td>The only place currency formatting happens. Reads the currency setting from context.</td></tr>
+    <tr><td><code>Rating</code></td><td><code>value</code>, <code>count</code>, <code>size</code>, <code>interactive</code>, <code>onChange</code></td><td>Interactive mode is a radio group, not clickable icons.</td></tr>
+    <tr><td><code>Skeleton</code></td><td><code>variant: text|rect|circle</code>, <code>width</code>, <code>height</code>, <code>lines</code></td><td>Static tint under reduced motion.</td></tr>
+    <tr><td><code>Spinner</code></td><td><code>size</code>, <code>label</code></td><td>Always carries a visually hidden label.</td></tr>
+    <tr><td><code>Modal</code></td><td><code>open</code>, <code>onClose</code>, <code>title</code>, <code>size</code>, <code>footer</code>, <code>closeOnScrim</code></td><td>Focus trap, scroll lock, <kbd>Esc</kbd>, focus restoration, <code>aria-modal</code>.</td></tr>
+    <tr><td><code>Offcanvas</code></td><td><code>open</code>, <code>onClose</code>, <code>side</code>, <code>title</code>, <code>footer</code></td><td>Same accessibility contract as <code>Modal</code>.</td></tr>
+    <tr><td><code>Toast</code>, <code>ToastRegion</code></td><td><code>tone</code>, <code>title</code>, <code>description</code>, <code>duration</code>, <code>action</code></td><td>Region is <code>aria-live="polite"</code>; error toasts do not auto-dismiss.</td></tr>
+    <tr><td><code>ConfirmDialog</code></td><td><code>open</code>, <code>title</code>, <code>message</code>, <code>confirmLabel</code>, <code>tone</code>, <code>onConfirm</code>, <code>requireTyping</code></td><td><code>requireTyping</code> makes the user type a phrase before the confirm button enables — reserved for bulk deletes (§14.19).</td></tr>
+    <tr><td><code>Tabs</code></td><td><code>tabs</code>, <code>active</code>, <code>onChange</code></td><td>Full ARIA tabs pattern with arrow-key navigation.</td></tr>
+    <tr><td><code>Accordion</code></td><td><code>items</code>, <code>allowMultiple</code>, <code>defaultOpen</code></td><td></td></tr>
+    <tr><td><code>Pagination</code></td><td><code>page</code>, <code>pageCount</code>, <code>onChange</code>, <code>pageSize</code>, <code>onPageSizeChange</code></td><td>Ellipsis for long ranges; <code>&lt;nav aria-label="Pagination"&gt;</code>.</td></tr>
+    <tr><td><code>EmptyState</code></td><td><code>icon</code>, <code>title</code>, <code>description</code>, <code>action</code></td><td>Used everywhere. No list, grid or table may render a bare blank area.</td></tr>
+    <tr><td><code>Breadcrumb</code></td><td><code>items</code></td><td>Emits <code>BreadcrumbList</code> JSON-LD alongside the markup.</td></tr>
+  </tbody>
+</table>
+
+<h2>8.2 Storefront composites</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Component</th><th style="width:56mm">Key props</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td><code>ProductCard</code></td><td><code>product</code>, <code>onQuickView</code>, <code>density</code></td><td>§7.2.3. Pure presentation — cart and wishlist actions come from hooks, not props, so the card can be dropped anywhere.</td></tr>
+    <tr><td><code>ProductGrid</code></td><td><code>products</code>, <code>loading</code>, <code>skeletonCount</code>, <code>emptyState</code></td><td>Responsive columns per §5.6.</td></tr>
+    <tr><td><code>ProductCarousel</code></td><td><code>title</code>, <code>subtitle</code>, <code>products</code>, <code>loading</code>, <code>viewAllHref</code></td><td>Renders nothing at all when the list is empty — including the heading.</td></tr>
+    <tr><td><code>BannerCarousel</code></td><td><code>banners</code>, <code>autoplayMs</code></td><td>Applies each banner's own colours and copy.</td></tr>
+    <tr><td><code>ProductGallery</code></td><td><code>images</code>, <code>activeIndex</code>, <code>onChange</code></td><td>Main image, thumbnail strip, lightbox.</td></tr>
+    <tr><td><code>VariantSelector</code></td><td><code>attributes</code>, <code>variants</code>, <code>selected</code>, <code>onChange</code></td><td>Pills up to 6 options, select beyond. Marks unavailable combinations disabled rather than hiding them.</td></tr>
+    <tr><td><code>BuyBox</code></td><td><code>product</code>, <code>selectedVariant</code>, <code>onAddToCart</code>, <code>onBuyNow</code></td><td>Price, stock, quantity, the three actions.</td></tr>
+    <tr><td><code>CartLineItem</code></td><td><code>line</code>, <code>onQuantityChange</code>, <code>onRemove</code>, <code>notice</code></td><td>Renders the price/stock change notice when present.</td></tr>
+    <tr><td><code>OrderSummary</code></td><td><code>lines</code>, <code>subtotal</code>, <code>shipping</code>, <code>total</code>, <code>primaryAction</code></td><td>Shared by cart, checkout, confirmation and the delegated payment page.</td></tr>
+    <tr><td><code>ShippingMethodPicker</code></td><td><code>methods</code>, <code>value</code>, <code>onChange</code></td><td>Radio list with cost and description.</td></tr>
+    <tr><td><code>AddressForm</code></td><td><code>value</code>, <code>onChange</code>, <code>errors</code>, <code>showCopyFromProfile</code></td><td>Owns the region → district dependency.</td></tr>
+    <tr><td><code>PaymentMethodPicker</code></td><td><code>methods</code>, <code>value</code>, <code>onChange</code>, <code>paymentNumber</code>, <code>onPaymentNumberChange</code></td><td>Reveals the instructions panel and the number field.</td></tr>
+    <tr><td><code>PaymentInstructions</code></td><td><code>amount</code>, <code>reference</code>, <code>networks</code>, <code>language</code></td><td>Renders admin-managed content (§14.16).</td></tr>
+    <tr><td><code>OrderTimeline</code></td><td><code>events</code>, <code>currentStatus</code></td><td>Built from the immutable event log.</td></tr>
+    <tr><td><code>ReviewList</code>, <code>ReviewForm</code>, <code>ReviewSummary</code></td><td><code>productId</code>, <code>reviews</code>, <code>summary</code></td><td>Histogram, list, composer.</td></tr>
+    <tr><td><code>CommentThread</code>, <code>CommentForm</code></td><td><code>articleId</code>, <code>comments</code></td><td>Moderation-aware.</td></tr>
+    <tr><td><code>RichText</code></td><td><code>html</code></td><td>The single sanitised-HTML renderer. No other component may set <code>dangerouslySetInnerHTML</code> — enforced by lint rule.</td></tr>
+    <tr><td><code>SearchBar</code>, <code>SearchSuggestions</code></td><td><code>value</code>, <code>onChange</code>, <code>onSubmit</code>, <code>suggestions</code></td><td>Full combobox pattern.</td></tr>
+    <tr><td><code>MegaMenu</code></td><td><code>categories</code>, <code>subcategoriesByCategory</code></td><td>Two-panel, keyboard navigable, hides empty branches.</td></tr>
+    <tr><td><code>AuthModal</code></td><td><code>open</code>, <code>mode</code>, <code>nextRoute</code></td><td>Login, register, forgot-password in one shell.</td></tr>
+  </tbody>
+</table>
+
+<h2>8.3 Layout components</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Component</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td><code>StorefrontLayout</code></td><td>Utility bar, sticky header, breadcrumb slot, main, footer, all global overlays, WhatsApp button, verification banner.</td></tr>
+    <tr><td><code>AdminLayout</code></td><td>Fixed sidebar (collapsible to icons), top bar with breadcrumb, global search, notification bell and account menu; content area; permission context.</td></tr>
+    <tr><td><code>AccountLayout</code></td><td>Account header and tab rail.</td></tr>
+    <tr><td><code>PageHeader</code></td><td>Title, optional subtitle, optional action cluster. Used by every admin page for a consistent top edge.</td></tr>
+    <tr><td><code>Section</code></td><td>Storefront section wrapper: heading, optional lead paragraph, consistent vertical rhythm.</td></tr>
+    <tr><td><code>Container</code></td><td>Max-width and gutters per §5.6.</td></tr>
+  </tbody>
+</table>
+
+<h2>8.4 Admin components</h2>
+
+<h3>8.4.1 <code>DataTable</code></h3>
+<p>The workhorse of the admin console. One component serves products, orders, invoices, customers, categories, subcategories, shipping methods, banners, campaigns, contacts, searches, comments, reviews, staff and the audit log.</p>
+<pre>interface DataTableProps&lt;T&gt; {
+  columns: Column&lt;T&gt;[]          // key, header, render?, sortable?, width?, hideBelow?
+  rows: T[]
+  rowKey: (row: T) =&gt; string
+
+  loading?: boolean             // renders skeleton rows at final height
+  error?: Error                 // renders an inline retry panel
+  emptyState: EmptyStateProps
+
+  // selection
+  selectable?: boolean
+  selectedKeys?: string[]
+  onSelectionChange?: (keys: string[]) =&gt; void
+  bulkActions?: BulkAction[]    // label, icon, tone, requiresConfirm, onRun
+
+  // server-driven state — the table never fetches, it only reports
+  sort?: { key: string; dir: 'asc' | 'desc' }
+  onSortChange?: (s: Sort) =&gt; void
+  page: number
+  pageSize: number
+  total: number
+  onPageChange: (p: number) =&gt; void
+  onPageSizeChange?: (n: number) =&gt; void
+
+  search?: { value: string; placeholder: string; onChange: (v: string) =&gt; void }
+  filters?: FilterDescriptor[]
+  rowActions?: (row: T) =&gt; RowAction[]
+  onRowClick?: (row: T) =&gt; void
+  density?: 'comfortable' | 'compact'
+}</pre>
+<p>Behaviour that is uniform everywhere it is used: sticky header on scroll; sortable headers with an aria-sort attribute; a select-all checkbox that selects the current page only, with a "Select all n matching" affordance when more exist; a bulk-action bar that slides in above the table when anything is selected, showing the count and a "Clear" control; search debounced at 300&nbsp;ms and written to the query string; row actions in a trailing column, collapsing to an overflow menu below <code>lg</code>; and horizontal scroll confined to the table's own container so the page never scrolls sideways.</p>
+
+<h3>8.4.2 Other admin components</h3>
+<table class="compact">
+  <thead><tr><th style="width:36mm">Component</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td><code>StatCard</code></td><td>Dashboard tile: label, large value, delta versus the previous period with direction and colour, sparkline, optional click-through.</td></tr>
+    <tr><td><code>ChartPanel</code></td><td>Chart.js wrapper with a title, a period selector (Last 7 Days / Last 30 Days / Last 12 Months), a loading skeleton, an empty state and an accessible data table alternative behind a "View as table" toggle.</td></tr>
+    <tr><td><code>ImageUploader</code></td><td>FilePond wrapper. Drag-and-drop, multiple files, reordering, per-file progress, delete with confirmation, and the accepted-types and size limits from §11.7. Copy: "Drag &amp; drop your files or <u>Browse</u>". Uploads immediately on drop and reports server ids to the form; never holds base64 in form state.</td></tr>
+    <tr><td><code>RichTextEditor</code></td><td>TipTap. Toolbar: bold, italic, underline, H3, H4, bullet list, ordered list, link, blockquote, code block, table, image, undo, redo, clear formatting. Emits HTML constrained to the allowlist in §7.4.2, with a character counter and an HTML source view for administrators who want it.</td></tr>
+    <tr><td><code>AttributeMatrix</code></td><td>The variant editor described in §14.3.2 — dynamic attribute columns plus fixed Price and Stock columns, add/remove row, add/remove column, delete table, per-cell validation.</td></tr>
+    <tr><td><code>ColorField</code></td><td>Swatch, native colour input and a hex text field kept in sync. Used by the banner builder for its six colour fields.</td></tr>
+    <tr><td><code>EntityPicker</code></td><td>Modal search-and-select over a catalogue entity. Used by the invoice builder to add products.</td></tr>
+    <tr><td><code>FormLayout</code></td><td>Standard admin form scaffold: section headings, two-column field grid, a sticky footer with Cancel and Submit, unsaved-changes guard, and a disabled submit until the form is dirty and valid.</td></tr>
+    <tr><td><code>PermissionGate</code></td><td>Renders children only when the signed-in staff member holds a permission; otherwise renders nothing, or a disabled control with an explanatory tooltip when <code>mode="disable"</code>.</td></tr>
+    <tr><td><code>AuditTrail</code></td><td>Compact reverse-chronological list of changes to one entity: who, when, what changed, before and after.</td></tr>
+  </tbody>
+</table>
+
+<h2>8.5 Contracts every component honours</h2>
+<ul>
+  <li><strong>Controlled by default.</strong> Components take <code>value</code> and <code>onChange</code>. Uncontrolled variants exist only where React Hook Form needs an uncontrolled input for performance.</li>
+  <li><strong>No data fetching in presentation components.</strong> Fetching lives in route loaders and hooks. A component that fetches cannot be reused with different data and cannot be tested without a network mock.</li>
+  <li><strong>Every interactive element has an accessible name.</strong> Enforced by <code>eslint-plugin-jsx-a11y</code> and by an axe pass in the component test suite.</li>
+  <li><strong>Loading, empty and error are props, not afterthoughts.</strong> Any component that renders a collection must accept all three; the type system requires <code>emptyState</code>.</li>
+  <li><strong>No hard-coded colour, spacing or font values.</strong> Only tokens. Enforced by a stylelint rule.</li>
+  <li><strong>No hard-coded user-facing strings.</strong> All copy is resolved through the i18n layer (§19.8), even while only English ships.</li>
+  <li><strong>Each component ships with a Storybook story per state.</strong> The story set is the visual regression suite (§21.1).</li>
+</ul>

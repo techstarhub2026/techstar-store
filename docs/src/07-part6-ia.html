@@ -1,0 +1,230 @@
+<h1 class="part"><span class="num">Part Six</span>Information Architecture and Routing</h1>
+
+<h2>6.1 Sitemap</h2>
+<pre>TechStar Store
+│
+├── /                                   Home
+├── /products                           Catalogue — all products
+│   ├── /products/c/:categorySlug        filtered to a category
+│   └── /products/s/:subcategorySlug     filtered to a subcategory
+├── /product/:slug                      Product detail
+├── /search?q=                          Search results
+├── /cart                               Cart page (off-canvas is the primary surface)
+├── /checkout                           Checkout
+├── /order/confirmation/:orderNumber    Post-order confirmation + payment instructions
+├── /pay/:paymentToken                  Delegated payment (opened by the nominated payer)
+├── /invoice/:invoiceToken              Shareable printable invoice
+│
+├── /account                            (requires sign-in)
+│   ├── /account/orders                  Order history
+│   ├── /account/orders/:orderNumber     Order detail
+│   ├── /account/profile                 Profile
+│   ├── /account/address                 Shipping address
+│   └── /account/password                Change password
+│
+├── /blog                               Article index
+│   └── /blog/:slug                      Article + comments
+├── /services                           Service index
+│   └── /services/:slug                  Service detail
+│
+├── /about                              About — story, vision, mission, values, map
+├── /contact                            Contact details + enquiry form
+├── /faq                                FAQ accordion
+├── /privacy-policy
+├── /terms-and-conditions
+│
+├── /auth
+│   ├── /auth/verify-email/:token
+│   ├── /auth/reset-password/:token
+│   └── /auth/oauth/callback
+│
+├── /admin                              (requires staff role)
+│   ├── /admin                           Dashboard
+│   ├── /admin/products  · /new · /:id/edit
+│   ├── /admin/categories
+│   ├── /admin/subcategories
+│   ├── /admin/orders · /:orderNumber
+│   ├── /admin/invoices · /new · /:id
+│   ├── /admin/customers · /:id
+│   ├── /admin/shipping-methods
+│   ├── /admin/banners · /new · /:id/edit
+│   ├── /admin/services · /new · /:id/edit
+│   ├── /admin/partners · /new · /:id/edit
+│   ├── /admin/articles · /new · /:id/edit
+│   ├── /admin/comments
+│   ├── /admin/reviews
+│   ├── /admin/campaigns · /sms/new · /email/new · /:id
+│   ├── /admin/contacts
+│   ├── /admin/searches
+│   ├── /admin/currency
+│   ├── /admin/settings
+│   ├── /admin/staff · /:id
+│   └── /admin/audit-log
+│
+├── /sitemap.xml   /robots.txt   /manifest.webmanifest
+└── /404</pre>
+
+<div class="decision">
+  <span class="lbl">Deliberate divergences from the reference route map</span>
+  <ul style="margin-bottom:0">
+    <li><code>/product/:slug</code> replaces <code>/product/:name</code>. Fixes defect R1 — see §6.6.</li>
+    <li><code>/products/c/:slug</code> and <code>/products/s/:slug</code> replace the single ambiguous <code>/products/:id</code>, which could only ever filter by subcategory and gave no way to view a whole category.</li>
+    <li><code>/admin</code> replaces <code>/dashboard</code>. Plainer, and it frees "dashboard" to mean the analytics page rather than the whole console.</li>
+    <li><code>/pay/:paymentToken</code> replaces <code>/friend_payment/:orderId</code>. Handing a raw order identifier to a third party lets anyone with an order id open a payment page; a single-purpose signed token does not (§12.9).</li>
+    <li><code>/invoice/:invoiceToken</code> likewise replaces a raw-id URL: invoices contain a customer's name, address, phone and purchase history and must not be enumerable.</li>
+    <li><code>/cart</code> exists as a real page, not only an off-canvas panel. The panel remains the primary surface; the page is what a mobile user gets, and what a shared or bookmarked link resolves to.</li>
+    <li><code>/admin/comments</code>, <code>/admin/reviews</code>, <code>/admin/staff</code>, <code>/admin/audit-log</code> and <code>/admin/customers</code> are new, closing gaps R13 and R12.</li>
+  </ul>
+</div>
+
+<h2>6.2 Public route table</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Path</th><th style="width:26mm">Component</th><th style="width:14mm">Guard</th><th>Data loaded on entry</th></tr></thead>
+  <tbody>
+    <tr><td><code>/</code></td><td>HomePage</td><td>none</td><td>banners (type=home), random products (24), new arrivals (24), best sellers (24), partners, category tree</td></tr>
+    <tr><td><code>/products</code></td><td>CataloguePage</td><td>none</td><td>paginated products, category tree, price range for facets</td></tr>
+    <tr><td><code>/products/c/:categorySlug</code></td><td>CataloguePage</td><td>none</td><td>as above, scoped to the category and its subcategories</td></tr>
+    <tr><td><code>/products/s/:subcategorySlug</code></td><td>CataloguePage</td><td>none</td><td>as above, scoped to one subcategory</td></tr>
+    <tr><td><code>/product/:slug</code></td><td>ProductPage</td><td>none</td><td>product group with variants and images, related products, reviews, review summary</td></tr>
+    <tr><td><code>/search</code></td><td>SearchPage</td><td>none</td><td>search results for <code>?q=</code>; fires the search-log write once per distinct term per session</td></tr>
+    <tr><td><code>/cart</code></td><td>CartPage</td><td>none</td><td>revalidates every line's price and stock against the server</td></tr>
+    <tr><td><code>/checkout</code></td><td>CheckoutPage</td><td>cart&nbsp;non-empty</td><td>shipping methods, regions, current profile and saved address if signed in; server-side cart revalidation</td></tr>
+    <tr><td><code>/order/confirmation/:orderNumber</code></td><td>OrderConfirmationPage</td><td>order token in session</td><td>order summary, payment instructions for the chosen method</td></tr>
+    <tr><td><code>/pay/:paymentToken</code></td><td>DelegatedPaymentPage</td><td>valid token</td><td>order summary (items, quantities, totals) and payment methods. No customer contact details are exposed to the payer.</td></tr>
+    <tr><td><code>/invoice/:invoiceToken</code></td><td>InvoicePage</td><td>valid token</td><td>invoice with line items; print stylesheet applied</td></tr>
+    <tr><td><code>/account/*</code></td><td>AccountLayout + tab</td><td>signed in</td><td>profile; orders list or detail per tab</td></tr>
+    <tr><td><code>/blog</code>, <code>/blog/:slug</code></td><td>BlogIndex, ArticlePage</td><td>none</td><td>articles paginated; article with comment thread and latest-articles rail</td></tr>
+    <tr><td><code>/services</code>, <code>/services/:slug</code></td><td>ServiceIndex, ServicePage</td><td>none</td><td>services; service with other-services rail</td></tr>
+    <tr><td><code>/about</code></td><td>AboutPage</td><td>none</td><td>site settings (hero image), map coordinates</td></tr>
+    <tr><td><code>/contact</code></td><td>ContactPage</td><td>none</td><td>none; posts the enquiry form</td></tr>
+    <tr><td><code>/faq</code></td><td>FaqPage</td><td>none</td><td>FAQ entries</td></tr>
+    <tr><td><code>/privacy-policy</code>, <code>/terms-and-conditions</code></td><td>LegalPage</td><td>none</td><td>site settings (hero image); body is static content</td></tr>
+    <tr><td><code>/auth/verify-email/:token</code></td><td>VerifyEmailPage</td><td>none</td><td>posts the token, then redirects home with a toast</td></tr>
+    <tr><td><code>/auth/reset-password/:token</code></td><td>ResetPasswordPage</td><td>none</td><td>none</td></tr>
+    <tr><td><code>/auth/oauth/callback</code></td><td>OAuthCallbackPage</td><td>none</td><td>exchanges the one-time code, then redirects to the stored return route</td></tr>
+    <tr><td><code>*</code></td><td>NotFoundPage</td><td>none</td><td>none</td></tr>
+  </tbody>
+</table>
+
+<h2>6.3 Admin route table</h2>
+<p>All admin routes are children of an <code>AdminLayout</code> that supplies the sidebar, top bar and permission context. Every route declares the permission it needs; the sidebar renders only entries the signed-in staff member holds a permission for.</p>
+<table class="compact">
+  <thead><tr><th style="width:48mm">Path</th><th style="width:34mm">Permission</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/admin</code></td><td><code>dashboard.view</code></td><td>Analytics home</td></tr>
+    <tr><td><code>/admin/products</code></td><td><code>product.read</code></td><td>Table, search, bulk delete, discount</td></tr>
+    <tr><td><code>/admin/products/new</code></td><td><code>product.create</code></td><td>Create with variant matrix</td></tr>
+    <tr><td><code>/admin/products/:id/edit</code></td><td><code>product.update</code></td><td>Edit, including variant matrix and images</td></tr>
+    <tr><td><code>/admin/categories</code></td><td><code>category.read</code></td><td>Table with create/edit modal</td></tr>
+    <tr><td><code>/admin/subcategories</code></td><td><code>category.read</code></td><td>Table with create/edit modal</td></tr>
+    <tr><td><code>/admin/orders</code></td><td><code>order.read</code></td><td>Table with status tabs</td></tr>
+    <tr><td><code>/admin/orders/:orderNumber</code></td><td><code>order.read</code></td><td>Detail, status transitions, payment reconciliation</td></tr>
+    <tr><td><code>/admin/invoices</code></td><td><code>invoice.read</code></td><td>List</td></tr>
+    <tr><td><code>/admin/invoices/new</code></td><td><code>invoice.create</code></td><td>Builder with product search</td></tr>
+    <tr><td><code>/admin/invoices/:id</code></td><td><code>invoice.read</code></td><td>Detail, print, share link, delete</td></tr>
+    <tr><td><code>/admin/customers</code></td><td><code>customer.read</code></td><td>Search, list</td></tr>
+    <tr><td><code>/admin/customers/:id</code></td><td><code>customer.read</code></td><td>Profile, orders, addresses, suspend</td></tr>
+    <tr><td><code>/admin/shipping-methods</code></td><td><code>shipping.read</code></td><td>Table with create/edit modal</td></tr>
+    <tr><td><code>/admin/banners</code> · <code>/new</code> · <code>/:id/edit</code></td><td><code>banner.*</code></td><td>Table, builder with live preview</td></tr>
+    <tr><td><code>/admin/services</code> · <code>/new</code> · <code>/:id/edit</code></td><td><code>service.*</code></td><td>Cards, composer</td></tr>
+    <tr><td><code>/admin/partners</code> · <code>/new</code> · <code>/:id/edit</code></td><td><code>partner.*</code></td><td>Cards, composer</td></tr>
+    <tr><td><code>/admin/articles</code> · <code>/new</code> · <code>/:id/edit</code></td><td><code>article.*</code></td><td>Cards, rich-text composer</td></tr>
+    <tr><td><code>/admin/comments</code></td><td><code>comment.moderate</code></td><td>Approve, reject, delete</td></tr>
+    <tr><td><code>/admin/reviews</code></td><td><code>review.moderate</code></td><td>Approve, reject, delete</td></tr>
+    <tr><td><code>/admin/campaigns</code></td><td><code>campaign.read</code></td><td>List with counters</td></tr>
+    <tr><td><code>/admin/campaigns/sms/new</code></td><td><code>campaign.create</code></td><td>SMS composer</td></tr>
+    <tr><td><code>/admin/campaigns/email/new</code></td><td><code>campaign.create</code></td><td>Email composer</td></tr>
+    <tr><td><code>/admin/campaigns/:id</code></td><td><code>campaign.read</code></td><td>Detail with delivery report</td></tr>
+    <tr><td><code>/admin/contacts</code></td><td><code>campaign.read</code></td><td>Audience list</td></tr>
+    <tr><td><code>/admin/searches</code></td><td><code>analytics.view</code></td><td>Search-term analytics</td></tr>
+    <tr><td><code>/admin/currency</code></td><td><code>settings.update</code></td><td>Display currency and fraction digits</td></tr>
+    <tr><td><code>/admin/settings</code></td><td><code>settings.update</code></td><td>Site settings and page hero images</td></tr>
+    <tr><td><code>/admin/staff</code> · <code>/:id</code></td><td><code>staff.manage</code></td><td>Staff accounts, roles, permissions</td></tr>
+    <tr><td><code>/admin/audit-log</code></td><td><code>audit.view</code></td><td>Immutable record of every admin mutation</td></tr>
+  </tbody>
+</table>
+
+<h2>6.4 Navigation model</h2>
+
+<h3>6.4.1 Header, desktop (≥ md)</h3>
+<p>Three stacked bars, matching the reference platform's structure exactly. The lower two are sticky.</p>
+<table class="compact">
+  <thead><tr><th style="width:24mm">Bar</th><th style="width:20mm">Height</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>Utility</td><td>32&nbsp;px</td><td>Background <code>--ts-ink-soft</code>. Left: phone (<code>tel:</code> link), email (<code>mailto:</code>), location (links to <code>/about#map</code>), each with a pale-green icon at 11&nbsp;px. Hidden below <code>md</code>. Not sticky.</td></tr>
+    <tr><td>Primary</td><td>72&nbsp;px</td><td>Background <code>--ts-ink</code>. Left: logo lockup linking to <code>/</code>. Centre: search field — a flush input plus a wide primary-green "Search" button, appearing at <code>lg</code> and above. Right: wishlist icon with count badge, cart icon with count badge and running total, and either "Login | Register" (primary-green button, opens the auth modal) or an account menu.</td></tr>
+    <tr><td>Category</td><td>48&nbsp;px</td><td>White, 2&nbsp;px bottom border. Left-aligned: <strong>PRODUCTS</strong> (link to <code>/products</code>), <strong>SHOP</strong> (mega-menu), <strong>SUPPORT</strong> (dropdown: Contact us, Blog, FAQ), <strong>SERVICES</strong> (dropdown listing each service). The active item carries a 2&nbsp;px primary-green underline.</td></tr>
+  </tbody>
+</table>
+
+<h3>6.4.2 The SHOP mega-menu</h3>
+<p>A two-panel dropdown, 720&nbsp;px wide, elevated with shadow 2.</p>
+<ul>
+  <li><strong>Left panel, 7 of 12 columns.</strong> All categories as a vertical list, each row showing the category name and a right-aligned chevron. Hovering or focusing a row loads that category's subcategories into the right panel; the row highlights with <code>--ts-primary-tint</code>. Clicking navigates to the category page.</li>
+  <li><strong>Right panel, 5 of 12 columns,</strong> separated by a left border. The hovered category's subcategories, each with a small primary-green pill showing its product count. Clicking navigates to the subcategory page.</li>
+  <li><strong>Default state.</strong> On open, the first category is pre-selected so the right panel is never empty.</li>
+  <li><strong>Keyboard.</strong> <kbd>↑</kbd>/<kbd>↓</kbd> move through categories; <kbd>→</kbd> enters the subcategory panel; <kbd>←</kbd> returns; <kbd>Enter</kbd> navigates; <kbd>Esc</kbd> closes and returns focus to the SHOP trigger.</li>
+</ul>
+<div class="note">
+  <span class="lbl">Fixing R11</span>
+  Subcategories with zero products are <strong>omitted</strong> from the mega-menu rather than shown with a "0" badge. Categories whose every subcategory is empty are omitted too. They remain fully visible and editable in the admin console — this rule affects storefront navigation only, and is driven by the maintained <code>product_count</code> column (§9.3).
+</div>
+
+<h3>6.4.3 Header, mobile (&lt; md)</h3>
+<ul>
+  <li>Single 64&nbsp;px bar on <code>--ts-ink</code>: hamburger, compact logo mark, search icon, wishlist, cart.</li>
+  <li>The hamburger opens a left off-canvas: Home · Products · Shop (an accordion of categories, each expanding to its subcategories) · Support · Services · then account links.</li>
+  <li>The search icon opens a full-screen modal with an autofocused field and live suggestions.</li>
+  <li>The utility bar is hidden; its phone and email move into the off-canvas footer.</li>
+</ul>
+
+<h3>6.4.4 Footer</h3>
+<p>Four columns on <code>--ts-ink</code>, stacking to one below <code>md</code>, then a legal strip on <code>--ts-ink-soft</code>.</p>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Column</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>Contact</td><td>Legal entity name, P.O. box, city and country, two phone numbers, email address.</td></tr>
+    <tr><td>Company</td><td>Country of registration, registration agency, TIN, certificate of incorporation number, registered address. <em>TechStar's own identifiers only</em> (§1.5).</td></tr>
+    <tr><td>Policies &amp; Support</td><td>Privacy policy · Terms &amp; conditions · FAQ · About us · Contact us · Shipping information · Returns.</td></tr>
+    <tr><td>Follow us</td><td>Facebook, YouTube, LinkedIn, Instagram, X — 24&nbsp;px brand-coloured marks, each with an accessible name.</td></tr>
+    <tr><td>Legal strip</td><td><code>© {year} TechStar Store. All rights reserved.</code> centred.</td></tr>
+  </tbody>
+</table>
+<p class="kv">This corrects R14: the reference platform's two footer columns are both headed "COMPANY INFORMATION". Here they are "Contact" and "Company".</p>
+
+<h3>6.4.5 Floating WhatsApp button</h3>
+<p>Fixed 56&nbsp;px circular button, bottom-right, 24&nbsp;px inset, WhatsApp green, above all content except modals and off-canvas scrims. Links to <code>https://wa.me/&lt;number&gt;</code> with a prefilled message. On a product page the message includes the product name and SKU so the agent has context. Accessible name: "Chat with TechStar on WhatsApp".</p>
+
+<h2>6.5 Route guards</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Guard</th><th style="width:38mm">Applies to</th><th>Behaviour when it fails</th></tr></thead>
+  <tbody>
+    <tr><td><code>requireAuth</code></td><td><code>/account/*</code></td><td>Open the auth modal with the intended route stored as <code>nextRoute</code>; on success, navigate there. Never a bare redirect to a login page — the reference platform's modal-based pattern is better and is kept.</td></tr>
+    <tr><td><code>requireCart</code></td><td><code>/checkout</code></td><td>Redirect to <code>/cart</code> with an informational toast, "Your cart is empty."</td></tr>
+    <tr><td><code>requireStaff</code></td><td><code>/admin/*</code></td><td>If unauthenticated, redirect to <code>/</code> and open the auth modal. If authenticated but not staff, render a 403 page with no navigation hints — do not confirm that <code>/admin</code> exists.</td></tr>
+    <tr><td><code>requirePermission(p)</code></td><td>each admin route</td><td>Render a 403 panel inside the admin shell, listing whom to ask for access.</td></tr>
+    <tr><td><code>requireToken</code></td><td><code>/pay/:t</code>, <code>/invoice/:t</code></td><td>Render "This link is no longer valid" with a contact route. Never reveal whether the token was wrong, expired or already used.</td></tr>
+    <tr><td><code>requireOrderAccess</code></td><td><code>/order/confirmation/:n</code></td><td>Accessible to the order's owner, or to any session holding the one-time confirmation token issued at placement — this is what lets a guest see their own confirmation.</td></tr>
+  </tbody>
+</table>
+<div class="warn">
+  <span class="lbl">Guards are convenience, not security</span>
+  Every guard above exists to give the user a sensible experience. None of them protects data: the client bundle is public and any route can be entered directly. Authorisation is enforced server-side on every request, per §11.5. A route guard that has no matching server-side check is a vulnerability, not a feature.
+</div>
+
+<h2>6.6 URL and slug rules</h2>
+<p>Fixing defect R1 properly requires a stated rule, not just a different path shape.</p>
+<table class="compact">
+  <thead><tr><th style="width:32mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Slug generation</td><td>Lowercase; transliterate accents to ASCII; replace every run of non-alphanumeric characters with a single hyphen; trim leading and trailing hyphens; collapse repeats; truncate to 80 characters at a hyphen boundary.</td></tr>
+    <tr><td>Uniqueness</td><td>Enforced by a unique index. On collision, append <code>-2</code>, <code>-3</code>, … until free.</td></tr>
+    <tr><td>Stability</td><td>A slug is generated once at creation and <strong>never regenerated</strong> when the name changes. This is the whole point: renaming "Arduino Uno R3" to "Arduino Uno Rev3" must not break the URL.</td></tr>
+    <tr><td>Renaming</td><td>Editing a name offers an optional "update the URL" checkbox, default off. If chosen, the old slug is written to <code>product_slug_history</code> and served as a 301 redirect to the new one, permanently.</td></tr>
+    <tr><td>Identifier in URL</td><td>Only slugs appear in public URLs. Numeric primary keys never do — they leak catalogue size and invite enumeration.</td></tr>
+    <tr><td>Tokenised URLs</td><td><code>/pay/:t</code> and <code>/invoice/:t</code> carry a 32-byte random token, base62-encoded, stored hashed. Payment tokens are single-use and expire after 14 days; invoice tokens are revocable from the admin console.</td></tr>
+    <tr><td>Canonical form</td><td>Every page emits a <code>&lt;link rel="canonical"&gt;</code>. Trailing slashes are stripped; uppercase paths 301 to lowercase; query parameters that do not change content (campaign tags, <code>utm_*</code>) are excluded from the canonical URL.</td></tr>
+    <tr><td>Query parameters</td><td>Catalogue state lives in the query string so a filtered view is shareable and survives a refresh: <code>?page</code>, <code>?sort</code>, <code>?minPrice</code>, <code>?maxPrice</code>, <code>?inStock</code>, <code>?q</code>. Defaults are omitted rather than written explicitly.</td></tr>
+    <tr><td>Reserved slugs</td><td><code>admin</code>, <code>account</code>, <code>api</code>, <code>auth</code>, <code>cart</code>, <code>checkout</code>, <code>search</code>, <code>products</code>, <code>product</code>, <code>blog</code>, <code>services</code>, <code>invoice</code>, <code>pay</code>, <code>new</code>, <code>edit</code> may not be used as any entity slug.</td></tr>
+  </tbody>
+</table>

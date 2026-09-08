@@ -1,0 +1,88 @@
+<h1 class="part"><span class="num">Appendix F</span>Seed Data Plan</h1>
+<p>Order matters: SKU allocation reads the parent record, so a child can never be seeded before its parent. The seed is idempotent — running it twice produces the same database, never duplicates — which is what makes it safe to re-run against a developer's existing schema.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:10mm">Step</th><th style="width:38mm">Data</th><th>Contents and notes</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Permissions</td><td>All ~60 permission keys from §11.5, grouped. Idempotent upsert on <code>key</code>.</td></tr>
+    <tr><td>2</td><td>Roles</td><td>owner, manager, catalogue, fulfilment, marketing, support — all flagged <code>is_system</code>, with their permission sets per the matrix in §11.5.</td></tr>
+    <tr><td>3</td><td>Owner account</td><td>One staff user from <code>SEED_OWNER_EMAIL</code> and <code>SEED_OWNER_PASSWORD</code>. In production the password must be changed at first sign-in; the seed refuses to run with a default password when <code>NODE_ENV=production</code>.</td></tr>
+    <tr><td>4</td><td>Regions</td><td>The 25 mainland regions: Dar es Salaam, Dodoma, Geita, Iringa, Kagera, Katavi, Kigoma, Kilimanjaro, Lindi, Manyara, Mara, Mbeya, Morogoro, Mtwara, Mwanza, Njombe, Pwani, Rukwa, Ruvuma, Shinyanga, Simiyu, Singida, Songwe, Tabora, Tanga. Zanzibar regions should be added if the store ships there — decide before launch, since it affects the delivery promise.</td></tr>
+    <tr><td>5</td><td>Districts</td><td>Per region. Dar es Salaam: Ilala, Ilala CBD, Kigamboni, Kinondoni, Temeke, Ubungo. The remainder from the official administrative list.</td></tr>
+    <tr><td>6</td><td>Site settings</td><td>Every key from §14.16 with sensible defaults and empty credentials. Payment till numbers and instruction blocks seeded as clearly marked placeholders so a missed configuration is visible rather than silent.</td></tr>
+    <tr><td>7</td><td>Currency</td><td>TZS, maximum fraction digits 0.</td></tr>
+    <tr><td>8</td><td>Shipping methods</td><td>Three, mirroring the proven set: <strong>Savings</strong> TZS 15,000 (address required, mobile payment yes) for upcountry; <strong>Cash on delivery</strong> TZS 5,000 (address required, mobile payment no, cash-on-delivery yes); <strong>Office pickup</strong> TZS 0 (no address, mobile payment yes).</td></tr>
+    <tr><td>9</td><td>Categories</td><td>The 17 categories from Appendix A with their two-digit codes.</td></tr>
+    <tr><td>10</td><td>Subcategories</td><td>The 102 subcategories from Appendix A with their four-digit codes.</td></tr>
+    <tr><td>11</td><td>FAQs</td><td>A starter set across Ordering, Payment, Shipping, Returns, Products and Account — placeholder answers clearly marked for replacement.</td></tr>
+    <tr><td>12</td><td>Demo content <em>(development only)</em></td><td>30 products spread across subcategories, some with variants; 4 banners; 3 partners; 2 services; 3 articles with comments; 20 customers; 40 orders across every status; payments in each state; search logs including zero-result terms. Enough to exercise every screen and every empty state. Guarded by <code>SEED_DEMO=true</code> and refused in production.</td></tr>
+  </tbody>
+</table>
+
+<h1 class="part"><span class="num">Appendix G</span>Order Status Reference</h1>
+<p>A one-page operational reference for staff. Lifecycle, payment and fulfilment are independent (§12.7).</p>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Lifecycle</th><th style="width:32mm">Customer sees</th><th style="width:26mm">Stock effect</th><th>Next steps available</th></tr></thead>
+  <tbody>
+    <tr><td><code>awaiting_payment</code></td><td>"Awaiting payment"</td><td>Reserved</td><td>Verify payment → confirmed · Cancel · Expires at 48 h</td></tr>
+    <tr><td><code>confirmed</code></td><td>"Confirmed"</td><td>Deducted (prepaid) or still reserved (cash on delivery)</td><td>Start processing · Cancel (staff)</td></tr>
+    <tr><td><code>processing</code></td><td>"Being prepared"</td><td>Deducted</td><td>Mark shipped · Cancel (staff)</td></tr>
+    <tr><td><code>shipped</code></td><td>"On the way"</td><td>Deducted</td><td>Mark delivered</td></tr>
+    <tr><td><code>delivered</code></td><td>"Delivered"</td><td>Deducted</td><td>Auto-completes after 7 days · Refund</td></tr>
+    <tr><td><code>completed</code></td><td>"Completed"</td><td>Deducted</td><td>Terminal. Review invitation sent.</td></tr>
+    <tr><td><code>cancelled</code></td><td>"Cancelled"</td><td>Released / restored</td><td>Terminal</td></tr>
+    <tr><td><code>expired</code></td><td>"Expired"</td><td>Released</td><td>Terminal. Reorder link sent.</td></tr>
+    <tr><td><code>refunded</code></td><td>"Refunded"</td><td>Restored only on physical return</td><td>Terminal</td></tr>
+  </tbody>
+</table>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Payment status</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>unpaid</code></td><td>Nothing received. Normal for a new order and for cash on delivery until handover.</td></tr>
+    <tr><td><code>pending_verification</code></td><td>The customer says they have paid. Sitting in the verification queue. <strong>This is the state that needs a human.</strong></td></tr>
+    <tr><td><code>paid</code></td><td>Money confirmed against a provider reference.</td></tr>
+    <tr><td><code>partially_refunded</code> / <code>refunded</code></td><td>Some or all returned.</td></tr>
+    <tr><td><code>failed</code></td><td>An aggregator declined the transaction. The customer may retry.</td></tr>
+  </tbody>
+</table>
+
+<h1 class="part"><span class="num">Appendix H</span>Alternative Stack: PHP / Laravel</h1>
+<p>Decision D1 selected Node.js. If PHP is preferred — and the workstation's existing XAMPP install is a fair reason to prefer it — nothing in Parts 5 to 18 changes. The data model, API contract, business rules, UI specification and admin design are all runtime-neutral. Only the server implementation is affected.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Node.js design</th><th>Laravel 11 equivalent</th></tr></thead>
+  <tbody>
+    <tr><td>Express router + controllers</td><td><code>routes/api.php</code> with API resource controllers</td></tr>
+    <tr><td>Zod schemas in <code>packages/contracts</code></td><td>Form Requests for validation; the schemas can no longer be shared with React, so the front end keeps its own Zod copies and a contract test asserts they agree — this is the single real cost of the switch</td></tr>
+    <tr><td>Prisma</td><td>Eloquent with migrations; the DDL in Appendix E translates directly</td></tr>
+    <tr><td>Service layer</td><td>Action classes (one public method each)</td></tr>
+    <tr><td><code>domain/</code> pure logic</td><td>Plain PHP classes under <code>app/Domain</code>, no framework dependency</td></tr>
+    <tr><td>JWT + refresh rotation</td><td>Sanctum with a custom refresh-token table, keeping the rotation and reuse-detection design of §11.2 — Sanctum's default is weaker</td></tr>
+    <tr><td>BullMQ + Redis</td><td>Laravel Queues on Redis; Horizon replaces the failed-job admin view</td></tr>
+    <tr><td>Scheduled jobs</td><td>Laravel Scheduler</td></tr>
+    <tr><td>Socket.IO</td><td>Laravel Reverb, or Pusher</td></tr>
+    <tr><td>sharp</td><td>Intervention Image with the Imagick driver</td></tr>
+    <tr><td>Nodemailer + React Email</td><td>Laravel Mail with Blade templates</td></tr>
+    <tr><td>pino</td><td>Monolog with a JSON formatter</td></tr>
+    <tr><td>Vitest / Supertest</td><td>Pest or PHPUnit with feature tests</td></tr>
+    <tr><td>PM2 cluster</td><td>PHP-FPM behind Nginx</td></tr>
+  </tbody>
+</table>
+<p>Points to preserve regardless of runtime: money as integers; the order state machine as a single guarded transition table; row locking in a consistent order for stock; unique constraints on payment references; the insert-only audit table enforced by database privileges; and the token strategy of §11.2, which Laravel's defaults do not give you.</p>
+
+<h1 class="part"><span class="num">Appendix I</span>Reference Screenshots</h1>
+<p>Captured from the reference platform at 1440&nbsp;px, used to derive the layouts in Part 7. Full-resolution originals, plus mobile captures and the complete rendered DOM outlines, are in <code>research/screenshots/</code> and <code>research/ui/</code>.</p>
+
+<figure>
+  <img src="assets/ref-home.png" alt="Reference platform home page">
+  <figcaption>Home. Note the three-bar header, the banner carousel's per-banner colour scheme, the three product rails with identical card treatment, the partners strip, and the four-column dark footer — the structure Part 7.2 specifies for TechStar, with the two duplicated "COMPANY INFORMATION" footer headings corrected (defect R14).</figcaption>
+</figure>
+
+<figure>
+  <img src="assets/ref-product.png" alt="Reference platform product detail page">
+  <figcaption>Product detail. The gallery and buy-box split, the QUANTITY stepper beside AVAILABLE STOCK, the three stacked actions, the DESCRIPTION / REVIEWS tabs and the RELATED PRODUCTS rail are all carried into §7.4, with variant selection, discount display, stock-state colouring and a specifications tab added.</figcaption>
+</figure>
+
+<figure>
+  <img src="assets/ref-checkout.png" alt="Reference platform checkout page">
+  <figcaption>Checkout. The single-page design — identity, shipping method with estimated cost, and a sticky order summary whose PLACE ORDER button sits above the totals — is the reference platform's strongest screen and is kept almost unchanged in §7.7. What is added: visible method descriptions, server-side price and stock revalidation, idempotency, and the delegated-payer disclosure.</figcaption>
+</figure>

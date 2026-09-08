@@ -1,0 +1,325 @@
+<h1 class="part"><span class="num">Part Nineteen</span>Frontend Architecture</h1>
+
+<h2>19.1 Folder structure</h2>
+<div class="tree">apps/web/src/
+├── main.tsx                  entry, providers, error boundary
+├── router.tsx                route tree, guards, lazy boundaries
+├── app/
+│   ├── providers/            query client, auth, toast, currency, i18n
+│   └── layouts/              StorefrontLayout, AdminLayout, AccountLayout
+├── features/                 vertical slices — the primary organising axis
+│   ├── catalogue/            components, hooks, api, types
+│   ├── product/
+│   ├── cart/
+│   ├── checkout/
+│   ├── orders/
+│   ├── account/
+│   ├── auth/
+│   ├── content/
+│   └── admin/
+│       ├── products/  orders/  customers/  categories/  banners/
+│       ├── campaigns/ settings/ staff/     analytics/
+│       └── shared/           DataTable, FormLayout, PermissionGate
+├── components/               cross-feature composites
+├── hooks/                    useDebounce, useMediaQuery, useLocalStorage…
+├── lib/                      apiClient, formatters, validators, analytics
+├── stores/                   zustand slices
+├── styles/                   tokens.scss, bootstrap overrides, globals
+└── locales/                  en.json, sw.json</div>
+<p>Features are vertical slices, not horizontal layers. Everything about checkout lives in <code>features/checkout</code>. A file is promoted to <code>components/</code> only when a second feature imports it — moving code up when it is shared beats guessing what will be shared.</p>
+
+<h2>19.2 State management</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">State</th><th style="width:26mm">Where</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Server data</td><td>TanStack Query</td><td>Products, orders, customers, settings. Cache keyed by request, invalidated by mutation. Directly fixes defects R4 and R5.</td></tr>
+    <tr><td>Cart, wishlist</td><td>Zustand + server sync</td><td>Needs optimistic local mutation and cross-tab sync; the server remains authoritative.</td></tr>
+    <tr><td>Auth session</td><td>Zustand, memory only</td><td>Access token never leaves memory (§11.2).</td></tr>
+    <tr><td>UI state</td><td>Zustand</td><td>Off-canvas open, modal mode, sidebar collapsed, toast queue.</td></tr>
+    <tr><td>Filters, pagination, tabs</td><td>URL query string</td><td>Shareable, bookmarkable, back-button correct. Never component state.</td></tr>
+    <tr><td>Form state</td><td>React Hook Form</td><td>Uncontrolled inputs, minimal re-render, Zod resolver.</td></tr>
+    <tr><td>Preferences</td><td><code>localStorage</code></td><td>Grid density, recently viewed, dismissed banners.</td></tr>
+  </tbody>
+</table>
+<pre>// stores/cart.ts — the shape ported from the reference platform's Pinia store,
+// with the increment defect (R3) removed and server sync added.
+interface CartStore {
+  lines: CartLine[]
+  notices: CartNotice[]
+  isSyncing: boolean
+  add(variantSku: string, quantity?: number): Promise&lt;void&gt;
+  setQuantity(variantSku: string, quantity: number): Promise&lt;void&gt;
+  remove(variantSku: string): Promise&lt;void&gt;
+  clear(): Promise&lt;void&gt;
+  hydrate(): Promise&lt;void&gt;      // localStorage first paint, then server truth
+  merge(): Promise&lt;MergeResult&gt;  // after sign-in, §12.5.4
+  get subtotal(): Money
+  get itemCount(): number
+}</pre>
+
+<h2>19.3 Data fetching</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Concern</th><th>Rule</th></tr></thead>
+  <tbody>
+    <tr><td>Query keys</td><td>Structured arrays: <code>['products', {subcategory, sort, page}]</code>. Built by a keys factory per feature so no two call sites can disagree.</td></tr>
+    <tr><td>Stale times</td><td>Categories and settings 30 min · products 5 min · cart 0 (always fresh) · orders 1 min · admin lists 0.</td></tr>
+    <tr><td>Invalidation</td><td>Every mutation declares the key prefixes it invalidates. A mutation with no invalidation list fails review.</td></tr>
+    <tr><td>Optimistic updates</td><td>Cart quantity, wishlist toggle, admin active toggles and reordering. Always with a rollback path.</td></tr>
+    <tr><td>Prefetch</td><td>Product detail is prefetched on card hover or focus after a 150&nbsp;ms delay; the next catalogue page is prefetched when the current one is 80% scrolled.</td></tr>
+    <tr><td>Retry</td><td>Twice with exponential backoff for GET; never for POST, PATCH or DELETE, which is what idempotency keys are for instead.</td></tr>
+    <tr><td>Error handling</td><td>A single API client maps error codes to typed errors; 401 triggers one queued refresh and a replay; 403 and 5xx surface through the error boundary.</td></tr>
+  </tbody>
+</table>
+
+<h2>19.4 Forms and validation</h2>
+<p>One Zod schema per form, imported from <code>packages/contracts</code> — the same object the server validates against. Mode is <code>onTouched</code> then <code>onChange</code> once a field has errored. Server-side field errors from a 422 are mapped back onto form fields by name so they appear in the same place as client-side ones. Submit is disabled while pending and while the form is pristine. Every form guards against navigation with unsaved changes.</p>
+
+<h2>19.5 Error boundaries</h2>
+<p>Three levels: a root boundary rendering the 500 page with the request id; a route-level boundary so one failing route does not blank the shell; and section-level boundaries around each independently loaded home-page rail (§7.2.2), so one failed request degrades one section. Boundaries report to the error tracker with the request id, the route and a redacted breadcrumb trail.</p>
+
+<h2>19.6 Code splitting and performance</h2>
+<ul>
+  <li>Route-level lazy loading for every route; the admin console is a single separate chunk group that a customer never downloads.</li>
+  <li>Heavy libraries are loaded only where used: the rich-text editor, the chart library, FilePond and Leaflet are all dynamic imports.</li>
+  <li>Initial storefront bundle budget: <strong>180&nbsp;KB gzipped</strong> of JavaScript. The reference platform ships a 2&nbsp;MB vendor bundle on first paint; the largest single contributor is a date library that has a 20× smaller replacement.</li>
+  <li>Images lazy below the fold, eager for the banner and the product hero, always with explicit dimensions.</li>
+  <li>Fonts self-hosted, preloaded, subset, <code>font-display: swap</code>.</li>
+  <li><code>react-window</code> for any list beyond 200 rows — the admin product table at scale.</li>
+</ul>
+
+<h2>19.7 Accessibility</h2>
+<p>WCAG 2.1 AA is the target and is testable. Landmark regions on every page; one <code>h1</code> per page with no skipped levels; a visible skip link; focus never lost or trapped except deliberately in modals and off-canvas panels; a visible 2&nbsp;px focus ring everywhere; all interactive elements reachable and operable by keyboard; 44&nbsp;px minimum touch targets; live regions for cart changes, search result counts and form errors; no information conveyed by colour alone — every status pill carries text; all images have meaningful alt text or are explicitly decorative; forms use real labels, never placeholders as labels. <code>eslint-plugin-jsx-a11y</code> runs in CI and axe runs against every Storybook story.</p>
+
+<h2>19.8 Internationalisation</h2>
+<p><code>react-i18next</code>, English shipped, Swahili scaffolded. All copy resolved through <code>t()</code> from day one — retrofitting this into a finished application costs many times what it costs now. Interpolation for names and counts; ICU plurals; dates and money through <code>Intl</code> with the Africa/Dar_es_Salaam zone and the configured currency. The payment instruction blocks ship in both languages immediately (§7.8.1), because that is where a mistranslation costs an order.</p>
+
+<h1 class="part"><span class="num">Part Twenty</span>Backend Architecture</h1>
+
+<h2>20.1 Folder structure</h2>
+<div class="tree">apps/api/src/
+├── server.ts                 http server, socket gateway, graceful shutdown
+├── app.ts                    express app, middleware pipeline (§4.3)
+├── config/                   zod-validated environment, fails fast at boot
+├── modules/                  one folder per bounded context
+│   ├── auth/     catalogue/  cart/      orders/    payments/
+│   ├── invoices/ customers/  shipping/  content/   campaigns/
+│   ├── media/    search/     analytics/ settings/  audit/
+│   └── each: routes.ts · controller.ts · service.ts · repository.ts
+│             · schemas.ts   · events.ts  · __tests__/
+├── middleware/               auth, rbac, validate, rateLimit, requestId, error
+├── infra/
+│   ├── db/                   prisma client, transaction helper
+│   ├── cache/                redis
+│   ├── queue/                bullmq queues and workers
+│   ├── storage/              storage adapters (§15.3)
+│   ├── mail/    sms/         provider adapters
+│   ├── payments/             payment provider adapters (§13.3)
+│   └── realtime/             socket.io gateway
+├── domain/                   pure logic: state machines, pricing, SKU, stock
+├── jobs/                     scheduled job definitions
+└── lib/                      logger, errors, money, phone, slug, ids</div>
+
+<h2>20.2 Layering</h2>
+<p>Strictly one direction: <code>routes → controller → service → repository → Prisma</code>. Controllers know HTTP and nothing about business rules. Services own invariants and transaction boundaries and know nothing about HTTP. Repositories know Prisma and nothing about rules. <code>domain/</code> is pure and has no imports from any other layer, which is what makes the order state machine, the pricing resolver and the SKU allocator testable without a database. Violations are caught by an import-boundary lint rule.</p>
+
+<h2>20.3 Transactions</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Operation</th><th>Must be atomic across</th></tr></thead>
+  <tbody>
+    <tr><td>Place order</td><td>Order · items · address · reservations on every variant · stock movements · order event · cart clear · idempotency record</td></tr>
+    <tr><td>Verify payment</td><td>Payment · order payment status and lifecycle · stock deduction · movements · order event · notification enqueue</td></tr>
+    <tr><td>Cancel order</td><td>Order status · reservation release · movements · order event</td></tr>
+    <tr><td>Create product</td><td>Product · attributes · variants · images · SKU allocation · counter updates on subcategory and category</td></tr>
+    <tr><td>Delete category</td><td>Precondition check · soft delete · counter updates · audit record</td></tr>
+    <tr><td>Approve review</td><td>Review status · product <code>review_count</code> and <code>average_rating</code> · audit record</td></tr>
+  </tbody>
+</table>
+<p>Rules: lock rows in a consistent order — always ascending by primary key — to avoid deadlock; keep transactions short and never perform network I/O inside one; enqueue side effects rather than executing them, so a failed email never rolls back a paid order; and set an explicit 5-second timeout with a retry for deadlock victims.</p>
+
+<h2>20.4 Error taxonomy</h2>
+<pre>AppError (base: code, httpStatus, message, details?, isOperational)
+├── ValidationError        422   from the Zod middleware
+├── UnauthenticatedError   401
+├── ForbiddenError         403
+├── NotFoundError          404
+├── GoneError              410
+├── ConflictError          409
+│   ├── PriceChangedError
+│   ├── InsufficientStockError
+│   └── InvalidStateTransitionError
+├── RateLimitError         429
+└── ExternalServiceError   502   provider unreachable or malformed
+
+Anything else is non-operational: logged with a full stack, reported to the
+error tracker, and returned to the client as a generic 500 with a request id.</pre>
+
+<h2>20.5 Logging and observability</h2>
+<p>Structured JSON via <code>pino</code>. Every line carries <code>requestId</code>, <code>userId</code> where known, route, method, status and duration. A serializer redacts <code>password</code>, <code>token</code>, <code>authorization</code>, <code>refreshToken</code>, <code>paymentNumber</code> and any key matching <code>/secret|key|hash/i</code>. Levels: <code>error</code> for failures needing attention, <code>warn</code> for handled anomalies such as a rejected webhook signature, <code>info</code> for business events (order placed, payment verified, campaign sent), <code>debug</code> off in production. OpenTelemetry traces span HTTP, database and queue work, so a slow checkout can be attributed to a specific query.</p>
+
+<h2>20.6 Caching</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Cached</th><th style="width:20mm">TTL</th><th>Invalidated by</th></tr></thead>
+  <tbody>
+    <tr><td>Category and subcategory tree</td><td>30 min</td><td>Any category or subcategory write</td></tr>
+    <tr><td>Public settings</td><td>30 min</td><td>Settings write</td></tr>
+    <tr><td>Shipping methods</td><td>30 min</td><td>Shipping write</td></tr>
+    <tr><td>Home page rails</td><td>5 min</td><td>Product or banner write</td></tr>
+    <tr><td>Product detail</td><td>5 min</td><td>Write to that product or its variants</td></tr>
+    <tr><td>Analytics aggregates</td><td>5 min</td><td>Time only</td></tr>
+    <tr><td>Regions and districts</td><td>24 h</td><td>Manual</td></tr>
+  </tbody>
+</table>
+<p>Cart, orders, customers, payments and anything user-specific are never cached. Cache keys are namespaced with a schema version so a deployment that changes a response shape does not serve stale structures.</p>
+
+<h2>20.7 Configuration</h2>
+<p>One <code>config/index.ts</code> parses <code>process.env</code> through a Zod schema at boot and exports a frozen, typed object. A missing or malformed variable stops the process with a message naming the variable — never a runtime <code>undefined</code> three hours later. No other file may read <code>process.env</code>, enforced by lint. The full variable list is Appendix D.</p>
+
+<h1 class="part"><span class="num">Part Twenty-One</span>Quality: Testing, Performance, SEO</h1>
+
+<h2>21.1 Test strategy</h2>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Level</th><th style="width:22mm">Target</th><th>Scope</th></tr></thead>
+  <tbody>
+    <tr><td>Unit — domain</td><td>95% of <code>domain/</code></td><td>Order state machine (every legal and illegal transition), pricing and discount resolution, SKU allocation, stock arithmetic, phone canonicalisation, slug generation, money formatting. Pure functions, no database, milliseconds to run.</td></tr>
+    <tr><td>Unit — components</td><td>80%</td><td>Every component in every state: loading, empty, error, populated. Plus an axe assertion per story.</td></tr>
+    <tr><td>Integration — API</td><td>Every endpoint</td><td>Supertest against a real MySQL schema in Docker. Each endpoint tested for success, validation failure, unauthenticated, unauthorised, and not-found.</td></tr>
+    <tr><td>Integration — data</td><td>Key invariants</td><td>Concurrent add-to-cart on the last unit; double webhook delivery; duplicate idempotency key; cascade and restrict behaviour; the financial invariant of §13.6.</td></tr>
+    <tr><td>End-to-end</td><td>7 journeys</td><td>Playwright, Chromium and mobile Chrome: guest purchase with Lipa Namba · signed-in purchase with saved address · delegated payment · admin creates a product with variants · admin verifies a payment and ships · search to purchase · registration, verification and password reset.</td></tr>
+    <tr><td>Visual</td><td>All stories</td><td>Storybook snapshots at three widths, diffed in CI.</td></tr>
+    <tr><td>Load</td><td>Before launch</td><td>k6: 200 concurrent browsers on the catalogue; 20 orders per minute sustained; the search endpoint at 100 requests per second.</td></tr>
+    <tr><td>Security</td><td>Each release</td><td>Dependency audit, an automated ZAP baseline scan, and a manual authorisation matrix test asserting that a customer token is rejected by every admin route.</td></tr>
+  </tbody>
+</table>
+<p>Test data comes from typed factories, never from fixtures copied between tests. Each test creates only what it asserts on. The database is truncated between tests, not re-migrated.</p>
+
+<h2>21.2 Performance budgets</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Metric</th><th style="width:22mm">Budget</th><th>Measured</th></tr></thead>
+  <tbody>
+    <tr><td>Largest Contentful Paint, mobile 3G</td><td>&lt; 2.5 s</td><td>Lighthouse CI on every pull request</td></tr>
+    <tr><td>Interaction to Next Paint</td><td>&lt; 200 ms</td><td>Field data</td></tr>
+    <tr><td>Cumulative Layout Shift</td><td>&lt; 0.1</td><td>Lighthouse CI</td></tr>
+    <tr><td>Initial JS, gzipped</td><td>&lt; 180 KB</td><td>Bundle analysis, CI fails on regression</td></tr>
+    <tr><td>API p95, reads</td><td>&lt; 200 ms</td><td>Server metrics</td></tr>
+    <tr><td>API p95, order creation</td><td>&lt; 800 ms</td><td>Server metrics</td></tr>
+    <tr><td>Search p95</td><td>&lt; 150 ms</td><td>Server metrics</td></tr>
+    <tr><td>Slow query threshold</td><td>&gt; 100 ms</td><td>MySQL slow log with alerting</td></tr>
+  </tbody>
+</table>
+
+<h2>21.3 SEO</h2>
+<p>The catalogue is the acquisition channel, so the client-rendered decision (D3) must be paid for deliberately. Public routes — home, catalogue, every product, every article, every content page — are <strong>prerendered at build time and revalidated on content change</strong>, producing static HTML that crawlers and slow devices receive immediately while React hydrates over it. Beyond that: unique title and meta description per page; canonical URLs; Open Graph and Twitter cards with the product image; JSON-LD for Product, Offer, BreadcrumbList, Review, Organisation and FAQPage; a generated <code>sitemap.xml</code> segmented by type and refreshed nightly; a <code>robots.txt</code> excluding <code>/admin</code>, <code>/account</code>, <code>/checkout</code>, <code>/pay</code> and <code>/invoice</code>; 301s from retired slugs; and a PWA manifest with offline support for previously viewed pages.</p>
+
+<h1 class="part"><span class="num">Part Twenty-Two</span>Deployment and Operations</h1>
+
+<h2>22.1 Topology</h2>
+<pre>Production (single VPS is adequate to ~50k monthly sessions)
+┌──────────────────────────────────────────────────────────┐
+│  Nginx  :443  TLS (Let's Encrypt, auto-renew)            │
+│    /            → SPA static build, immutable cache      │
+│    /api         → 127.0.0.1:4000                         │
+│    /socket.io   → 127.0.0.1:4000 (upgrade)               │
+│    /media       → /var/lib/techstar/media (exec off)     │
+├──────────────────────────────────────────────────────────┤
+│  PM2: api ×2 (cluster)  ·  worker ×1  ·  scheduler ×1    │
+├──────────────────────────────────────────────────────────┤
+│  MySQL 8   (local socket, 2 GB buffer pool)              │
+│  Redis 7   (maxmemory 512 MB, allkeys-lru for cache DB,  │
+│             noeviction for the queue DB — never evict    │
+│             a job)                                        │
+└──────────────────────────────────────────────────────────┘
+
+Scaling path, in order: move MySQL to its own host → add a read replica for
+analytics → move media to S3 + CDN → run the API behind a load balancer.</pre>
+
+<h2>22.2 CI/CD</h2>
+<pre>on pull request        typecheck · lint · unit · integration · build
+                       bundle-size check · Lighthouse CI · axe
+                       npm audit (fail on high/critical)
+on merge to main       build → staging → migrate → smoke → e2e
+on tag v*              build → manual approval → production
+                         ├─ backup database
+                         ├─ prisma migrate deploy
+                         ├─ pm2 reload (zero downtime)
+                         ├─ smoke tests
+                         └─ rollback on failure</pre>
+<p>The production build strips all non-production configuration — no development hostnames, no localhost ports (fixing R10), no source maps served publicly, though they are uploaded to the error tracker. Secrets come from the deployment environment and never from the repository.</p>
+
+<h2>22.3 Migrations</h2>
+<p>Prisma Migrate, forward-only, reviewed in the pull request that needs them. Rules: additive first — add a column nullable, backfill in a job, then enforce <code>NOT NULL</code> in a later release; never drop a column in the same release that stops writing to it; every destructive migration is preceded by a verified backup; and migrations run automatically on deploy with an advisory lock so two instances cannot race.</p>
+
+<h2>22.4 Backups and disaster recovery</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Item</th><th>Policy</th></tr></thead>
+  <tbody>
+    <tr><td>Database</td><td><code>mysqldump --single-transaction</code> nightly, plus binary logs for point-in-time recovery. Encrypted, off-site, 30 daily / 12 monthly / 7 yearly.</td></tr>
+    <tr><td>Media</td><td>Nightly incremental sync to off-site object storage.</td></tr>
+    <tr><td>Restore drill</td><td><strong>Quarterly, mandatory.</strong> Restore to a scratch host and verify order counts and totals. An untested backup is not a backup.</td></tr>
+    <tr><td>RPO / RTO</td><td>24 hours / 4 hours for a full rebuild from backup; 15 minutes / 1 hour with binary logs available.</td></tr>
+  </tbody>
+</table>
+
+<h2>22.5 Monitoring and runbooks</h2>
+<p>Uptime checks on <code>/</code>, <code>/api/v1/health</code> and <code>/api/v1/health/deep</code> (which verifies MySQL, Redis and storage). Alerts on: 5xx rate above 1% for 5 minutes; p95 latency above 1 second; queue depth above 1,000; failed webhook count above zero; disk above 80%; MySQL connections above 80% of maximum; SMS balance below the threshold; a failed nightly backup; and any financial-invariant violation. Written runbooks cover payment provider outage, SMS provider outage, database restore, stuck queue, high traffic event, and a suspected security incident — each naming who to call and what to say to customers.</p>
+
+<h2>22.6 Local development on XAMPP</h2>
+<p>The workstation already runs XAMPP, and its MySQL is a perfectly good development database. Start MySQL from the XAMPP control panel, create the <code>techstar</code> schema with <code>utf8mb4</code>, point <code>DATABASE_URL</code> at <code>mysql://root@127.0.0.1:3306/techstar</code>, and run migrations and the seed. phpMyAdmin at <code>localhost/phpmyadmin</code> is then available for inspection. Apache is not needed — Vite serves the front end and Express serves the API. Redis is the one thing XAMPP does not provide: run it under Docker, or under WSL, or use the in-memory queue driver, which is supported for development only.</p>
+
+<h1 class="part"><span class="num">Part Twenty-Three</span>Delivery Plan</h1>
+
+<h2>23.1 Phases</h2>
+<table>
+  <thead><tr><th style="width:12mm">Phase</th><th style="width:34mm">Outcome</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>Foundations</td><td>Repository, workspaces, tooling, CI. Prisma schema and migrations for all 50 tables. Seed: taxonomy, regions, districts, roles, permissions, settings. Design tokens and the primitive component set with Storybook. Auth end to end. <em>Exit: a developer can clone, install, migrate, seed and sign in.</em></td></tr>
+    <tr><td>1</td><td>Catalogue</td><td>Categories, subcategories, products with variants, images and media pipeline. Admin CRUD for all of it. Storefront home, catalogue, product detail, search. <em>Exit: the full reference catalogue shape is enterable and browsable.</em></td></tr>
+    <tr><td>2</td><td>Commerce</td><td>Cart, wishlist, checkout, shipping methods, order creation with revalidation and reservation, order state machine, manual Lipa Namba, cash on delivery, admin order queue and payment verification, transactional email and SMS. <em>Exit: a real order can be placed, paid and shipped.</em></td></tr>
+    <tr><td>3</td><td>Accounts &amp; content</td><td>Profile, addresses, order history, reviews, banners, articles, comments, services, partners, FAQs, content pages, moderation queues, invoices, delegated payment. <em>Exit: feature parity with the reference platform.</em></td></tr>
+    <tr><td>4</td><td>Operations &amp; growth</td><td>Dashboard analytics, search analytics, campaigns, contacts, staff and roles, audit log, exports, aggregator payment adapter, prerendering and SEO, PWA. <em>Exit: the business can be run and measured from the console.</em></td></tr>
+    <tr><td>5</td><td>Hardening &amp; launch</td><td>Load testing, security review, accessibility audit, restore drill, runbooks, staff training, content population, sender-ID registration, soft launch, launch. <em>Exit: live.</em></td></tr>
+  </tbody>
+</table>
+
+<h2>23.2 Estimate</h2>
+<p>Ranges for one full-stack engineer working steadily, and for a team of three (two full-stack, one front-end-leaning). They assume the design system is built once in Phase 0 and reused, which is where most of the compression comes from.</p>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Phase</th><th style="width:26mm">Solo</th><th style="width:26mm">Team of three</th><th>Critical path</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>2–3 weeks</td><td>1–1.5 weeks</td><td>Schema decisions; everything downstream depends on them</td></tr>
+    <tr><td>1</td><td>4–5 weeks</td><td>2–2.5 weeks</td><td>The variant matrix; it is the hardest single screen</td></tr>
+    <tr><td>2</td><td>5–6 weeks</td><td>2.5–3 weeks</td><td>Order state machine, stock concurrency, payment reconciliation</td></tr>
+    <tr><td>3</td><td>4–5 weeks</td><td>2–2.5 weeks</td><td>Breadth rather than depth; highly parallelisable</td></tr>
+    <tr><td>4</td><td>4–5 weeks</td><td>2–2.5 weeks</td><td>Campaigns and the aggregator integration, both with external dependencies</td></tr>
+    <tr><td>5</td><td>2–3 weeks</td><td>1.5–2 weeks</td><td>Sender-ID registration and content population are not engineering work and must start in Phase 3</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>21–27 weeks</strong></td><td><strong>11.5–14 weeks</strong></td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>23.3 Acceptance criteria</h2>
+<p>A phase is complete only when all of the following hold, not when the screens look finished.</p>
+<ul>
+  <li>Every endpoint in scope has integration tests covering success, validation, unauthenticated, unauthorised and not-found.</li>
+  <li>Every screen in scope has its loading, empty, error and populated states implemented and covered by a Storybook story.</li>
+  <li>Domain logic in scope is at 95% unit coverage.</li>
+  <li>Lighthouse and axe pass at the budgets in §21.2 with no new violations.</li>
+  <li>No high or critical dependency advisory.</li>
+  <li>Every admin action in scope writes an audit record.</li>
+  <li>The relevant end-to-end journeys pass on Chromium and mobile Chrome.</li>
+  <li>Any deviation from this specification is written down, with its reason, in a decision record.</li>
+</ul>
+
+<h2>23.4 Risk register</h2>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Risk</th><th style="width:14mm">Impact</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>SMS sender-ID registration takes weeks</td><td>High</td><td>Start in Phase 3, not Phase 5. It blocks launch and cannot be accelerated. Have an email-only fallback path ready.</td></tr>
+    <tr><td>Manual reconciliation does not scale past ~50 orders/day</td><td>High</td><td>Aggregator adapter designed in Phase 2, implemented in Phase 4. Watch the payment-lag metric; it is the trigger.</td></tr>
+    <tr><td>Catalogue population is slower than expected</td><td>High</td><td>CSV import in Phase 1, not later. Product entry time is a tracked metric (§3.6).</td></tr>
+    <tr><td>Payment provider onboarding is slow or is refused</td><td>Medium</td><td>Launch does not depend on it. Approach two providers in parallel.</td></tr>
+    <tr><td>Mobile money USSD menus change</td><td>Medium</td><td>Instructions are editable settings, not code (§14.16). Re-verify quarterly.</td></tr>
+    <tr><td>Legal copy not ready at launch</td><td>Medium</td><td>Assign in Phase 0. Privacy and Terms need legal review, which has its own lead time.</td></tr>
+    <tr><td>Product photography inconsistent</td><td>Medium</td><td>Agree a shooting standard — white background, square, 1200&nbsp;px minimum — before Phase 1 bulk entry, not after.</td></tr>
+    <tr><td>Scope creep into marketplace or multi-currency</td><td>Medium</td><td>§3.5 states the non-goals. Changes go through a written decision record.</td></tr>
+    <tr><td>Single-server topology becomes a bottleneck</td><td>Low</td><td>The scaling path in §22.1 is ordered and requires no re-architecture.</td></tr>
+  </tbody>
+</table>

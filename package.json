@@ -1,0 +1,28 @@
+{
+  "name": "techstar-store",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TechStar Store \u2014 STEM & electronics e-commerce platform (React + MySQL)",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace apps/api",
+    "dev:web": "npm run dev --workspace apps/web",
+    "build": "npm run build --workspace apps/api && npm run build --workspace apps/web",
+    "db:push": "npm run db:push --workspace apps/api",
+    "db:seed": "npm run db:seed --workspace apps/api",
+    "db:studio": "npm run db:studio --workspace apps/api",
+    "setup": "npm install && npm run db:push && npm run db:seed",
+    "db:reset": "npm run db:reset --workspace apps/api",
+    "db:generate": "npm run db:generate --workspace apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,512 @@
+[
+ {
+  "name": "Components",
+  "skuCode": "00",
+  "subcategories": [
+   {
+    "name": "Connectors & sockets",
+    "skuCode": "0000"
+   },
+   {
+    "name": "Prototyping boards & PCBs",
+    "skuCode": "0001"
+   },
+   {
+    "name": "Displays",
+    "skuCode": "0002"
+   },
+   {
+    "name": "Switches & keypads",
+    "skuCode": "0003"
+   },
+   {
+    "name": "Passive devices",
+    "skuCode": "0004"
+   },
+   {
+    "name": "Circuit protection",
+    "skuCode": "0005"
+   },
+   {
+    "name": "Semiconductors",
+    "skuCode": "0006"
+   },
+   {
+    "name": "Electromechanics",
+    "skuCode": "0007"
+   },
+   {
+    "name": "Wires &cables",
+    "skuCode": "0008"
+   }
+  ]
+ },
+ {
+  "name": "Hardware Development Tools & Platforms",
+  "skuCode": "01",
+  "subcategories": [
+   {
+    "name": "Compatible Arduino® boards & accessories",
+    "skuCode": "0100"
+   },
+   {
+    "name": "Programmers and debuggers",
+    "skuCode": "0101"
+   },
+   {
+    "name": "Development kits",
+    "skuCode": "0102"
+   },
+   {
+    "name": "Raspberry Pi boards & accessories",
+    "skuCode": "0111"
+   }
+  ]
+ },
+ {
+  "name": "Integrated Circuits",
+  "skuCode": "02",
+  "subcategories": [
+   {
+    "name": "4000 Series",
+    "skuCode": "0200"
+   },
+   {
+    "name": "7400 Series",
+    "skuCode": "0201"
+   },
+   {
+    "name": "OpAmps",
+    "skuCode": "0202"
+   },
+   {
+    "name": "A/D & D/A Converters",
+    "skuCode": "0203"
+   },
+   {
+    "name": "Memory chips",
+    "skuCode": "0204"
+   },
+   {
+    "name": "Timers",
+    "skuCode": "0205"
+   },
+   {
+    "name": "Drivers",
+    "skuCode": "0206"
+   },
+   {
+    "name": "Programmable devices",
+    "skuCode": "0207"
+   },
+   {
+    "name": "Special function",
+    "skuCode": "0208"
+   }
+  ]
+ },
+ {
+  "name": "Microcontrollers & Microprocessors",
+  "skuCode": "03",
+  "subcategories": [
+   {
+    "name": "AVR",
+    "skuCode": "0300"
+   },
+   {
+    "name": "PIC",
+    "skuCode": "0301"
+   },
+   {
+    "name": "ARM",
+    "skuCode": "0302"
+   },
+   {
+    "name": "8051",
+    "skuCode": "0303"
+   },
+   {
+    "name": "MSP",
+    "skuCode": "0304"
+   }
+  ]
+ },
+ {
+  "name": "Power Supply & Switching Boards",
+  "skuCode": "04",
+  "subcategories": [
+   {
+    "name": "AC--DC",
+    "skuCode": "0400"
+   },
+   {
+    "name": "DC--DC",
+    "skuCode": "0401"
+   },
+   {
+    "name": "Switching",
+    "skuCode": "0402"
+   }
+  ]
+ },
+ {
+  "name": "Sensors & Conditioning Boards",
+  "skuCode": "05",
+  "subcategories": [
+   {
+    "name": "Liquid",
+    "skuCode": "0500"
+   },
+   {
+    "name": "Pressure",
+    "skuCode": "0501"
+   },
+   {
+    "name": "Vibration",
+    "skuCode": "0502"
+   },
+   {
+    "name": "Sound",
+    "skuCode": "0503"
+   },
+   {
+    "name": "Temperature",
+    "skuCode": "0504"
+   },
+   {
+    "name": "Touch",
+    "skuCode": "0505"
+   },
+   {
+    "name": "Gas",
+    "skuCode": "0506"
+   },
+   {
+    "name": "Biometric",
+    "skuCode": "0507"
+   },
+   {
+    "name": "Object & Metal",
+    "skuCode": "0508"
+   },
+   {
+    "name": "Current",
+    "skuCode": "0509"
+   },
+   {
+    "name": "Voltage",
+    "skuCode": "0510"
+   },
+   {
+    "name": "Motion",
+    "skuCode": "0511"
+   },
+   {
+    "name": "Dust",
+    "skuCode": "0512"
+   },
+   {
+    "name": "Distance",
+    "skuCode": "0513"
+   },
+   {
+    "name": "Weight/Stress",
+    "skuCode": "0514"
+   },
+   {
+    "name": "Light & Radiation",
+    "skuCode": "0515"
+   },
+   {
+    "name": "Temperature/Humidity",
+    "skuCode": "0516"
+   }
+  ]
+ },
+ {
+  "name": "Tools & consumables",
+  "skuCode": "06",
+  "subcategories": [
+   {
+    "name": "Screw drivers",
+    "skuCode": "0600"
+   },
+   {
+    "name": "Fasteners",
+    "skuCode": "0601"
+   },
+   {
+    "name": "Soldering tools & cleaners",
+    "skuCode": "0602"
+   },
+   {
+    "name": "PCB processing tools",
+    "skuCode": "0603"
+   },
+   {
+    "name": "Strippers, crimpers & cutters",
+    "skuCode": "0604"
+   },
+   {
+    "name": "Pliers",
+    "skuCode": "0605"
+   },
+   {
+    "name": "Drilling machines, rotary drivers & accessories",
+    "skuCode": "0606"
+   },
+   {
+    "name": "Tweezers",
+    "skuCode": "0607"
+   },
+   {
+    "name": "Hot glue gun & sticks",
+    "skuCode": "0608"
+   },
+   {
+    "name": "Helping hands",
+    "skuCode": "0609"
+   },
+   {
+    "name": "Magnifying glass",
+    "skuCode": "0610"
+   },
+   {
+    "name": "Anti-static and ESD tools",
+    "skuCode": "0611"
+   },
+   {
+    "name": "Bench vise",
+    "skuCode": "0612"
+   },
+   {
+    "name": "Toolbox",
+    "skuCode": "0613"
+   }
+  ]
+ },
+ {
+  "name": "Lab Equipment",
+  "skuCode": "07",
+  "subcategories": [
+   {
+    "name": "Power supplies",
+    "skuCode": "0700"
+   },
+   {
+    "name": "Function generators",
+    "skuCode": "0701"
+   },
+   {
+    "name": "Frequency counters",
+    "skuCode": "0702"
+   },
+   {
+    "name": "Oscilloscopes",
+    "skuCode": "0703"
+   },
+   {
+    "name": "Multimeters",
+    "skuCode": "0704"
+   },
+   {
+    "name": "Ammeters",
+    "skuCode": "0705"
+   },
+   {
+    "name": "Voltmeters",
+    "skuCode": "0706"
+   },
+   {
+    "name": "Galvanometers",
+    "skuCode": "0707"
+   }
+  ]
+ },
+ {
+  "name": "Energy",
+  "skuCode": "08",
+  "subcategories": [
+   {
+    "name": "Solar panels",
+    "skuCode": "0800"
+   },
+   {
+    "name": "Solar charge controllers",
+    "skuCode": "0801"
+   },
+   {
+    "name": "Inverters",
+    "skuCode": "0802"
+   },
+   {
+    "name": "Batteries & accessories",
+    "skuCode": "0803"
+   }
+  ]
+ },
+ {
+  "name": "Toys & Hobbies",
+  "skuCode": "09",
+  "subcategories": [
+   {
+    "name": "Aircraft & accessories",
+    "skuCode": "0900"
+   },
+   {
+    "name": "Car & accessories",
+    "skuCode": "0901"
+   },
+   {
+    "name": "Drones",
+    "skuCode": "0902"
+   },
+   {
+    "name": "Robots",
+    "skuCode": "0903"
+   }
+  ]
+ },
+ {
+  "name": "Communication",
+  "skuCode": "10",
+  "subcategories": [
+   {
+    "name": "USB-to-TTL",
+    "skuCode": "1000"
+   },
+   {
+    "name": "USB-to-UART",
+    "skuCode": "1001"
+   },
+   {
+    "name": "UART-to-USB",
+    "skuCode": "1002"
+   },
+   {
+    "name": "Radio Frequency",
+    "skuCode": "1003"
+   },
+   {
+    "name": "Laser",
+    "skuCode": "1004"
+   },
+   {
+    "name": "Infrared",
+    "skuCode": "1005"
+   }
+  ]
+ },
+ {
+  "name": "Computers & Accessories",
+  "skuCode": "11",
+  "subcategories": [
+   {
+    "name": "Single Board Computers & Accessories",
+    "skuCode": "1100"
+   },
+   {
+    "name": "Networking devices",
+    "skuCode": "1101"
+   },
+   {
+    "name": "Data storage devices",
+    "skuCode": "1102"
+   },
+   {
+    "name": "Calculators",
+    "skuCode": "1103"
+   },
+   {
+    "name": "Presenters",
+    "skuCode": "1104"
+   },
+   {
+    "name": "Keyboards",
+    "skuCode": "1105"
+   },
+   {
+    "name": "Mice & accessories",
+    "skuCode": "1106"
+   }
+  ]
+ },
+ {
+  "name": "Data & Signal Processing",
+  "skuCode": "12",
+  "subcategories": [
+   {
+    "name": "Audio amplifiers",
+    "skuCode": "1200"
+   },
+   {
+    "name": "Voice recognition boards",
+    "skuCode": "1201"
+   },
+   {
+    "name": "SD Card Readers",
+    "skuCode": "1202"
+   },
+   {
+    "name": "Decoder Modules",
+    "skuCode": "1203"
+   }
+  ]
+ },
+ {
+  "name": "Security & Surveillance",
+  "skuCode": "13",
+  "subcategories": [
+   {
+    "name": "CCTV Cameras",
+    "skuCode": "1300"
+   },
+   {
+    "name": "Access control systems",
+    "skuCode": "1301"
+   }
+  ]
+ },
+ {
+  "name": "Industrial Control & Automation",
+  "skuCode": "14",
+  "subcategories": [
+   {
+    "name": "Programmable Logic Controllers",
+    "skuCode": "1400"
+   }
+  ]
+ },
+ {
+  "name": "Heating, Cooling & Air Quality",
+  "skuCode": "16",
+  "subcategories": [
+   {
+    "name": "Humidifiers",
+    "skuCode": "1600"
+   },
+   {
+    "name": "Dehumidifiers",
+    "skuCode": "1601"
+   },
+   {
+    "name": "Heat sinks",
+    "skuCode": "1604"
+   },
+   {
+    "name": "Heat shrink tubing & heat sleeves",
+    "skuCode": "1605"
+   }
+  ]
+ },
+ {
+  "name": "Electronics Projects",
+  "skuCode": "17",
+  "subcategories": [
+   {
+    "name": "Automatic Irrigation Pump",
+    "skuCode": "1700"
+   }
+  ]
+ }
+]

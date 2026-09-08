@@ -1,0 +1,229 @@
+<h2>7.7 Checkout</h2>
+<p><strong>Purpose.</strong> Convert a cart into a paid order with the fewest possible decisions, without forcing account creation. This is the highest-value screen in the product and the one where the reference platform's design is at its strongest: a single page, no steps, no wizard, everything visible at once.</p>
+
+<h3>7.7.1 Layout</h3>
+<p>Two columns at <code>lg</code> and above: the form on the left (8 of 12), the order summary on the right (4 of 12), sticky from the top of the viewport. Below <code>lg</code>, the summary moves above the form as a collapsed accordion showing the total, expandable to the full breakdown, and the "PLACE ORDER" button becomes a fixed bottom bar showing the total.</p>
+
+<table>
+  <thead><tr><th style="width:34mm">Block</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Page heading</td><td>"Getting your order" — kept verbatim from the reference platform. It is warmer and less transactional than "Checkout", and the visitor already knows where they are.</td></tr>
+    <tr><td>Sign-in prompt</td><td>Two lines, shown only to guests. "Returning customer? <u>Click here to log in</u>" and "Don't have a TechStar account? <u>Click here to create an account</u>". Both open the auth modal at the corresponding tab and, on success, refill the form from the profile without losing anything already typed.</td></tr>
+    <tr><td>1. CLIENT DETAILS</td><td>Bordered card. Two fields side by side at <code>md</code>+, stacked below. <strong>Username</strong> — the buyer's name, placeholder "Username", prefilled from the profile when signed in. <strong>Phone</strong> — placeholder "255XXXXXXXXX", <code>inputmode="numeric"</code>.</td></tr>
+    <tr><td>2. SHIPPING METHOD</td><td>Bordered card with the heading row "SHIPPING METHOD" on the left and "ESTIMATED COST" right-aligned. One radio per method: label on the left, formatted cost on the right in semibold. The method's description renders beneath its label in muted 12&nbsp;px — the reference platform hides this in a tooltip, where a customer choosing between "Savings" and "Cash on delivery" will never find it. Selecting a method immediately updates the summary and reveals or hides the two dependent blocks below.</td></tr>
+    <tr><td>3. SHIPPING DETAILS</td><td>Shown only when the selected method has <code>requiresShippingDetails</code>. Fields: <strong>Receiver's name</strong> (prefilled from Client Details, editable — the recipient is often not the buyer); <strong>Email</strong>; <strong>Phone</strong>; <strong>Country</strong> (fixed to "Tanzania", disabled); <strong>Region</strong> (select of the 25 regions); <strong>District</strong> (select, disabled and empty until a region is chosen, then loaded for that region); <strong>Street address</strong> (textarea, 2 rows); <strong>Postal code / Zip code</strong> (optional). A "Use my saved address" checkbox appears for signed-in users with a saved address, checked by default, and collapses the block to a summary with an "Edit" link.</td></tr>
+    <tr><td>4. PAYMENT METHOD</td><td>Shown only when the selected shipping method has <code>canReceiveMobilePayments</code>; when it does not — as with Cash on delivery — payment is implicitly cash and this block is replaced by a short explanatory note. Two radios: <strong>Lipa Namba</strong> (mobile money) and <strong>Cash</strong>. Choosing Lipa Namba reveals the payment-instructions panel (§7.8.1) and a required <strong>Payment number</strong> field, placeholder "255XXXXXXXXX", helper text "The mobile money number you will pay from."</td></tr>
+    <tr><td>5. SOMEONE ELSE PAYING?</td><td>A collapsed disclosure, "Someone else is paying for this order". Expanding reveals one field, <strong>Payer's email address</strong>, with helper text explaining that a payment link will be emailed to them and the order will be held until they pay. Specified in §12.9.</td></tr>
+    <tr><td>Order summary</td><td>Card on <code>--ts-surface-alt</code>. Header "Your Order" with a cart icon. Then the <strong>PLACE ORDER</strong> primary button — placed at the <em>top</em> of the summary as the reference platform does, so it is above the fold on desktop. Then a compact line-item list (thumbnail, name, "Quantity: n", line total), then Sub Total, Shipping Cost, a rule, and TOTAL in 18&nbsp;px semibold. An "Edit cart" link returns to <code>/cart</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.7.2 Validation</h3>
+<p>Validated on blur, then on every change once a field has errored, then in full on submit. Messages are the reference platform's own wording where it is already clear.</p>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Field</th><th style="width:44mm">Rule</th><th>Message</th></tr></thead>
+  <tbody>
+    <tr><td>Username</td><td>required, 2–80 chars</td><td>"Username is required"</td></tr>
+    <tr><td>Phone</td><td>required</td><td>"Phone is required"</td></tr>
+    <tr><td>Phone</td><td>digits only</td><td>"Phone must be a number"</td></tr>
+    <tr><td>Phone</td><td>exactly 12 digits</td><td>"Phone number must be 12 characters long"</td></tr>
+    <tr><td>Phone</td><td>starts with <code>255</code></td><td>"Enter your number in the form 255XXXXXXXXX"</td></tr>
+    <tr><td>Shipping method</td><td>required</td><td>"Please select a shipping method"</td></tr>
+    <tr><td>Email (shipping)</td><td>required, valid</td><td>"Email is required" / "Enter a valid email"</td></tr>
+    <tr><td>Receiver's name</td><td>required</td><td>"Receiver's name is required"</td></tr>
+    <tr><td>Region</td><td>required</td><td>"Region is required"</td></tr>
+    <tr><td>District</td><td>required</td><td>"District is required"</td></tr>
+    <tr><td>Street address</td><td>required, 5–255 chars</td><td>"Street address is required"</td></tr>
+    <tr><td>Payment method</td><td>required when the block is shown</td><td>"Please select a payment method"</td></tr>
+    <tr><td>Payment number</td><td>required when Lipa Namba</td><td>"Enter a payment number"</td></tr>
+    <tr><td>Payment number</td><td>digits, exactly 12</td><td>"Payment number must be 12 characters long"</td></tr>
+    <tr><td>Payer's email</td><td>valid when present</td><td>"Enter a valid email"</td></tr>
+  </tbody>
+</table>
+<p>On a failed submit, focus moves to the first invalid field, the page scrolls it into view beneath the sticky header, and a live region announces "n fields need attention".</p>
+
+<h3>7.7.3 Submit sequence</h3>
+<pre>PLACE ORDER pressed
+ ├─ client-side validation ─── fail → focus first error, announce, stop
+ ├─ button enters loading state, label replaced by spinner, form disabled
+ ├─ POST /orders  { customer, items[], shippingMethodId,
+ │                  shippingAddress?, paymentMethod, paymentNumber?,
+ │                  delegatedPayerEmail?, idempotencyKey }
+ ├─ server revalidates EVERY line: product live, variant live,
+ │  price unchanged, stock sufficient                      (§12.5.3)
+ │    ├─ 409 PRICE_CHANGED  → summary updates in place, amber notice
+ │    │                        "Prices have changed. Please review and
+ │    │                         place your order again." Button re-enabled.
+ │    ├─ 409 OUT_OF_STOCK   → affected lines flagged, quantities clamped,
+ │    │                        same re-confirm treatment
+ │    └─ 200/201            → continue
+ ├─ order created, stock reserved, order number issued  (§12.7)
+ ├─ cart cleared client-side and server-side
+ └─ navigate to /order/confirmation/:orderNumber
+      (if an aggregator returned a hosted checkout URL, redirect there
+       instead and return to the confirmation route afterwards — this is
+       the `url` field the reference platform's client already honours)</pre>
+
+<div class="note">
+  <span class="lbl">Idempotency</span>
+  The client generates a UUID when the checkout page mounts and sends it as <code>idempotencyKey</code>. The server stores it against the created order and returns the same order for any repeat of the same key within 24 hours. A double-click, a flaky mobile connection or an impatient refresh must never create two orders — on a payment screen this is not a nicety.
+</div>
+
+<h3>7.7.4 States</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">State</th><th>Rendering</th></tr></thead>
+  <tbody>
+    <tr><td>Empty cart</td><td>Guard redirects to <code>/cart</code> with the toast "Your cart is empty."</td></tr>
+    <tr><td>Loading reference data</td><td>Shipping method list and region select render as skeletons; the identity fields are usable immediately.</td></tr>
+    <tr><td>Districts loading</td><td>District select shows a spinner and is disabled; it never appears empty and enabled.</td></tr>
+    <tr><td>Submitting</td><td>All inputs disabled, button spinning, a scrim over the summary. Navigation away triggers a <code>beforeunload</code> warning.</td></tr>
+    <tr><td>Network failure</td><td>"We could not reach the server. Your cart is safe — please try again." Form re-enabled with all input preserved. The idempotency key is retained so a retry cannot duplicate.</td></tr>
+    <tr><td>Signed in mid-checkout</td><td>Profile data merges into empty fields only; anything the user has already typed is never overwritten.</td></tr>
+  </tbody>
+</table>
+
+<h2>7.8 Payment</h2>
+
+<h3>7.8.1 Payment instructions panel</h3>
+<p>Shown inline at checkout once Lipa Namba is selected, and again on the confirmation page. It is a two-column card of network-specific instructions, one block per mobile money network, plus a QR code for the primary network. The instructions are the operational heart of the manual payment flow and are therefore <strong>content managed in the admin console</strong> (§14.16), not hard-coded — till numbers change, and a code deploy is the wrong way to change one.</p>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Block</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>M-Pesa (Vodacom)</td><td>Numbered steps: dial the USSD string or open the app, choose "Lipa kwa M-Pesa", enter the till number, enter the amount, enter the PIN, await the confirmation SMS. Accompanied by the app QR code.</td></tr>
+    <tr><td>Mixx by Yas (Tigo Pesa)</td><td>Numbered steps for the Tigo USSD menu and till number.</td></tr>
+    <tr><td>Airtel Money</td><td>Numbered steps for the Airtel USSD menu and till number.</td></tr>
+    <tr><td>Other networks</td><td>Steps for sending to another network, ending at the M-Pesa till number.</td></tr>
+    <tr><td>Amount</td><td>Rendered prominently above the blocks: "Pay exactly <strong>TZS 45,000</strong>" with a copy control, and the order number beneath as the reference to quote.</td></tr>
+    <tr><td>Language</td><td>Presented in Swahili with an English toggle. The reference platform ships Swahili only; both matter, because the buyer's phone menus are in one language and the site is in the other.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.8.2 Order confirmation page</h3>
+<p><code>/order/confirmation/:orderNumber</code>. Contents in order:</p>
+<ul>
+  <li>A success panel: green <code>check-circle</code>, "Order placed", the order number in monospace with a copy control, and "We have emailed a copy to <em>address</em>" when an email is known.</li>
+  <li><strong>What happens next</strong> — three or four numbered steps that differ by payment method. Lipa Namba: pay, we confirm within one business hour, we pack, we ship. Cash on delivery: we call to confirm, we pack, you pay the courier on delivery. Delegated: we have emailed the payer, the order is held until they pay.</li>
+  <li>The payment instructions panel, when the method is Lipa Namba and payment is not yet confirmed.</li>
+  <li>Order summary: items, quantities, unit prices, subtotal, shipping, total, delivery address and chosen shipping method.</li>
+  <li>Actions: "View order", "Print", "Continue shopping".</li>
+  <li>A live status strip that updates over the realtime channel — when an administrator marks payment received, the page changes to "Payment confirmed" without a refresh (§17.5).</li>
+</ul>
+
+<h3>7.8.3 Delegated payment page</h3>
+<p><code>/pay/:paymentToken</code>, opened by the nominated payer, who is usually not a TechStar account holder and may never become one.</p>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Heading</td><td>"Payment request" and beneath it "<em>Amina M.</em> has asked you to pay for this order." Only the requester's first name and last initial — never their full contact details.</td></tr>
+    <tr><td>Order details</td><td>Read-only: item thumbnails, names, "Quantity: n", line totals, Sub Total, Shipping Cost, TOTAL. No delivery address, no phone number, no email.</td></tr>
+    <tr><td>Payment methods</td><td>The same radio group and instructions panel as checkout, plus the required payment-number field.</td></tr>
+    <tr><td>Action</td><td>"MAKE PAYMENT" primary button, full width.</td></tr>
+    <tr><td>After submit</td><td>Success panel confirming the payment is recorded and pending verification; both payer and requester are notified.</td></tr>
+    <tr><td>Token states</td><td>Already paid → "This order has already been paid." Expired → "This payment link has expired." plus a "Contact TechStar" action. Invalid → the same generic message as expired, so tokens cannot be probed.</td></tr>
+    <tr><td>Robots</td><td><code>noindex, nofollow</code>. Never included in the sitemap.</td></tr>
+  </tbody>
+</table>
+
+<h2>7.9 Order history and detail</h2>
+
+<h3>7.9.1 Order list — <code>/account/orders</code></h3>
+<ul>
+  <li>Heading "My orders". Filter chips: All · Pending · Processing · Shipped · Delivered · Cancelled, each with a count.</li>
+  <li>Desktop: a table with Order (monospace number), Date, Items (count), Total, Status pill, and a "View" action. Mobile: stacked cards carrying the same fields.</li>
+  <li>Sorted newest first; paginated at 20.</li>
+  <li>Empty: <code>package</code> icon, "You have not placed any orders yet", "Browse products".</li>
+</ul>
+
+<h3>7.9.2 Order detail — <code>/account/orders/:orderNumber</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Header</td><td>"Order <code>TS-2026-000148</code>", placement date, status pill, and a payment-status pill ("Awaiting payment", "Paid", "Refunded").</td></tr>
+    <tr><td>Timeline</td><td>A vertical stepper built from the order event log: Placed → Paid → Processing → Shipped → Delivered, each completed step showing its timestamp, the current step highlighted, future steps muted. Cancellation replaces the remainder with a red terminal node.</td></tr>
+    <tr><td>Items</td><td>Thumbnail, name (linking to the product), selected attributes, SKU, unit price, "Quantity: n", line total.</td></tr>
+    <tr><td>Client details</td><td>"Client:", "Email:", "Phone:" — falling back to "Anonymous" and "Not specified" as the reference platform does, since guest orders legitimately lack these.</td></tr>
+    <tr><td>Shipping</td><td>Method name and cost; delivery address as "Receiver's name:", "Country:", "City/Town:", "Street Address:", "Postal Code:".</td></tr>
+    <tr><td>Totals</td><td>Sub Total, Shipping Cost, TOTAL.</td></tr>
+    <tr><td>Actions</td><td><strong>Order again</strong> — adds every still-available line to the cart and reports what could not be added. <strong>Print invoice</strong> — opens the print stylesheet. <strong>Cancel order</strong> — only while the status is Pending or Awaiting payment; opens a confirmation dialog reading "Are you sure you want to cancel this order?" with an optional reason. <strong>Pay now</strong> — when awaiting payment, reopens the instructions panel.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Cancellation is a transition, not a deletion</span>
+  Fixing R18: the reference platform cancels by sending <code>DELETE /order/:id</code>. Here, cancelling writes a <code>CANCELLED</code> transition and an event-log entry, releases any stock reservation, and keeps the order permanently visible to both customer and administrator. Financial records are never deleted by a customer action.
+</div>
+
+<h2>7.10 Account</h2>
+<p><code>/account</code> renders a layout with a left navigation rail (a horizontal tab bar below <code>md</code>): <strong>Account</strong> · <strong>Orders</strong> · <strong>Shipping address</strong> · <strong>Change password</strong>. Above the rail sit the avatar, display name and email.</p>
+
+<table>
+  <thead><tr><th style="width:34mm">Tab</th><th>Fields and behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Account</td><td>Avatar with "Upload image" (JPEG/PNG/WebP, max 3&nbsp;MB, cropped square client-side, live preview). Then <strong>Email</strong> (changing it re-triggers verification and warns so before saving), <strong>Username</strong>, <strong>Phone Number (255XXXXXXXXX)</strong>. "Update" primary button, disabled until something changes. Success toast "Successfully updated user account".</td></tr>
+    <tr><td>Orders</td><td>The list from §7.9.1 rendered inside the account shell.</td></tr>
+    <tr><td>Shipping address</td><td><strong>Receiver's Name</strong>, with a "Details similar to my account" checkbox that copies name, email and phone from the profile. <strong>Email</strong>, <strong>Phone</strong>, <strong>Country</strong> (fixed "Tanzania"), <strong>Region</strong>, <strong>District</strong> (dependent), <strong>Street Address</strong>, <strong>Postal Code/Zip Code</strong>. Saved address prefills checkout. Success toast "Successfully updated shipping details".</td></tr>
+    <tr><td>Change password</td><td><strong>Current password</strong>, <strong>New password</strong> with a live strength meter, <strong>Confirm new password</strong>. Rules in §11.4.3. On success, all other sessions are revoked and the user is told so: "Password changed. You have been signed out on other devices."</td></tr>
+  </tbody>
+</table>
+
+<h2>7.11 Content pages</h2>
+
+<h3>7.11.1 About</h3>
+<p>Hero band with the admin-managed image behind a dark scrim, the page title centred, and a breadcrumb. Then, in order: <strong>Our Story</strong> — long-form copy with a "Read more" expander that reveals the remainder in place; <strong>Vision</strong> and <strong>Mission</strong> as two cards side by side; <strong>Core values</strong> as a four-up grid of icon, name and one line each; and finally a <strong>map</strong>. The map is Leaflet with OpenStreetMap tiles, a single marker at the store's coordinates with a popup showing name, address and a "Get directions" link. Height 400&nbsp;px, non-scroll-hijacking (zoom requires <kbd>Ctrl</kbd> + wheel or a two-finger gesture), with the address also rendered as text beneath so the information does not depend on tiles loading. The anchor <code>/about#map</code> is linked from the utility bar and must scroll to it accounting for the sticky header offset.</p>
+
+<h3>7.11.2 Contact</h3>
+<p>Heading, then two columns. Right (5 of 12) — <strong>CONTACT DETAILS</strong>: address, "E-Mail:", "Tel:" with two numbers, opening hours, and social links, each with an icon. Left (7 of 12) — <strong>GET IN TOUCH WITH US</strong>: Your name (required), Email (required, valid), Subject (optional), Message (required, 10–2,000 characters with a counter), a checkbox "Send me a copy of this message", and an invisible honeypot plus a timing check for spam. "Send Message" primary button. On success the form is replaced in place by a confirmation panel — "Thank you for getting in touch with TechStar Store" — and a "Submit another message" link. Errors: "Name is required", "Email is required", "Email not valid", "Message is required", and on failure "Failed to send message" with the input preserved.</p>
+
+<h3>7.11.3 FAQ</h3>
+<p>Centred heading "Frequently Asked Questions", optional intro, then an accordion grouped by topic — Ordering, Payment, Shipping &amp; Delivery, Returns, Products, Account. One item open by default. Real <code>&lt;button&gt;</code> headers with <code>aria-expanded</code> and <code>aria-controls</code>; chevron rotates on expand. Below the accordion, a support panel: "Can't find your answer?" with "Contact us" and "Chat on WhatsApp". <code>FAQPage</code> JSON-LD is emitted. Entries are admin-managed with an ordering field.</p>
+
+<h3>7.11.4 Privacy policy and terms</h3>
+<p>Same shell: hero band with admin-managed image, page title, breadcrumb, then long-form content with a sticky table of contents on the left at <code>lg</code>+ that highlights the section in view. Sections are anchored so individual clauses can be linked. A "Last updated" date is shown at the top and maintained by the administrator. Both documents must be drafted for TechStar (§1.5); the platform provides the structure, the ordering and the anchors, not the words.</p>
+
+<h2>7.12 Blog</h2>
+<ul>
+  <li><strong>Index.</strong> Heading "Blog", then a responsive card grid — 3 columns at <code>lg</code>, 2 at <code>md</code>, 1 below. Each card: 16:9 cover image, title (two-line clamp), publication date, excerpt (three-line clamp), comment count, and "Read more". Paginated at 9.</li>
+  <li><strong>Article.</strong> Cover image, title as h1, author and date, then sanitised rich-text body constrained to a 72-character measure. A right rail at <code>lg</code>+ carries "Latest Articles" — five entries with 56&nbsp;px thumbnails.</li>
+  <li><strong>Comments.</strong> Beneath the article: count, then a list of comments each with avatar, display name, relative timestamp and body. A signed-in user sees a composer with the placeholder "Write something here" and a "Post comment" button; a guest sees "Please create an account or log in to comment" with a button opening the auth modal. Submitted comments enter moderation with "Thank you for your comment — it will appear once approved." Authors may delete their own.</li>
+  <li><strong>Empty.</strong> "No articles yet" with a <code>newspaper</code> icon. The reference platform ships this module with zero content; TechStar should launch with at least three articles or hide the Blog navigation entry entirely — an empty section in primary navigation reads as neglect.</li>
+</ul>
+
+<h2>7.13 Services</h2>
+<ul>
+  <li><strong>Index.</strong> Card grid of services: image, heading, excerpt, "Learn more".</li>
+  <li><strong>Detail.</strong> Hero image, heading, publication date, rich-text body. A right rail lists "Other Services". At the foot, a call to action: <strong>"ASK FOR DESIGN SERVICE"</strong> with a "Contact Us" button that opens the contact form with the subject prefilled with the service name.</li>
+  <li>Each service also appears in the SERVICES header dropdown, sourced from the latest-services endpoint.</li>
+</ul>
+
+<h2>7.14 Authentication surfaces</h2>
+<p>Authentication is a modal, never a page — the reference platform's choice, and the right one, because it preserves cart and checkout context. The modal opens at the tab requested and remembers the route to return to.</p>
+
+<table>
+  <thead><tr><th style="width:30mm">Surface</th><th>Fields and behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Modal shell</td><td>Centred, max-width 460&nbsp;px, with the TechStar mark in a white circle overlapping the top edge. Header bar in primary green with the current mode as a white uppercase title and an "×" close control. Focus trapped; <kbd>Esc</kbd> closes; focus returns to the trigger.</td></tr>
+    <tr><td>LOGIN</td><td><strong>EMAIL OR PHONE</strong> — one field accepting either, as the reference platform does; the server resolves which. <strong>PASSWORD</strong> with a show/hide eye toggle. "Forgot password?" link. "LOGIN" primary button, full width. "Don't have an account? <u>Create your account here</u>". Then a divider and two social buttons: "Continue with Facebook" (brand blue) and "Continue with Google" (white, outlined, with the Google mark).</td></tr>
+    <tr><td>REGISTER</td><td><strong>USERNAME</strong>, <strong>EMAIL</strong>, <strong>PHONE</strong> (255XXXXXXXXX), <strong>PASSWORD</strong> with a strength meter, <strong>CONFIRM PASSWORD</strong>, and a required checkbox "I agree to the Terms &amp; Conditions and Privacy Policy" with both linked. "REGISTER" primary button. On success the user is signed in immediately, the modal closes, a verification email is sent and the verification banner appears.</td></tr>
+    <tr><td>FORGOT PASSWORD</td><td>One <strong>EMAIL</strong> field and "SEND RESET LINK". The response is always the same regardless of whether the address exists: "If an account exists for that address, we have sent a reset link." Anything else is an account-enumeration oracle.</td></tr>
+    <tr><td>Reset page</td><td><code>/auth/reset-password/:token</code>. New password plus confirmation, strength meter, and the same rules as registration. On success: sign in, revoke all other sessions, toast "Password changed", redirect home. Invalid or expired token: "This reset link is no longer valid" with a control to request a new one.</td></tr>
+    <tr><td>Email verification</td><td><code>/auth/verify-email/:token</code>. Shows a spinner, then either "Email verification successful" or "Verification failed" with a resend control, then redirects home after 3 seconds.</td></tr>
+    <tr><td>OAuth callback</td><td><code>/auth/oauth/callback</code>. Full-screen spinner with "Signing you in…", then exchanges the one-time code, then redirects to the stored return route. Failure: "Failed to sign in" with a control to return to the sign-in modal.</td></tr>
+    <tr><td>Errors</td><td>Credential failures render one message above the form — "Email, phone or password is incorrect" — never distinguishing which was wrong. Rate-limit lockout renders "Too many attempts. Please try again in n minutes."</td></tr>
+  </tbody>
+</table>
+
+<h2>7.15 Errors and empty states</h2>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Case</th><th style="width:36mm">Copy</th><th>Actions</th></tr></thead>
+  <tbody>
+    <tr><td>404</td><td>"Oops!" / "Page not found" / "The page you're looking for doesn't exist."</td><td>"Go home" primary; a search field; popular categories. (The reference platform ships this as "Opps!" — see R15.)</td></tr>
+    <tr><td>403</td><td>"You don't have access to this page."</td><td>"Go home"; "Sign in as a different user".</td></tr>
+    <tr><td>500</td><td>"Something went wrong at our end."</td><td>"Try again"; "Go home"; the request id in small monospace so support can trace it.</td></tr>
+    <tr><td>Offline</td><td>"You appear to be offline."</td><td>Auto-retries on reconnect. The cart survives, because it is in local storage.</td></tr>
+    <tr><td>Maintenance</td><td>"TechStar Store is briefly down for maintenance."</td><td>Expected return time; WhatsApp contact.</td></tr>
+    <tr><td>Slow response</td><td>After 8 seconds, an inline "This is taking longer than usual…" beneath the spinner</td><td>Never an indefinite spinner with no explanation.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Error-copy rule</span>
+  Every error message states what happened, whether the user's data is safe, and what to do next. "Failed to place order" alone is not acceptable; "We could not place your order. Nothing has been charged and your cart is unchanged. Please try again." is. This rule applies equally to the admin console.
+</div>

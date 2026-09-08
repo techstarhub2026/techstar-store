@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+apps/api/uploads/
+apps/api/prisma/dev.db
+.DS_Store
+
+# Agent/editor local config
+.claude/
+CLAUDE.md
+.mcp.json

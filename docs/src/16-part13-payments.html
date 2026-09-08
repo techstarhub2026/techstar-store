@@ -1,0 +1,179 @@
+<h1 class="part"><span class="num">Part Thirteen</span>Payments in Tanzania</h1>
+
+<p>Payment is where an e-commerce specification written for one market fails in another. Card penetration is low, mobile money is near-universal, and the dominant flow is a customer pushing funds to a merchant till number from a USSD menu — an action the website cannot observe. Everything in this part follows from that fact.</p>
+
+<h2>13.1 Landscape</h2>
+<table>
+  <thead><tr><th style="width:34mm">Channel</th><th>Characteristics and implications for TechStar</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Mobile money — customer-initiated push</strong> (Lipa Namba / merchant till)</td><td>The customer dials a USSD string or uses their wallet app, selects the merchant-payment option, enters the till number and the amount, and confirms with a PIN. The merchant receives an SMS or email notification. <em>No API is involved.</em> This is what the reference platform implements, it works without any commercial integration, and it is what TechStar launches with. The cost is manual reconciliation (§12.8).</td></tr>
+    <tr><td><strong>Mobile money — merchant-initiated pull</strong> (USSD push / STK)</td><td>The merchant's system asks the network to prompt the customer's handset; the customer approves with a PIN and the merchant is notified over a webhook within seconds. This requires an aggregator or a direct operator integration, and it removes reconciliation entirely. It is the target state, specified as Phase 4.</td></tr>
+    <tr><td><strong>Cash on delivery</strong></td><td>Widely expected, especially for first-time buyers, and materially raises conversion. The cost is delivery risk and a cash-handling process. The reference platform charges a lower shipping fee for it, which is a sensible way to price the risk down.</td></tr>
+    <tr><td><strong>Bank transfer</strong></td><td>Relevant for institutional buyers — schools, universities, companies — who pay against an invoice. Handled by the invoice module plus manual reconciliation; no integration needed.</td></tr>
+    <tr><td><strong>Cards</strong></td><td>Low volume domestically, useful for diaspora and corporate purchases. Available through the same aggregators. Out of scope for v1 (§3.5).</td></tr>
+  </tbody>
+</table>
+
+<h3>13.1.1 Networks to support</h3>
+<table class="compact">
+  <thead><tr><th style="width:36mm">Network</th><th style="width:30mm">Operator</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>M-Pesa</td><td>Vodacom</td><td>Largest by subscriber base. Wallet app supports scanning a merchant QR code, which is why the payment panel carries one.</td></tr>
+    <tr><td>Mixx by Yas</td><td>Yas (formerly Tigo)</td><td>The reference platform still labels this "Tigo Pesa". Show both names during the transition — a customer whose phone menu says one thing and whose screen says another will hesitate.</td></tr>
+    <tr><td>Airtel Money</td><td>Airtel</td><td></td></tr>
+    <tr><td>HaloPesa</td><td>Halotel</td><td>Smaller, but the "other networks" instruction block covers it, since all Tanzanian wallets interoperate.</td></tr>
+    <tr><td>T-Pesa</td><td>TTCL</td><td>Covered by the same interoperability path.</td></tr>
+  </tbody>
+</table>
+<div class="warn">
+  <span class="lbl">Verify before you publish</span>
+  USSD strings, menu positions and till-number formats change, and they differ between consumer and merchant products. Every instruction block must be verified against the live network — by an actual test payment — before launch, and re-verified whenever an operator changes its menus. That is precisely why the instruction content is stored as editable settings (§14.16) rather than compiled into the front end: correcting a wrong menu step must take two minutes, not a release.
+</div>
+
+<h2>13.2 Manual Lipa Namba flow</h2>
+<pre>Checkout                          Order created                Reconciliation
+────────                          ─────────────                ──────────────
+choose "Lipa Namba"       ──▶  status AWAITING_PAYMENT   ──▶  admin queue
+enter paying number             stock reserved (48 h)          "Awaiting verification"
+PLACE ORDER                     payments row: initiated              │
+      │                         SMS + email with                     │
+      │                         amount + reference                    │
+      ▼                                 │                             ▼
+confirmation page                       │                      match on payer number
+ ├─ amount, copyable                    │                      or amount + time window
+ ├─ order number as reference           │                             │
+ ├─ per-network instructions            │                             ▼
+ └─ live status strip  ◀────────────────┴──────────────────  verify → CONFIRMED
+                          realtime push                       stock deducted
+                                                              SMS + email sent</pre>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Design point</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Capture the paying number</td><td>The single strongest reconciliation key. Required, validated as 12 digits beginning <code>255</code>. It is what turns matching from a search into a lookup.</td></tr>
+    <tr><td>Order number as reference</td><td>Shown prominently and copyable. Some wallets allow a reference; where they do, it makes matching exact.</td></tr>
+    <tr><td>Exact amount</td><td>"Pay exactly TZS 85,000." Round-number habits produce under- and over-payments, and each one costs a phone call.</td></tr>
+    <tr><td>Reservation window</td><td>48 hours, communicated at placement and again by SMS at 36 hours. Long enough for someone who pays on payday; short enough that stock is not held indefinitely.</td></tr>
+    <tr><td>Live status</td><td>The confirmation page subscribes to the order's realtime channel, so verification updates the page the customer is already looking at. It is a small thing that removes a large share of "have you received my payment?" contacts.</td></tr>
+    <tr><td>No payment proof upload</td><td>Deliberately omitted. Screenshots are trivially forged and create a queue of items requiring judgement. The merchant's own notification is the source of truth.</td></tr>
+  </tbody>
+</table>
+
+<h2>13.3 Aggregator integration</h2>
+<p>Automation is introduced behind one interface, so that the choice of provider is a configuration decision and never a rewrite. Nothing outside the adapter knows which provider is in use.</p>
+<pre>interface PaymentProvider {
+  readonly key: string                       // 'selcom' | 'clickpesa' | …
+  readonly capabilities: {
+    mobileMoneyPush: boolean                 // prompt the customer's handset
+    hostedCheckout: boolean                  // redirect to a provider page
+    cards: boolean
+    refunds: boolean
+    statusQuery: boolean
+  }
+
+  createPayment(input: {
+    orderNumber: string
+    amount: Money
+    customer: { name: string; phone: string; email?: string }
+    method: 'mobile_money' | 'card'
+    network?: 'mpesa' | 'mixx' | 'airtel' | 'halopesa'
+    returnUrl: string
+    webhookUrl: string
+    idempotencyKey: string
+  }): Promise&lt;{
+    providerReference: string
+    status: 'pending' | 'succeeded' | 'failed'
+    redirectUrl?: string                     // hosted checkout
+    instructions?: string                    // e.g. "approve the prompt on your phone"
+  }&gt;
+
+  verifyWebhook(headers, rawBody): { valid: boolean; event: ProviderEvent }
+  queryStatus(providerReference): Promise&lt;PaymentStatus&gt;
+  refund(providerReference, amount: Money, reason: string): Promise&lt;RefundResult&gt;
+}</pre>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Candidate</th><th>What to evaluate at selection time</th></tr></thead>
+  <tbody>
+    <tr><td>Selcom</td><td>Established Tanzanian aggregator with broad wallet coverage and a merchant network. Evaluate settlement period, per-transaction pricing and webhook reliability.</td></tr>
+    <tr><td>ClickPesa</td><td>Developer-oriented, positioned at exactly this use case. Evaluate onboarding time and sandbox quality.</td></tr>
+    <tr><td>AzamPay</td><td>Local aggregator with multi-wallet collection. Evaluate documentation depth and support responsiveness.</td></tr>
+    <tr><td>DPO Group / Pesapal</td><td>Pan-African, card plus mobile money, hosted checkout available. Evaluate pricing on low-value transactions — a TZS 200 resistor order must not cost more in fees than it earns.</td></tr>
+    <tr><td>Direct operator</td><td>Vodacom and Airtel offer merchant APIs directly. Better unit economics at volume; heavier onboarding and one integration per network.</td></tr>
+  </tbody>
+</table>
+<div class="decision">
+  <span class="lbl">Selection criteria, in priority order</span>
+  (1) Coverage of all four major wallets through one integration. (2) Reliable, signed webhooks with documented retry semantics. (3) A sandbox that behaves like production. (4) Settlement within two business days. (5) Per-transaction cost that is viable on a TZS 5,000 basket. (6) Refund support through the API. Providers that fail (2) create more manual work than they remove.
+</div>
+
+<h2>13.4 Cash on delivery</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Order state</td><td>Placed directly as <code>CONFIRMED</code> — payment is not pending in any meaningful sense. Payment status stays <code>unpaid</code> until the courier settles.</td></tr>
+    <tr><td>Stock</td><td>Reserved at placement, deducted at <code>SHIPPED</code>, not at confirmation.</td></tr>
+    <tr><td>Reservation expiry</td><td>Does not apply. The order is confirmed, so there is nothing to expire.</td></tr>
+    <tr><td>Basket cap</td><td>Configurable maximum order value for cash on delivery, default TZS 300,000. Above it the method is hidden with an explanation. Unpaid delivery risk scales with basket size and should be bounded.</td></tr>
+    <tr><td>Verification call</td><td>Staff telephone the customer to confirm before dispatch. Recorded as an order event, so a repeat no-answer is visible.</td></tr>
+    <tr><td>Settlement</td><td>The courier records collection; staff mark the payment received with the collecting person named. This creates the <code>payments</code> row with method <code>cash</code>.</td></tr>
+    <tr><td>Refusal on delivery</td><td>Order moves to <code>CANCELLED</code> with reason "refused on delivery"; stock is restored on return to the store. Repeat refusals from one phone number are surfaced to staff on that customer's record.</td></tr>
+  </tbody>
+</table>
+
+<h2>13.5 Webhooks and idempotency</h2>
+<p>An aggregator's webhook is the only moment where money and system state meet automatically. It must be impossible to double-credit, and impossible to lose an event.</p>
+<pre>POST /api/v1/webhooks/payments/:provider
+
+ 1  Read the RAW body — never the parsed one. Signature verification over
+    re-serialised JSON fails intermittently and inexplicably.
+ 2  Verify the signature with the provider's secret, constant-time compare.
+    Fail → log, return 401, do not process.
+ 3  Check the source IP against the provider's published range when one exists.
+ 4  INSERT the event into payment_events, keyed by external_event_id.
+    Duplicate key → this is a retry. Return 200 immediately. Do nothing else.
+ 5  Return 200 NOW. Everything below runs on a queue.
+    A provider that does not get a prompt 200 will retry, sometimes forever.
+ 6  Worker:
+      ├─ resolve the order by merchant_reference
+      ├─ compare the amount to the expected total
+      ├─ update the payments row inside a transaction
+      ├─ run the order state transition through the state machine
+      ├─ deduct stock with a ledger row
+      ├─ write order_events with actor_type = 'webhook'
+      ├─ queue customer notifications
+      └─ mark payment_events.processed_at
+ 7  Processing failure → record processing_error, alert staff, leave the event
+    replayable from the admin console. The event is never lost.</pre>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Guarantee</th><th>Mechanism</th></tr></thead>
+  <tbody>
+    <tr><td>At-most-once crediting</td><td>Unique index on <code>payment_events.external_event_id</code>, and on <code>payments(provider, provider_reference)</code>. Two independent constraints, because this is the one thing that must not fail.</td></tr>
+    <tr><td>No lost events</td><td>Persist before processing. Every webhook body is stored whether or not it can be handled.</td></tr>
+    <tr><td>Out-of-order delivery</td><td>Events carry a provider timestamp; an event older than the payment's current state is recorded and ignored.</td></tr>
+    <tr><td>Unknown order</td><td>Recorded with <code>processing_error = 'order_not_found'</code> and raised to staff. Never silently dropped — an unmatched payment is money that arrived.</td></tr>
+    <tr><td>Amount mismatch</td><td>Never auto-confirms. Flagged for manual review with both figures shown.</td></tr>
+    <tr><td>Replay</td><td>Staff with <code>payment.verify</code> can replay a stored event from the admin console after a bug fix, without asking the provider to resend.</td></tr>
+    <tr><td>Reconciliation sweep</td><td>A scheduled job queries provider status for every payment stuck in <code>pending</code> beyond 30 minutes, catching webhooks that never arrived.</td></tr>
+  </tbody>
+</table>
+
+<h2>13.6 The reconciliation ledger</h2>
+<p>Three questions must be answerable at any moment, from the database alone, without a spreadsheet:</p>
+<ol>
+  <li><strong>What have we been paid?</strong> Sum of <code>payments</code> in status <code>succeeded</code> over a period, grouped by method and provider.</li>
+  <li><strong>What are we owed?</strong> Sum of <code>orders.total_amount − paid_amount</code> where the order is not cancelled, expired or refunded.</li>
+  <li><strong>What arrived that we cannot place?</strong> <code>payment_events</code> with a processing error, and payments whose amount does not match their order.</li>
+</ol>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Report</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>Daily settlement</td><td>Every payment verified in the day, with order number, method, provider reference, amount and verifier. Exportable to CSV; reconciled against the mobile-money statement.</td></tr>
+    <tr><td>Outstanding</td><td>Orders awaiting payment, aged into 0–2 h, 2–24 h and over 24 h buckets. Drives the dashboard alert.</td></tr>
+    <tr><td>Exceptions</td><td>Amount mismatches, unmatched events, duplicate reference attempts, overpayments awaiting refund. Should normally be empty; a persistently non-empty exceptions list is the signal to move to an aggregator.</td></tr>
+    <tr><td>Refund register</td><td>All refunds with reason, amount, destination number and authorising staff member.</td></tr>
+    <tr><td>Method mix</td><td>Share of orders and of revenue by payment method over time — the evidence base for deciding whether cash on delivery is worth its risk and whether automation is worth its fee.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Financial invariant</span>
+  For every order: <code>paid_amount = SUM(payments.amount WHERE status = 'succeeded') − SUM(refunds)</code>. A nightly job asserts this across all orders and alerts on any row that fails. An invariant that is checked is a control; one that is merely intended is a hope.
+</div>

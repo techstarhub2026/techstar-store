@@ -1,0 +1,1097 @@
+-- =====================================================================
+--  TechStar Store — complete MySQL 8.0 schema
+--  Specification: Part Nine. Runs top to bottom against a clean schema.
+--  Engine InnoDB · utf8mb4 · all timestamps UTC · money in minor units
+-- =====================================================================
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE DATABASE IF NOT EXISTS techstar
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE techstar;
+
+-- ---------------------------------------------------------------------
+--  1. MEDIA  (referenced by almost everything, so created first)
+-- ---------------------------------------------------------------------
+CREATE TABLE media_files (
+  id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  public_id        CHAR(26)        NOT NULL,
+  storage_driver   VARCHAR(20)     NOT NULL DEFAULT 'local',
+  storage_key      VARCHAR(512)    NOT NULL,
+  original_filename VARCHAR(255)   NOT NULL DEFAULT '',
+  mime_type        VARCHAR(80)     NOT NULL,
+  byte_size        INT UNSIGNED    NOT NULL,
+  width            INT UNSIGNED    NULL,
+  height           INT UNSIGNED    NULL,
+  checksum_sha256  CHAR(64)        NOT NULL,
+  derivatives      JSON            NOT NULL,
+  alt_text         VARCHAR(255)    NULL,
+  uploaded_by      BIGINT UNSIGNED NULL,
+  reference_count  INT UNSIGNED    NOT NULL DEFAULT 0,
+  created_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at       DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_media_public_id (public_id),
+  KEY idx_media_checksum (checksum_sha256),
+  KEY idx_media_refcount (reference_count, created_at),
+  CONSTRAINT chk_media_driver CHECK (storage_driver IN ('local','s3','cloudinary'))
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  2. IDENTITY AND ACCESS
+-- ---------------------------------------------------------------------
+CREATE TABLE users (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  public_id          CHAR(26)        NOT NULL,
+  email              VARCHAR(255)    NULL,
+  email_verified_at  DATETIME(3)     NULL,
+  phone              VARCHAR(15)     NULL,
+  phone_verified_at  DATETIME(3)     NULL,
+  username           VARCHAR(80)     NOT NULL,
+  password_hash      VARCHAR(255)    NULL,
+  account_type       VARCHAR(16)     NOT NULL DEFAULT 'customer',
+  status             VARCHAR(16)     NOT NULL DEFAULT 'active',
+  profile_image_id   BIGINT UNSIGNED NULL,
+  marketing_opt_in   TINYINT(1)      NOT NULL DEFAULT 0,
+  last_login_at      DATETIME(3)     NULL,
+  failed_login_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  locked_until       DATETIME(3)     NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at         DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_users_public_id (public_id),
+  UNIQUE KEY uq_users_email (email),
+  UNIQUE KEY uq_users_phone (phone),
+  KEY idx_users_status_created (status, created_at),
+  KEY idx_users_account_type (account_type),
+  CONSTRAINT fk_users_avatar FOREIGN KEY (profile_image_id) REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT chk_users_reachable CHECK (email IS NOT NULL OR phone IS NOT NULL),
+  CONSTRAINT chk_users_type   CHECK (account_type IN ('customer','staff')),
+  CONSTRAINT chk_users_status CHECK (status IN ('active','suspended','closed'))
+) ENGINE=InnoDB;
+
+ALTER TABLE media_files
+  ADD CONSTRAINT fk_media_uploader FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL;
+
+CREATE TABLE user_addresses (
+  id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id        BIGINT UNSIGNED NOT NULL,
+  label          VARCHAR(40)     NULL,
+  receiver_name  VARCHAR(120)    NOT NULL,
+  email          VARCHAR(255)    NULL,
+  phone          VARCHAR(15)     NOT NULL,
+  country        VARCHAR(64)     NOT NULL DEFAULT 'Tanzania',
+  region         VARCHAR(64)     NOT NULL,
+  district       VARCHAR(64)     NOT NULL,
+  street_address VARCHAR(255)    NOT NULL,
+  postal_code    VARCHAR(20)     NULL,
+  is_default     TINYINT(1)      NOT NULL DEFAULT 0,
+  created_at     DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at     DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at     DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_addresses_user (user_id, deleted_at),
+  CONSTRAINT fk_addresses_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE oauth_accounts (
+  id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id          BIGINT UNSIGNED NOT NULL,
+  provider         VARCHAR(20)     NOT NULL,
+  provider_user_id VARCHAR(191)    NOT NULL,
+  email            VARCHAR(255)    NULL,
+  raw_profile      JSON            NULL,
+  linked_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  created_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_oauth_provider_user (provider, provider_user_id),
+  KEY idx_oauth_user (user_id),
+  CONSTRAINT fk_oauth_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT chk_oauth_provider CHECK (provider IN ('google','facebook'))
+) ENGINE=InnoDB;
+
+CREATE TABLE sessions (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id            BIGINT UNSIGNED NOT NULL,
+  refresh_token_hash CHAR(64)        NOT NULL,
+  user_agent         VARCHAR(255)    NULL,
+  ip_address         VARBINARY(16)   NULL,
+  expires_at         DATETIME(3)     NOT NULL,
+  revoked_at         DATETIME(3)     NULL,
+  replaced_by_id     BIGINT UNSIGNED NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_sessions_token (refresh_token_hash),
+  KEY idx_sessions_user (user_id, revoked_at),
+  KEY idx_sessions_expiry (expires_at),
+  CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE email_verification_tokens (
+  id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id      BIGINT UNSIGNED NOT NULL,
+  token_hash   CHAR(64)        NOT NULL,
+  expires_at   DATETIME(3)     NOT NULL,
+  used_at      DATETIME(3)     NULL,
+  requested_ip VARBINARY(16)   NULL,
+  created_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_evt_token (token_hash),
+  KEY idx_evt_user (user_id),
+  CONSTRAINT fk_evt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE password_reset_tokens (
+  id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id      BIGINT UNSIGNED NOT NULL,
+  token_hash   CHAR(64)        NOT NULL,
+  expires_at   DATETIME(3)     NOT NULL,
+  used_at      DATETIME(3)     NULL,
+  requested_ip VARBINARY(16)   NULL,
+  created_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_prt_token (token_hash),
+  KEY idx_prt_user (user_id),
+  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE roles (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `key`       VARCHAR(40)     NOT NULL,
+  name        VARCHAR(80)     NOT NULL,
+  description VARCHAR(255)    NULL,
+  is_system   TINYINT(1)      NOT NULL DEFAULT 0,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_roles_key (`key`)
+) ENGINE=InnoDB;
+
+CREATE TABLE permissions (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `key`       VARCHAR(60)     NOT NULL,
+  `group`     VARCHAR(40)     NOT NULL,
+  description VARCHAR(255)    NULL,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_permissions_key (`key`)
+) ENGINE=InnoDB;
+
+CREATE TABLE role_permissions (
+  role_id       BIGINT UNSIGNED NOT NULL,
+  permission_id BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (role_id, permission_id),
+  KEY idx_rp_permission (permission_id),
+  CONSTRAINT fk_rp_role       FOREIGN KEY (role_id)       REFERENCES roles(id)       ON DELETE CASCADE,
+  CONSTRAINT fk_rp_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE user_roles (
+  user_id    BIGINT UNSIGNED NOT NULL,
+  role_id    BIGINT UNSIGNED NOT NULL,
+  granted_by BIGINT UNSIGNED NULL,
+  granted_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (user_id, role_id),
+  KEY idx_ur_role (role_id),
+  CONSTRAINT fk_ur_user    FOREIGN KEY (user_id)    REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ur_role    FOREIGN KEY (role_id)    REFERENCES roles(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ur_granter FOREIGN KEY (granted_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  3. LOCATIONS
+-- ---------------------------------------------------------------------
+CREATE TABLE regions (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name       VARCHAR(64)     NOT NULL,
+  code       VARCHAR(10)     NULL,
+  position   INT             NOT NULL DEFAULT 0,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_regions_name (name)
+) ENGINE=InnoDB;
+
+CREATE TABLE districts (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  region_id  BIGINT UNSIGNED NOT NULL,
+  name       VARCHAR(64)     NOT NULL,
+  position   INT             NOT NULL DEFAULT 0,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_districts_region_name (region_id, name),
+  CONSTRAINT fk_districts_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  4. CATALOGUE
+-- ---------------------------------------------------------------------
+CREATE TABLE categories (
+  id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name              VARCHAR(120)    NOT NULL,
+  slug              VARCHAR(96)     NOT NULL,
+  sku_code          CHAR(2)         NOT NULL,
+  description       VARCHAR(500)    NULL,
+  image_id          BIGINT UNSIGNED NULL,
+  position          INT             NOT NULL DEFAULT 0,
+  subcategory_count INT UNSIGNED    NOT NULL DEFAULT 0,
+  product_count     INT UNSIGNED    NOT NULL DEFAULT 0,
+  is_active         TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at        DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_categories_slug (slug),
+  UNIQUE KEY uq_categories_sku (sku_code),
+  KEY idx_categories_position (position, id),
+  CONSTRAINT fk_categories_image FOREIGN KEY (image_id) REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT chk_categories_sku CHECK (sku_code REGEXP '^[0-9]{2}$')
+) ENGINE=InnoDB;
+
+CREATE TABLE subcategories (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  category_id   BIGINT UNSIGNED NOT NULL,
+  name          VARCHAR(140)    NOT NULL,
+  slug          VARCHAR(96)     NOT NULL,
+  sku_code      CHAR(4)         NOT NULL,
+  description   VARCHAR(500)    NULL,
+  image_id      BIGINT UNSIGNED NULL,
+  position      INT             NOT NULL DEFAULT 0,
+  product_count INT UNSIGNED    NOT NULL DEFAULT 0,
+  is_active     TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at    DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_subcategories_slug (slug),
+  UNIQUE KEY uq_subcategories_sku (sku_code),
+  KEY idx_subcategories_category (category_id, position),
+  CONSTRAINT fk_subcategories_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_subcategories_image    FOREIGN KEY (image_id)    REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT chk_subcategories_sku CHECK (sku_code REGEXP '^[0-9]{4}$')
+) ENGINE=InnoDB;
+
+CREATE TABLE products (
+  id                        BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  subcategory_id            BIGINT UNSIGNED NOT NULL,
+  name                      VARCHAR(255)    NOT NULL,
+  slug                      VARCHAR(96)     NOT NULL,
+  sku_prefix                CHAR(7)         NOT NULL,
+  short_description         VARCHAR(500)    NULL,
+  description_html          MEDIUMTEXT      NOT NULL,
+  description_text          MEDIUMTEXT      NOT NULL,
+  brand                     VARCHAR(120)    NULL,
+  manufacturer_part_number  VARCHAR(80)     NULL,
+  display_image_id          BIGINT UNSIGNED NULL,
+  status                    VARCHAR(16)     NOT NULL DEFAULT 'draft',
+  total_stock               INT             NOT NULL DEFAULT 0,
+  min_price_amount          BIGINT          NOT NULL DEFAULT 0,
+  max_price_amount          BIGINT          NOT NULL DEFAULT 0,
+  order_count               INT UNSIGNED    NOT NULL DEFAULT 0,
+  view_count                INT UNSIGNED    NOT NULL DEFAULT 0,
+  review_count              INT UNSIGNED    NOT NULL DEFAULT 0,
+  average_rating            DECIMAL(3,2)    NOT NULL DEFAULT 0.00,
+  is_featured               TINYINT(1)      NOT NULL DEFAULT 0,
+  meta_title                VARCHAR(70)     NULL,
+  meta_description          VARCHAR(160)    NULL,
+  published_at              DATETIME(3)     NULL,
+  created_at                DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at                DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at                DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_products_slug (slug),
+  UNIQUE KEY uq_products_sku_prefix (sku_prefix),
+  KEY idx_products_subcat_status (subcategory_id, status, published_at),
+  KEY idx_products_status_published (status, published_at),
+  KEY idx_products_order_count (status, order_count),
+  KEY idx_products_min_price (status, min_price_amount),
+  KEY idx_products_mpn (manufacturer_part_number),
+  FULLTEXT KEY ft_products_search (name, description_text, brand, manufacturer_part_number),
+  CONSTRAINT fk_products_subcategory FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_products_image       FOREIGN KEY (display_image_id) REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT chk_products_status CHECK (status IN ('draft','active','archived'))
+) ENGINE=InnoDB;
+
+CREATE TABLE product_slug_history (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id BIGINT UNSIGNED NOT NULL,
+  slug       VARCHAR(96)     NOT NULL,
+  retired_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_slug_history_slug (slug),
+  KEY idx_slug_history_product (product_id),
+  CONSTRAINT fk_slug_history_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE product_attributes (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id BIGINT UNSIGNED NOT NULL,
+  name       VARCHAR(80)     NOT NULL,
+  unit       VARCHAR(20)     NULL,
+  position   INT             NOT NULL DEFAULT 0,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_attr_product_name (product_id, name),
+  CONSTRAINT fk_attr_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE product_variants (
+  id                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id           BIGINT UNSIGNED NOT NULL,
+  sku                  VARCHAR(20)     NOT NULL,
+  attribute_hash       CHAR(40)        NOT NULL,
+  price_amount         BIGINT          NOT NULL,
+  compare_at_amount    BIGINT          NULL,
+  cost_amount          BIGINT          NULL,
+  currency             CHAR(3)         NOT NULL DEFAULT 'TZS',
+  stock_quantity       INT             NOT NULL DEFAULT 0,
+  reserved_quantity    INT             NOT NULL DEFAULT 0,
+  low_stock_threshold  INT             NOT NULL DEFAULT 5,
+  weight_grams         INT             NULL,
+  barcode              VARCHAR(64)     NULL,
+  image_id             BIGINT UNSIGNED NULL,
+  position             INT             NOT NULL DEFAULT 0,
+  is_active            TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at           DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_variants_sku (sku),
+  UNIQUE KEY uq_variants_product_attrs (product_id, attribute_hash),
+  KEY idx_variants_product_active (product_id, is_active, position),
+  KEY idx_variants_stock (stock_quantity),
+  KEY idx_variants_price (price_amount),
+  CONSTRAINT fk_variants_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  CONSTRAINT fk_variants_image   FOREIGN KEY (image_id)   REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT chk_variants_price    CHECK (price_amount > 0),
+  CONSTRAINT chk_variants_stock    CHECK (stock_quantity >= 0),
+  CONSTRAINT chk_variants_reserved CHECK (reserved_quantity >= 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE variant_attribute_values (
+  variant_id           BIGINT UNSIGNED NOT NULL,
+  product_attribute_id BIGINT UNSIGNED NOT NULL,
+  value                VARCHAR(120)    NOT NULL,
+  PRIMARY KEY (variant_id, product_attribute_id),
+  KEY idx_vav_attr_value (product_attribute_id, value),
+  CONSTRAINT fk_vav_variant FOREIGN KEY (variant_id)           REFERENCES product_variants(id)   ON DELETE CASCADE,
+  CONSTRAINT fk_vav_attr    FOREIGN KEY (product_attribute_id) REFERENCES product_attributes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE product_images (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id    BIGINT UNSIGNED NOT NULL,
+  media_file_id BIGINT UNSIGNED NOT NULL,
+  variant_id    BIGINT UNSIGNED NULL,
+  alt_text      VARCHAR(255)    NULL,
+  position      INT             NOT NULL DEFAULT 0,
+  created_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_product_images (product_id, media_file_id),
+  KEY idx_product_images_order (product_id, position),
+  CONSTRAINT fk_pi_product FOREIGN KEY (product_id)    REFERENCES products(id)         ON DELETE CASCADE,
+  CONSTRAINT fk_pi_media   FOREIGN KEY (media_file_id) REFERENCES media_files(id)      ON DELETE RESTRICT,
+  CONSTRAINT fk_pi_variant FOREIGN KEY (variant_id)    REFERENCES product_variants(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE tags (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name       VARCHAR(60)     NOT NULL,
+  slug       VARCHAR(60)     NOT NULL,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_tags_slug (slug)
+) ENGINE=InnoDB;
+
+CREATE TABLE product_tags (
+  product_id BIGINT UNSIGNED NOT NULL,
+  tag_id     BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (product_id, tag_id),
+  KEY idx_pt_tag (tag_id),
+  CONSTRAINT fk_pt_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  CONSTRAINT fk_pt_tag     FOREIGN KEY (tag_id)     REFERENCES tags(id)     ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE discounts (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  scope      VARCHAR(20)     NOT NULL,
+  scope_id   BIGINT UNSIGNED NOT NULL,
+  type       VARCHAR(16)     NOT NULL,
+  value      INT             NOT NULL,
+  starts_at  DATETIME(3)     NOT NULL,
+  ends_at    DATETIME(3)     NOT NULL,
+  is_active  TINYINT(1)      NOT NULL DEFAULT 1,
+  created_by BIGINT UNSIGNED NULL,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_discounts_scope (scope, scope_id, is_active, starts_at, ends_at),
+  CONSTRAINT fk_discounts_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT chk_discounts_scope  CHECK (scope IN ('variant','product','subcategory','category')),
+  CONSTRAINT chk_discounts_type   CHECK (type IN ('percentage','fixed')),
+  CONSTRAINT chk_discounts_value  CHECK (value > 0),
+  CONSTRAINT chk_discounts_window CHECK (ends_at > starts_at)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  5. SHOPPING
+-- ---------------------------------------------------------------------
+CREATE TABLE carts (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id            BIGINT UNSIGNED NULL,
+  guest_token        CHAR(32)        NULL,
+  currency           CHAR(3)         NOT NULL DEFAULT 'TZS',
+  last_activity_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  converted_order_id BIGINT UNSIGNED NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_carts_user (user_id),
+  UNIQUE KEY uq_carts_guest (guest_token),
+  KEY idx_carts_activity (last_activity_at),
+  CONSTRAINT fk_carts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT chk_carts_owner CHECK (user_id IS NOT NULL OR guest_token IS NOT NULL)
+) ENGINE=InnoDB;
+
+CREATE TABLE cart_items (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  cart_id            BIGINT UNSIGNED NOT NULL,
+  product_variant_id BIGINT UNSIGNED NOT NULL,
+  quantity           INT             NOT NULL,
+  unit_price_amount  BIGINT          NOT NULL,
+  added_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_cart_items (cart_id, product_variant_id),
+  KEY idx_cart_items_variant (product_variant_id),
+  CONSTRAINT fk_ci_cart    FOREIGN KEY (cart_id)            REFERENCES carts(id)            ON DELETE CASCADE,
+  CONSTRAINT fk_ci_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE RESTRICT,
+  CONSTRAINT chk_ci_quantity CHECK (quantity > 0 AND quantity <= 999)
+) ENGINE=InnoDB;
+
+CREATE TABLE wishlists (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id     BIGINT UNSIGNED NULL,
+  guest_token CHAR(32)        NULL,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_wishlists_user (user_id),
+  UNIQUE KEY uq_wishlists_guest (guest_token),
+  CONSTRAINT fk_wishlists_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE wishlist_items (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  wishlist_id        BIGINT UNSIGNED NOT NULL,
+  product_id         BIGINT UNSIGNED NOT NULL,
+  product_variant_id BIGINT UNSIGNED NULL,
+  added_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_wishlist_items (wishlist_id, product_id, product_variant_id),
+  CONSTRAINT fk_wi_wishlist FOREIGN KEY (wishlist_id)        REFERENCES wishlists(id)        ON DELETE CASCADE,
+  CONSTRAINT fk_wi_product  FOREIGN KEY (product_id)         REFERENCES products(id)         ON DELETE CASCADE,
+  CONSTRAINT fk_wi_variant  FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  6. ORDERS AND PAYMENTS
+-- ---------------------------------------------------------------------
+CREATE TABLE shipping_methods (
+  id                        BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name                      VARCHAR(80)     NOT NULL,
+  slug                      VARCHAR(60)     NOT NULL,
+  description               VARCHAR(500)    NOT NULL,
+  cost_amount               BIGINT          NOT NULL DEFAULT 0,
+  requires_shipping_address TINYINT(1)      NOT NULL DEFAULT 1,
+  accepts_mobile_payment    TINYINT(1)      NOT NULL DEFAULT 1,
+  is_cash_on_delivery       TINYINT(1)      NOT NULL DEFAULT 0,
+  free_over_amount          BIGINT          NULL,
+  estimated_days_min        SMALLINT        NULL,
+  estimated_days_max        SMALLINT        NULL,
+  available_regions         JSON            NULL,
+  position                  INT             NOT NULL DEFAULT 0,
+  is_active                 TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at                DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at                DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at                DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_shipping_slug (slug),
+  CONSTRAINT chk_shipping_cost CHECK (cost_amount >= 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE orders (
+  id                       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_number             VARCHAR(24)     NOT NULL,
+  user_id                  BIGINT UNSIGNED NULL,
+  status                   VARCHAR(24)     NOT NULL DEFAULT 'awaiting_payment',
+  payment_status           VARCHAR(24)     NOT NULL DEFAULT 'unpaid',
+  fulfilment_status        VARCHAR(24)     NOT NULL DEFAULT 'unfulfilled',
+  customer_name            VARCHAR(120)    NOT NULL,
+  customer_email           VARCHAR(255)    NULL,
+  customer_phone           VARCHAR(15)     NOT NULL,
+  shipping_method_id       BIGINT UNSIGNED NULL,
+  shipping_method_name     VARCHAR(80)     NOT NULL,
+  subtotal_amount          BIGINT          NOT NULL,
+  discount_amount          BIGINT          NOT NULL DEFAULT 0,
+  shipping_amount          BIGINT          NOT NULL DEFAULT 0,
+  tax_amount               BIGINT          NOT NULL DEFAULT 0,
+  total_amount             BIGINT          NOT NULL,
+  paid_amount              BIGINT          NOT NULL DEFAULT 0,
+  currency                 CHAR(3)         NOT NULL DEFAULT 'TZS',
+  payment_method           VARCHAR(24)     NULL,
+  payment_number           VARCHAR(15)     NULL,
+  delegated_payer_email    VARCHAR(255)    NULL,
+  payment_token_hash       CHAR(64)        NULL,
+  payment_token_expires_at DATETIME(3)     NULL,
+  confirmation_token_hash  CHAR(64)        NULL,
+  idempotency_key          CHAR(36)        NULL,
+  customer_note            VARCHAR(500)    NULL,
+  internal_note            TEXT            NULL,
+  cancel_reason            VARCHAR(255)    NULL,
+  cancelled_at             DATETIME(3)     NULL,
+  placed_at                DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  paid_at                  DATETIME(3)     NULL,
+  shipped_at               DATETIME(3)     NULL,
+  delivered_at             DATETIME(3)     NULL,
+  reservation_expires_at   DATETIME(3)     NULL,
+  source                   VARCHAR(20)     NOT NULL DEFAULT 'web',
+  created_at               DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at               DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_orders_number (order_number),
+  UNIQUE KEY uq_orders_idempotency (idempotency_key),
+  UNIQUE KEY uq_orders_payment_token (payment_token_hash),
+  KEY idx_orders_user_placed (user_id, placed_at),
+  KEY idx_orders_status_placed (status, placed_at),
+  KEY idx_orders_payment_status (payment_status, placed_at),
+  KEY idx_orders_phone (customer_phone),
+  KEY idx_orders_paid_at (payment_status, paid_at),
+  KEY idx_orders_reservation (status, reservation_expires_at),
+  CONSTRAINT fk_orders_user     FOREIGN KEY (user_id)            REFERENCES users(id)            ON DELETE SET NULL,
+  CONSTRAINT fk_orders_shipping FOREIGN KEY (shipping_method_id) REFERENCES shipping_methods(id) ON DELETE SET NULL,
+  CONSTRAINT chk_orders_status CHECK (status IN
+    ('awaiting_payment','confirmed','processing','shipped','delivered','completed','cancelled','expired','refunded')),
+  CONSTRAINT chk_orders_payment_status CHECK (payment_status IN
+    ('unpaid','pending_verification','paid','partially_refunded','refunded','failed')),
+  CONSTRAINT chk_orders_fulfilment CHECK (fulfilment_status IN
+    ('unfulfilled','processing','shipped','delivered','returned')),
+  CONSTRAINT chk_orders_payment_method CHECK (payment_method IS NULL OR payment_method IN
+    ('lipa_namba','cash','aggregator')),
+  CONSTRAINT chk_orders_source CHECK (source IN ('web','admin','phone'))
+) ENGINE=InnoDB;
+
+CREATE TABLE order_items (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id           BIGINT UNSIGNED NOT NULL,
+  product_id         BIGINT UNSIGNED NULL,
+  product_variant_id BIGINT UNSIGNED NULL,
+  product_name       VARCHAR(255)    NOT NULL,
+  product_slug       VARCHAR(96)     NULL,
+  variant_sku        VARCHAR(20)     NOT NULL,
+  variant_attributes JSON            NULL,
+  image_url          VARCHAR(512)    NULL,
+  unit_price_amount  BIGINT          NOT NULL,
+  quantity           INT             NOT NULL,
+  discount_amount    BIGINT          NOT NULL DEFAULT 0,
+  line_total_amount  BIGINT          NOT NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_order_items_order (order_id),
+  KEY idx_order_items_product (product_id),
+  KEY idx_order_items_variant (product_variant_id),
+  CONSTRAINT fk_oi_order   FOREIGN KEY (order_id)           REFERENCES orders(id)           ON DELETE CASCADE,
+  CONSTRAINT fk_oi_product FOREIGN KEY (product_id)         REFERENCES products(id)         ON DELETE SET NULL,
+  CONSTRAINT fk_oi_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE SET NULL,
+  CONSTRAINT chk_oi_quantity CHECK (quantity > 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE order_shipping_addresses (
+  id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id       BIGINT UNSIGNED NOT NULL,
+  receiver_name  VARCHAR(120)    NOT NULL,
+  email          VARCHAR(255)    NULL,
+  phone          VARCHAR(15)     NOT NULL,
+  country        VARCHAR(64)     NOT NULL DEFAULT 'Tanzania',
+  region         VARCHAR(64)     NOT NULL,
+  district       VARCHAR(64)     NOT NULL,
+  street_address VARCHAR(255)    NOT NULL,
+  postal_code    VARCHAR(20)     NULL,
+  created_at     DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_osa_order (order_id),
+  CONSTRAINT fk_osa_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE order_events (
+  id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id       BIGINT UNSIGNED NOT NULL,
+  event_type     VARCHAR(40)     NOT NULL,
+  from_value     VARCHAR(40)     NULL,
+  to_value       VARCHAR(40)     NULL,
+  actor_type     VARCHAR(16)     NOT NULL DEFAULT 'system',
+  actor_user_id  BIGINT UNSIGNED NULL,
+  message        VARCHAR(500)    NULL,
+  metadata       JSON            NULL,
+  created_at     DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_order_events_order (order_id, created_at),
+  CONSTRAINT fk_oe_order FOREIGN KEY (order_id)      REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_oe_actor FOREIGN KEY (actor_user_id) REFERENCES users(id)  ON DELETE SET NULL,
+  CONSTRAINT chk_oe_actor_type CHECK (actor_type IN ('customer','staff','system','webhook'))
+) ENGINE=InnoDB;
+
+CREATE TABLE payments (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id           BIGINT UNSIGNED NOT NULL,
+  method             VARCHAR(24)     NOT NULL,
+  provider           VARCHAR(40)     NULL,
+  amount             BIGINT          NOT NULL,
+  currency           CHAR(3)         NOT NULL DEFAULT 'TZS',
+  status             VARCHAR(24)     NOT NULL DEFAULT 'initiated',
+  payer_phone        VARCHAR(15)     NULL,
+  payer_name         VARCHAR(120)    NULL,
+  provider_reference VARCHAR(120)    NULL,
+  merchant_reference VARCHAR(64)     NOT NULL,
+  verified_by        BIGINT UNSIGNED NULL,
+  verified_at        DATETIME(3)     NULL,
+  failure_reason     VARCHAR(255)    NULL,
+  raw_payload        JSON            NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_payments_provider_ref (provider, provider_reference),
+  KEY idx_payments_order (order_id),
+  KEY idx_payments_status (status, created_at),
+  KEY idx_payments_payer (payer_phone),
+  CONSTRAINT fk_payments_order    FOREIGN KEY (order_id)    REFERENCES orders(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_payments_verifier FOREIGN KEY (verified_by) REFERENCES users(id)  ON DELETE SET NULL,
+  CONSTRAINT chk_payments_status CHECK (status IN
+    ('initiated','pending','succeeded','failed','cancelled','refunded')),
+  CONSTRAINT chk_payments_amount CHECK (amount > 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE payment_events (
+  id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  payment_id        BIGINT UNSIGNED NULL,
+  provider          VARCHAR(40)     NOT NULL,
+  event_type        VARCHAR(60)     NOT NULL,
+  external_event_id VARCHAR(120)    NOT NULL,
+  signature_valid   TINYINT(1)      NOT NULL DEFAULT 0,
+  payload           JSON            NOT NULL,
+  processed_at      DATETIME(3)     NULL,
+  processing_error  VARCHAR(500)    NULL,
+  created_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_payment_events_external (provider, external_event_id),
+  KEY idx_payment_events_unprocessed (processed_at, created_at),
+  CONSTRAINT fk_pe_payment FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE stock_movements (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_variant_id BIGINT UNSIGNED NOT NULL,
+  delta              INT             NOT NULL,
+  balance_after      INT             NOT NULL,
+  reason             VARCHAR(32)     NOT NULL,
+  reference_type     VARCHAR(32)     NULL,
+  reference_id       BIGINT UNSIGNED NULL,
+  actor_user_id      BIGINT UNSIGNED NULL,
+  note               VARCHAR(255)    NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_stock_variant (product_variant_id, created_at),
+  KEY idx_stock_reason (reason, created_at),
+  CONSTRAINT fk_sm_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_sm_actor   FOREIGN KEY (actor_user_id)      REFERENCES users(id)            ON DELETE SET NULL,
+  CONSTRAINT chk_sm_reason CHECK (reason IN
+    ('purchase','sale','reservation','release','adjustment','return','damage','stocktake'))
+) ENGINE=InnoDB;
+
+CREATE TABLE invoices (
+  id                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  invoice_number       VARCHAR(24)     NOT NULL,
+  order_id             BIGINT UNSIGNED NULL,
+  client_name          VARCHAR(120)    NOT NULL,
+  client_email         VARCHAR(255)    NOT NULL,
+  client_phone         VARCHAR(15)     NULL,
+  client_address       VARCHAR(500)    NULL,
+  shipping_method_name VARCHAR(80)     NULL,
+  subtotal_amount      BIGINT          NOT NULL DEFAULT 0,
+  shipping_amount      BIGINT          NOT NULL DEFAULT 0,
+  tax_amount           BIGINT          NOT NULL DEFAULT 0,
+  total_amount         BIGINT          NOT NULL DEFAULT 0,
+  currency             CHAR(3)         NOT NULL DEFAULT 'TZS',
+  status               VARCHAR(20)     NOT NULL DEFAULT 'draft',
+  issued_at            DATETIME(3)     NULL,
+  due_at               DATETIME(3)     NULL,
+  paid_at              DATETIME(3)     NULL,
+  share_token_hash     CHAR(64)        NULL,
+  notes                TEXT            NULL,
+  created_by           BIGINT UNSIGNED NULL,
+  created_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at           DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at           DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_invoices_number (invoice_number),
+  UNIQUE KEY uq_invoices_share_token (share_token_hash),
+  KEY idx_invoices_status (status, issued_at),
+  KEY idx_invoices_order (order_id),
+  CONSTRAINT fk_invoices_order   FOREIGN KEY (order_id)   REFERENCES orders(id) ON DELETE SET NULL,
+  CONSTRAINT fk_invoices_creator FOREIGN KEY (created_by) REFERENCES users(id)  ON DELETE SET NULL,
+  CONSTRAINT chk_invoices_status CHECK (status IN ('draft','issued','paid','void'))
+) ENGINE=InnoDB;
+
+CREATE TABLE invoice_items (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  invoice_id         BIGINT UNSIGNED NOT NULL,
+  product_variant_id BIGINT UNSIGNED NULL,
+  description        VARCHAR(255)    NOT NULL,
+  sku                VARCHAR(20)     NULL,
+  unit_price_amount  BIGINT          NOT NULL,
+  quantity           INT             NOT NULL,
+  line_total_amount  BIGINT          NOT NULL,
+  position           INT             NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  KEY idx_invoice_items_invoice (invoice_id, position),
+  CONSTRAINT fk_ii_invoice FOREIGN KEY (invoice_id)         REFERENCES invoices(id)         ON DELETE CASCADE,
+  CONSTRAINT fk_ii_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE SET NULL,
+  CONSTRAINT chk_ii_quantity CHECK (quantity > 0)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  7. CONTENT
+-- ---------------------------------------------------------------------
+CREATE TABLE banners (
+  id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  title             VARCHAR(120)    NOT NULL,
+  title_color       CHAR(7)         NOT NULL DEFAULT '#FFFFFF',
+  subtitle          VARCHAR(300)    NULL,
+  subtitle_color    CHAR(7)         NOT NULL DEFAULT '#FFFFFF',
+  background_color  CHAR(7)         NOT NULL DEFAULT '#0A5C43',
+  image_id          BIGINT UNSIGNED NOT NULL,
+  link_url          VARCHAR(512)    NULL,
+  button_text       VARCHAR(40)     NULL,
+  button_background CHAR(7)         NOT NULL DEFAULT '#0E7C5A',
+  button_text_color CHAR(7)         NOT NULL DEFAULT '#FFFFFF',
+  placement         VARCHAR(20)     NOT NULL DEFAULT 'home',
+  position          INT             NOT NULL DEFAULT 0,
+  starts_at         DATETIME(3)     NULL,
+  ends_at           DATETIME(3)     NULL,
+  is_active         TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at        DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at        DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_banners_placement (placement, is_active, position),
+  CONSTRAINT fk_banners_image FOREIGN KEY (image_id) REFERENCES media_files(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE services (
+  id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  heading      VARCHAR(160)    NOT NULL,
+  slug         VARCHAR(96)     NOT NULL,
+  excerpt      VARCHAR(500)    NULL,
+  content_html MEDIUMTEXT      NOT NULL,
+  content_text MEDIUMTEXT      NOT NULL,
+  image_id     BIGINT UNSIGNED NULL,
+  position     INT             NOT NULL DEFAULT 0,
+  is_active    TINYINT(1)      NOT NULL DEFAULT 1,
+  published_at DATETIME(3)     NULL,
+  created_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at   DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_services_slug (slug),
+  CONSTRAINT fk_services_image FOREIGN KEY (image_id) REFERENCES media_files(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE partners (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name        VARCHAR(120)    NOT NULL,
+  logo_id     BIGINT UNSIGNED NULL,
+  website_url VARCHAR(512)    NULL,
+  position    INT             NOT NULL DEFAULT 0,
+  is_active   TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at  DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_partners_logo FOREIGN KEY (logo_id) REFERENCES media_files(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE articles (
+  id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  title            VARCHAR(200)    NOT NULL,
+  slug             VARCHAR(96)     NOT NULL,
+  excerpt          VARCHAR(500)    NULL,
+  content_html     MEDIUMTEXT      NOT NULL,
+  content_text     MEDIUMTEXT      NOT NULL,
+  cover_image_id   BIGINT UNSIGNED NULL,
+  author_id        BIGINT UNSIGNED NULL,
+  status           VARCHAR(16)     NOT NULL DEFAULT 'draft',
+  published_at     DATETIME(3)     NULL,
+  view_count       INT UNSIGNED    NOT NULL DEFAULT 0,
+  comment_count    INT UNSIGNED    NOT NULL DEFAULT 0,
+  meta_title       VARCHAR(70)     NULL,
+  meta_description VARCHAR(160)    NULL,
+  created_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at       DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at       DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_articles_slug (slug),
+  KEY idx_articles_status_published (status, published_at),
+  FULLTEXT KEY ft_articles_search (title, content_text),
+  CONSTRAINT fk_articles_image  FOREIGN KEY (cover_image_id) REFERENCES media_files(id) ON DELETE SET NULL,
+  CONSTRAINT fk_articles_author FOREIGN KEY (author_id)      REFERENCES users(id)       ON DELETE SET NULL,
+  CONSTRAINT chk_articles_status CHECK (status IN ('draft','published','archived'))
+) ENGINE=InnoDB;
+
+CREATE TABLE comments (
+  id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  article_id   BIGINT UNSIGNED NOT NULL,
+  user_id      BIGINT UNSIGNED NULL,
+  parent_id    BIGINT UNSIGNED NULL,
+  author_name  VARCHAR(120)    NOT NULL,
+  body         TEXT            NOT NULL,
+  status       VARCHAR(16)     NOT NULL DEFAULT 'pending',
+  moderated_by BIGINT UNSIGNED NULL,
+  moderated_at DATETIME(3)     NULL,
+  ip_address   VARBINARY(16)   NULL,
+  created_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at   DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at   DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_comments_article (article_id, status, created_at),
+  KEY idx_comments_status (status, created_at),
+  CONSTRAINT fk_comments_article   FOREIGN KEY (article_id)   REFERENCES articles(id) ON DELETE CASCADE,
+  CONSTRAINT fk_comments_user      FOREIGN KEY (user_id)      REFERENCES users(id)    ON DELETE SET NULL,
+  CONSTRAINT fk_comments_parent    FOREIGN KEY (parent_id)    REFERENCES comments(id) ON DELETE CASCADE,
+  CONSTRAINT fk_comments_moderator FOREIGN KEY (moderated_by) REFERENCES users(id)    ON DELETE SET NULL,
+  CONSTRAINT chk_comments_status CHECK (status IN ('pending','approved','rejected','spam'))
+) ENGINE=InnoDB;
+
+CREATE TABLE reviews (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id    BIGINT UNSIGNED NOT NULL,
+  user_id       BIGINT UNSIGNED NULL,
+  order_item_id BIGINT UNSIGNED NULL,
+  author_name   VARCHAR(120)    NOT NULL,
+  rating        TINYINT         NOT NULL,
+  title         VARCHAR(80)     NULL,
+  body          TEXT            NOT NULL,
+  status        VARCHAR(16)     NOT NULL DEFAULT 'pending',
+  helpful_count INT UNSIGNED    NOT NULL DEFAULT 0,
+  moderated_by  BIGINT UNSIGNED NULL,
+  moderated_at  DATETIME(3)     NULL,
+  created_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at    DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_reviews_product_user (product_id, user_id),
+  KEY idx_reviews_product_status (product_id, status, created_at),
+  KEY idx_reviews_status (status, created_at),
+  CONSTRAINT fk_reviews_product   FOREIGN KEY (product_id)    REFERENCES products(id)    ON DELETE CASCADE,
+  CONSTRAINT fk_reviews_user      FOREIGN KEY (user_id)       REFERENCES users(id)       ON DELETE SET NULL,
+  CONSTRAINT fk_reviews_orderitem FOREIGN KEY (order_item_id) REFERENCES order_items(id) ON DELETE SET NULL,
+  CONSTRAINT fk_reviews_moderator FOREIGN KEY (moderated_by)  REFERENCES users(id)       ON DELETE SET NULL,
+  CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5),
+  CONSTRAINT chk_reviews_status CHECK (status IN ('pending','approved','rejected','spam'))
+) ENGINE=InnoDB;
+
+CREATE TABLE faqs (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  question    VARCHAR(300)    NOT NULL,
+  answer_html TEXT            NOT NULL,
+  `group`     VARCHAR(60)     NOT NULL DEFAULT 'General',
+  position    INT             NOT NULL DEFAULT 0,
+  is_active   TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at  DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_faqs_group (`group`, position)
+) ENGINE=InnoDB;
+
+CREATE TABLE site_settings (
+  `key`       VARCHAR(80)     NOT NULL,
+  value       JSON            NOT NULL,
+  `group`     VARCHAR(40)     NOT NULL DEFAULT 'general',
+  description VARCHAR(255)    NULL,
+  updated_by  BIGINT UNSIGNED NULL,
+  created_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at  DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`key`),
+  KEY idx_settings_group (`group`),
+  CONSTRAINT fk_settings_updater FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  8. MARKETING AND ANALYTICS
+-- ---------------------------------------------------------------------
+CREATE TABLE contacts (
+  id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id         BIGINT UNSIGNED NULL,
+  name            VARCHAR(120)    NOT NULL,
+  email           VARCHAR(255)    NULL,
+  phone           VARCHAR(15)     NULL,
+  source          VARCHAR(24)     NOT NULL DEFAULT 'manual',
+  email_opt_in    TINYINT(1)      NOT NULL DEFAULT 0,
+  sms_opt_in      TINYINT(1)      NOT NULL DEFAULT 0,
+  unsubscribed_at DATETIME(3)     NULL,
+  tags            JSON            NULL,
+  created_at      DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at      DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at      DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_contacts_email (email),
+  UNIQUE KEY uq_contacts_phone (phone),
+  KEY idx_contacts_user (user_id),
+  CONSTRAINT fk_contacts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT chk_contacts_source CHECK (source IN
+    ('registration','order','manual','import','contact_form'))
+) ENGINE=InnoDB;
+
+CREATE TABLE campaigns (
+  id                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  channel               VARCHAR(10)     NOT NULL,
+  name                  VARCHAR(160)    NOT NULL,
+  audience              VARCHAR(16)     NOT NULL DEFAULT 'all',
+  audience_filter       JSON            NULL,
+  body_text             TEXT            NOT NULL,
+  body_html             MEDIUMTEXT      NULL,
+  additional_recipients JSON            NULL,
+  scheduled_for         DATETIME(3)     NULL,
+  status                VARCHAR(16)     NOT NULL DEFAULT 'draft',
+  recipient_count       INT             NOT NULL DEFAULT 0,
+  sent_count            INT             NOT NULL DEFAULT 0,
+  delivered_count       INT             NOT NULL DEFAULT 0,
+  failed_count          INT             NOT NULL DEFAULT 0,
+  cost_amount           BIGINT          NULL,
+  created_by            BIGINT UNSIGNED NULL,
+  sent_at               DATETIME(3)     NULL,
+  created_at            DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at            DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at            DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_campaigns_status (status, scheduled_for),
+  CONSTRAINT fk_campaigns_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT chk_campaigns_channel  CHECK (channel IN ('sms','email')),
+  CONSTRAINT chk_campaigns_audience CHECK (audience IN ('all','specific','tag','segment')),
+  CONSTRAINT chk_campaigns_status   CHECK (status IN
+    ('draft','scheduled','sending','sent','failed','cancelled'))
+) ENGINE=InnoDB;
+
+CREATE TABLE campaign_recipients (
+  id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  campaign_id         BIGINT UNSIGNED NOT NULL,
+  contact_id          BIGINT UNSIGNED NULL,
+  destination         VARCHAR(255)    NOT NULL,
+  status              VARCHAR(16)     NOT NULL DEFAULT 'queued',
+  provider_message_id VARCHAR(120)    NULL,
+  error               VARCHAR(255)    NULL,
+  sent_at             DATETIME(3)     NULL,
+  delivered_at        DATETIME(3)     NULL,
+  created_at          DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_cr_campaign_status (campaign_id, status),
+  CONSTRAINT fk_cr_campaign FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cr_contact  FOREIGN KEY (contact_id)  REFERENCES contacts(id)  ON DELETE SET NULL,
+  CONSTRAINT chk_cr_status CHECK (status IN
+    ('queued','sent','delivered','failed','bounced','unsubscribed'))
+) ENGINE=InnoDB;
+
+CREATE TABLE search_logs (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  term               VARCHAR(160)    NOT NULL,
+  normalised_term    VARCHAR(160)    NOT NULL,
+  result_count       INT             NOT NULL DEFAULT 0,
+  user_id            BIGINT UNSIGNED NULL,
+  session_id         CHAR(32)        NULL,
+  clicked_product_id BIGINT UNSIGNED NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_search_term (normalised_term, created_at),
+  KEY idx_search_zero (result_count, created_at),
+  CONSTRAINT fk_search_user    FOREIGN KEY (user_id)            REFERENCES users(id)    ON DELETE SET NULL,
+  CONSTRAINT fk_search_product FOREIGN KEY (clicked_product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE contact_messages (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name       VARCHAR(120)    NOT NULL,
+  email      VARCHAR(255)    NOT NULL,
+  subject    VARCHAR(200)    NULL,
+  message    TEXT            NOT NULL,
+  send_copy  TINYINT(1)      NOT NULL DEFAULT 0,
+  status     VARCHAR(16)     NOT NULL DEFAULT 'new',
+  handled_by BIGINT UNSIGNED NULL,
+  ip_address VARBINARY(16)   NULL,
+  user_agent VARCHAR(255)    NULL,
+  created_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at DATETIME(3)     NULL,
+  PRIMARY KEY (id),
+  KEY idx_contact_messages_status (status, created_at),
+  CONSTRAINT fk_cm_handler FOREIGN KEY (handled_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT chk_cm_status CHECK (status IN ('new','read','replied','archived','spam'))
+) ENGINE=InnoDB;
+
+CREATE TABLE notify_requests (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_variant_id BIGINT UNSIGNED NOT NULL,
+  email              VARCHAR(255)    NOT NULL,
+  user_id            BIGINT UNSIGNED NULL,
+  notified_at        DATETIME(3)     NULL,
+  created_at         DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_notify_variant_email (product_variant_id, email),
+  CONSTRAINT fk_nr_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE CASCADE,
+  CONSTRAINT fk_nr_user    FOREIGN KEY (user_id)            REFERENCES users(id)            ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  9. AUDIT  (insert-only; grant the runtime user INSERT + SELECT only)
+-- ---------------------------------------------------------------------
+CREATE TABLE audit_logs (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  actor_user_id BIGINT UNSIGNED NULL,
+  actor_email   VARCHAR(255)    NULL,
+  action        VARCHAR(60)     NOT NULL,
+  entity_type   VARCHAR(60)     NOT NULL,
+  entity_id     BIGINT UNSIGNED NULL,
+  entity_label  VARCHAR(255)    NULL,
+  `before`      JSON            NULL,
+  `after`       JSON            NULL,
+  ip_address    VARBINARY(16)   NULL,
+  user_agent    VARCHAR(255)    NULL,
+  request_id    CHAR(26)        NULL,
+  created_at    DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  KEY idx_audit_entity (entity_type, entity_id, created_at),
+  KEY idx_audit_actor (actor_user_id, created_at),
+  KEY idx_audit_action (action, created_at),
+  CONSTRAINT fk_audit_actor FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  Full-text tuning (server variables — set in my.cnf, shown for reference)
+--    innodb_ft_min_token_size = 2
+--    innodb_ft_user_stopword_table = techstar/ft_stopwords   (empty table)
+-- ---------------------------------------------------------------------
+CREATE TABLE ft_stopwords (value VARCHAR(30)) ENGINE=InnoDB;

@@ -1,0 +1,192 @@
+<h1 class="part"><span class="num">Part Eleven</span>Authentication, Authorisation and Security</h1>
+
+<h2>11.1 Identity model</h2>
+<p>One <code>users</code> table holds both customers and staff, distinguished by <code>account_type</code> and by the roles attached to them. Two tables would duplicate authentication, password reset, session handling and profile management for no benefit, and would make "promote this customer to staff" a data migration.</p>
+<table class="compact">
+  <thead><tr><th style="width:32mm">Concept</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>Identifier</td><td>A user is reachable by email, by phone, or by both. Login accepts either in a single field, as the reference platform does; the server decides which by shape. At least one must exist, enforced by a check constraint.</td></tr>
+    <tr><td>Credential</td><td>A password hash, an OAuth link, or both. A user who registered with Google and later sets a password holds both and may use either.</td></tr>
+    <tr><td>Guest</td><td>No account. Identified within a session by a <code>guest_token</code> cookie that owns a cart and a wishlist. A guest may place an order; the order stores their name and phone directly.</td></tr>
+    <tr><td>Staff</td><td><code>account_type = 'staff'</code> plus at least one role. Staff sign in through the same modal; the admin console appears in their account menu.</td></tr>
+    <tr><td>Role</td><td>A named bundle of permissions. Users may hold several; effective permissions are the union.</td></tr>
+    <tr><td>Permission</td><td>An atomic capability string, <code>resource.action</code>. This is the unit checked at every guard.</td></tr>
+  </tbody>
+</table>
+
+<h2>11.2 Token strategy</h2>
+<div class="warn">
+  <span class="lbl">The single most important divergence from the reference platform</span>
+  The reference platform stores its bearer token in <code>localStorage</code> (defect R9). Any script that executes on the page — an injected third-party tag, a compromised dependency, a stored XSS — can read it and exfiltrate a full session. TechStar splits the session in two so that no single compromise is sufficient.
+</div>
+
+<table>
+  <thead><tr><th style="width:30mm">Token</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Access token</td><td>JWT, <strong>15-minute</strong> lifetime, signed <code>HS256</code> with a 32-byte secret (or <code>RS256</code> if the API is ever split across services). Held <strong>in memory only</strong> — a JavaScript variable inside the auth store, never in <code>localStorage</code>, <code>sessionStorage</code> or a cookie. Claims: <code>sub</code> (user public id), <code>typ</code>, <code>roles</code>, <code>perms</code>, <code>sid</code> (session id), <code>iat</code>, <code>exp</code>, <code>jti</code>. Sent as <code>Authorization: Bearer</code>.</td></tr>
+    <tr><td>Refresh token</td><td>32 bytes of cryptographic randomness, base64url, stored server-side as a SHA-256 hash. Delivered as a cookie: <code>HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth; Max-Age=2592000</code> (30 days). Unreadable from JavaScript by construction.</td></tr>
+    <tr><td>Rotation</td><td>Every call to <code>/auth/refresh</code> issues a new refresh token and marks the old one replaced. Refresh tokens are strictly single-use.</td></tr>
+    <tr><td>Reuse detection</td><td>Presenting a refresh token that has already been replaced means it was stolen. The entire session family is revoked immediately, the user is signed out everywhere, and a security email is sent. This is the mechanism that limits the damage of a stolen cookie to a single refresh cycle.</td></tr>
+    <tr><td>Silent refresh</td><td>The client refreshes at 80% of the access token's life, and once on application boot to restore a session after a reload. Concurrent 401s are queued behind a single refresh, then replayed.</td></tr>
+    <tr><td>Revocation</td><td>Sign-out revokes the current session; password change and reset revoke all others. Revoked session ids are held in a Redis set until their natural expiry, so an unexpired access token cannot outlive its revocation.</td></tr>
+    <tr><td>Socket authentication</td><td>The Socket.IO handshake carries the access token and is verified server-side. Fixes defect R9's second half: the reference platform authenticates sockets with a raw user id, which anyone can supply.</td></tr>
+  </tbody>
+</table>
+
+<h2>11.3 OAuth</h2>
+<p>Google and Facebook, both authorization-code flow with PKCE. Implicit flow is not used under any circumstances.</p>
+<pre>1  Client → GET /api/v1/auth/oauth/google
+2  Server generates code_verifier + state, stores both against a short-lived
+   cookie, redirects to the provider
+3  Provider → GET /auth/oauth/google/callback?code=…&amp;state=…
+4  Server validates state (CSRF), exchanges code + verifier for tokens,
+   fetches the profile
+5  Account resolution
+     a. oauth_accounts row for (provider, providerUserId) exists → sign in
+     b. no row, but a verified user has that email → link, then sign in
+     c. no row, no match → create the user with email_verified_at set,
+        since the provider has already verified it
+6  Server issues its own session, redirects to
+   /auth/oauth/callback?code=&lt;one-time&gt;
+7  Client → POST /auth/oauth/exchange { code } → session established</pre>
+<div class="note">
+  <span class="lbl">Why the extra exchange step</span>
+  Redirecting with a token in the URL leaks it into browser history, the <code>Referer</code> header of any subsequent request, and server access logs. The one-time exchange code is valid for 60 seconds, single-use, and bound to the originating browser. Case (b) links only against a <em>verified</em> email — otherwise anyone could claim an account by registering its address at a provider.
+</div>
+
+<h2>11.4 Email verification, password reset, password rules</h2>
+
+<h3>11.4.1 Email verification</h3>
+<p>Registration queues a verification email carrying a 32-byte token, hashed at rest, valid 24 hours, single-use. Until verified, the account can browse, buy and pay — verification is not a gate on commerce, which would cost orders — but it is required to write reviews or comments, and the persistent banner (§7.1.5) keeps asking. Requesting a new link invalidates all outstanding ones. Rate limited to 3 per hour.</p>
+
+<h3>11.4.2 Password reset</h3>
+<p>Token of 32 bytes, hashed at rest, valid 60 minutes, single-use. The request endpoint always returns the same response whether or not the address exists, and takes the same measured time either way — a fast negative is as good an oracle as a different message. On success, every session is revoked and a confirmation email is sent to the address on file, so an unauthorised reset is visible to the real owner.</p>
+
+<h3>11.4.3 Password rules</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Length</td><td>Minimum 10 characters, maximum 128. Length is the only requirement that reliably increases strength.</td></tr>
+    <tr><td>Composition</td><td>No mandatory character classes. Forced classes push users toward <code>Password1!</code>; they measurably reduce entropy.</td></tr>
+    <tr><td>Blocklist</td><td>Rejected against the 100,000 most common passwords and against the user's own email, username and phone.</td></tr>
+    <tr><td>Breach check</td><td>Optional k-anonymity lookup against Have I Been Pwned's range API — only the first five characters of the SHA-1 hash leave the server. Fails open if the service is unreachable.</td></tr>
+    <tr><td>Strength meter</td><td>zxcvbn, shown live during registration and change. Advisory, not blocking, beyond the hard rules above.</td></tr>
+    <tr><td>Hashing</td><td>Argon2id, memory 19&nbsp;MiB, iterations 2, parallelism 1 — the OWASP baseline. Parameters are stored with the hash so they can be raised later and rehashed on next successful login.</td></tr>
+    <tr><td>Comparison</td><td>Constant-time. On an unknown identifier, a dummy hash is still verified so that response time does not reveal whether the account exists.</td></tr>
+  </tbody>
+</table>
+
+<h2>11.5 Authorisation — the RBAC matrix</h2>
+<p>Permissions are checked on the server for every request. Route guards in the client are convenience only (§6.5).</p>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Permission group</th><th>Keys</th></tr></thead>
+  <tbody>
+    <tr><td>Catalogue</td><td><code>product.read create update delete publish</code> · <code>category.read create update delete</code> · <code>discount.read create update delete</code> · <code>stock.read adjust</code> · <code>media.read upload delete</code></td></tr>
+    <tr><td>Commerce</td><td><code>order.read update cancel refund export</code> · <code>invoice.read create update delete send</code> · <code>shipping.read create update delete</code> · <code>payment.verify refund</code></td></tr>
+    <tr><td>Customers</td><td><code>customer.read update suspend export</code></td></tr>
+    <tr><td>Content</td><td><code>banner.* service.* partner.* article.* faq.*</code> (read create update delete) · <code>comment.moderate</code> · <code>review.moderate</code></td></tr>
+    <tr><td>Marketing</td><td><code>campaign.read create send delete</code> · <code>contact.read import export</code></td></tr>
+    <tr><td>Platform</td><td><code>settings.read update</code> · <code>staff.manage</code> · <code>audit.view</code> · <code>analytics.view</code> · <code>dashboard.view</code></td></tr>
+  </tbody>
+</table>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Role</th><th style="width:14mm" class="c">Catalogue</th><th style="width:14mm" class="c">Orders</th><th style="width:16mm" class="c">Customers</th><th style="width:14mm" class="c">Content</th><th style="width:16mm" class="c">Marketing</th><th class="c">Platform</th></tr></thead>
+  <tbody>
+    <tr><td>owner</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">full</td></tr>
+    <tr><td>manager</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">full</td><td class="c">analytics, audit</td></tr>
+    <tr><td>catalogue</td><td class="c">full</td><td class="c">read</td><td class="c">—</td><td class="c">media only</td><td class="c">—</td><td class="c">dashboard</td></tr>
+    <tr><td>fulfilment</td><td class="c">read, stock</td><td class="c">full</td><td class="c">read</td><td class="c">—</td><td class="c">—</td><td class="c">dashboard</td></tr>
+    <tr><td>marketing</td><td class="c">read</td><td class="c">read</td><td class="c">read</td><td class="c">full</td><td class="c">full</td><td class="c">analytics</td></tr>
+    <tr><td>support</td><td class="c">read</td><td class="c">read, cancel</td><td class="c">read</td><td class="c">moderate</td><td class="c">—</td><td class="c">dashboard</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Structural rules</span>
+  At least one active <code>owner</code> must exist at all times — the system refuses to remove the last one. Nobody may edit their own roles. <code>payment.verify</code> and <code>order.refund</code> are never granted to <code>support</code>; separating who takes the order from who confirms the money is basic segregation of duties. Every permission change is written to the audit log with before and after.
+</div>
+
+<h2>11.6 Input validation</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Layer</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Schema</td><td>Every endpoint declares Zod schemas for <code>params</code>, <code>query</code> and <code>body</code> in <code>packages/contracts</code>. The middleware replaces the raw request values with the parsed, typed result, so a controller cannot accidentally read an unvalidated field.</td></tr>
+    <tr><td>Strictness</td><td>Objects are strict — an unexpected property is a 422, not silently dropped. This catches typos in client code and blocks mass-assignment.</td></tr>
+    <tr><td>Coercion</td><td>Explicit only. Query strings coerce to number or boolean where the schema says so; nowhere else.</td></tr>
+    <tr><td>Normalisation</td><td>Email lowercased and trimmed. Phone stripped to digits and canonicalised to <code>255XXXXXXXXX</code>, accepting <code>+255…</code>, <code>0…</code> and <code>255…</code> as input. Names trimmed with internal whitespace collapsed. Slugs generated per §6.6.</td></tr>
+    <tr><td>HTML</td><td>Rich text is sanitised with an allowlist on write <em>and</em> on render. Two independent passes, because a single point of sanitisation is a single point of failure.</td></tr>
+    <tr><td>SQL</td><td>Prisma parameterises everything. The few raw queries in Part 18 use <code>$queryRaw</code> with tagged-template parameters; string concatenation into SQL is forbidden and caught by lint rule.</td></tr>
+    <tr><td>Mass assignment</td><td>Controllers pass explicit field lists to services. No <code>...req.body</code> spread into an update, ever — that is how a customer sets <code>account_type = 'staff'</code>.</td></tr>
+    <tr><td>Ownership</td><td>Every resource read or write verifies the caller owns the row or holds the permission. Never trust an id in a URL to belong to its bearer.</td></tr>
+    <tr><td>Enumeration</td><td>Sequential ids never appear in URLs (§9.1), so resources cannot be walked.</td></tr>
+  </tbody>
+</table>
+
+<h2>11.7 Upload security</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Control</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Accepted types</td><td><code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>, <code>image/avif</code>. SVG is <strong>rejected</strong> — it is a script-execution vector, and vector logos should be converted to PNG on the way in.</td></tr>
+    <tr><td>Type determination</td><td>Magic bytes, not the client's <code>Content-Type</code> and not the file extension. A mismatch between claimed and actual type is a rejection, not a correction.</td></tr>
+    <tr><td>Size</td><td>3&nbsp;MB per file, 30&nbsp;MB per request, 100 files per product. Enforced by the multipart parser before anything touches disk.</td></tr>
+    <tr><td>Dimensions</td><td>Maximum 8000 × 8000&nbsp;px. Larger images are rejected rather than resized, which stops decompression-bomb attacks.</td></tr>
+    <tr><td>Re-encoding</td><td>Every accepted image is decoded and re-encoded by <code>sharp</code>. The original bytes are never served. This strips any embedded payload and, incidentally, all EXIF including GPS coordinates.</td></tr>
+    <tr><td>Naming</td><td>Stored under a generated ULID with a canonical extension. The user's filename is retained as metadata only, and never used as a path component.</td></tr>
+    <tr><td>Storage location</td><td>Outside the web root. Served through a handler that sets <code>Content-Type</code>, <code>Content-Disposition: inline</code>, <code>X-Content-Type-Options: nosniff</code> and long-lived immutable cache headers.</td></tr>
+    <tr><td>Execution</td><td>The upload directory is configured with execution disabled at the web-server level, belt and braces.</td></tr>
+    <tr><td>Authorisation</td><td>Only staff with <code>media.upload</code> may upload, except the customer avatar endpoint, which is limited to one file, 2&nbsp;MB, 1024&nbsp;px.</td></tr>
+    <tr><td>Rate</td><td>30 uploads per hour per user.</td></tr>
+  </tbody>
+</table>
+
+<h2>11.8 Security checklist</h2>
+<table>
+  <thead><tr><th style="width:44mm">Risk</th><th>Control</th></tr></thead>
+  <tbody>
+    <tr><td>Broken access control</td><td>Server-side permission check on every route; ownership check on every resource; no sequential ids in URLs; strict schemas prevent mass assignment; automated tests assert that each admin route rejects a customer token.</td></tr>
+    <tr><td>Cryptographic failures</td><td>TLS 1.2+ only, HSTS with a one-year max-age and preload. Argon2id for passwords, SHA-256 for token storage. Secrets from the environment, never in the repository. Database at rest on an encrypted volume. Backups encrypted with a separately managed key.</td></tr>
+    <tr><td>Injection</td><td>Parameterised queries throughout; HTML sanitised twice; no shell interpolation anywhere; JSON body size capped.</td></tr>
+    <tr><td>Insecure design</td><td>Order state machine rejects illegal transitions server-side; stock changes are transactional with a ledger row; payment verification is a separate permission from order handling; idempotency keys on order and payment creation.</td></tr>
+    <tr><td>Security misconfiguration</td><td>Config validated at boot and fails fast; production build strips development hosts (fixing R10); <code>X-Powered-By</code> removed; directory listing off; error responses carry no stack traces; distinct credentials per environment.</td></tr>
+    <tr><td>Vulnerable components</td><td><code>npm audit</code> and Dependabot in CI; the build fails on a high or critical advisory; a monthly patch window; lockfiles committed.</td></tr>
+    <tr><td>Authentication failures</td><td>Rate limits and progressive lockout; identical responses for unknown and wrong credentials; refresh rotation with reuse detection; sessions listed and revocable by the user.</td></tr>
+    <tr><td>Data integrity failures</td><td>Webhook signatures verified before processing; every inbound event persisted before it is acted on; Subresource Integrity on the few external assets; CI publishes build provenance.</td></tr>
+    <tr><td>Logging failures</td><td>Structured logs with a request id on every line; authentication events, permission denials, payment verifications and admin mutations all logged; passwords, tokens, card-like numbers and full phone numbers redacted by a logger serializer; audit log is insert-only at the database-privilege level.</td></tr>
+    <tr><td>SSRF</td><td>No endpoint fetches a user-supplied URL. Outbound calls go only to a fixed allowlist of provider hosts.</td></tr>
+    <tr><td>XSS</td><td>React escapes by default; <code>dangerouslySetInnerHTML</code> permitted in exactly one component (§8.2), enforced by lint; CSP without <code>unsafe-inline</code>, using nonces for the few inline scripts; access token never in a readable store.</td></tr>
+    <tr><td>CSRF</td><td>Refresh cookie is <code>SameSite=Strict</code> and scoped to <code>/api/v1/auth</code>; all other authentication is a bearer header, which CSRF cannot forge; state-changing requests require <code>Content-Type: application/json</code>, which blocks simple form posts.</td></tr>
+    <tr><td>Clickjacking</td><td><code>frame-ancestors 'none'</code> plus <code>X-Frame-Options: DENY</code>.</td></tr>
+    <tr><td>Enumeration</td><td>Identical responses and timing for unknown accounts, expired tokens and invalid tokens throughout.</td></tr>
+    <tr><td>Denial of service</td><td>Rate limits at several scopes; body and upload caps; query complexity bounded by a maximum page size; slow-query logging with alerting; Nginx connection limits.</td></tr>
+  </tbody>
+</table>
+
+<h3>11.8.1 Response headers</h3>
+<pre>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Content-Security-Policy: default-src 'self';
+  script-src 'self' 'nonce-{random}' https://www.googletagmanager.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob: https://*.tile.openstreetmap.org;
+  font-src 'self';
+  connect-src 'self' https://www.google-analytics.com wss://{host};
+  frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+  object-src 'none'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin</pre>
+<p class="kv"><code>style-src 'unsafe-inline'</code> is required because banners apply administrator-chosen colours as inline styles. The alternative — emitting a nonce per banner — is achievable and preferable, and is listed as a hardening item for Phase 5.</p>
+
+<h3>11.8.2 Personal data</h3>
+<table class="compact">
+  <thead><tr><th style="width:36mm">Obligation</th><th>Implementation</th></tr></thead>
+  <tbody>
+    <tr><td>Minimisation</td><td>Only what an order needs: name, phone, and an address when the shipping method requires one. Date of birth, gender and national identifiers are never collected.</td></tr>
+    <tr><td>Consent</td><td><code>marketing_opt_in</code> is off by default and captured explicitly. Campaign sending excludes anyone without consent or with an unsubscribe timestamp — the reference platform mails every contact, which is a live compliance exposure.</td></tr>
+    <tr><td>Unsubscribe</td><td>One-click, honoured within seconds, present in every campaign email and every marketing SMS.</td></tr>
+    <tr><td>Access and portability</td><td>A customer may request an export of their personal data; the admin console produces a JSON bundle of profile, addresses, orders, reviews and comments.</td></tr>
+    <tr><td>Erasure</td><td>Account closure anonymises the user row — name replaced with "Deleted user", email and phone nulled, avatar removed — while orders are retained with their snapshot fields for statutory record-keeping. This is the only way to satisfy both obligations at once.</td></tr>
+    <tr><td>Retention</td><td>Guest carts 30 days · search logs 24 months · audit logs 24 months · sessions until expiry · orders and invoices retained per Tanzanian record-keeping requirements, minimum 7 years.</td></tr>
+  </tbody>
+</table>

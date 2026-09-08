@@ -1,0 +1,308 @@
+<h1 class="part"><span class="num">Part Two</span>Reference Platform Analysis</h1>
+
+<p>This part records what the reference platform actually is. It is the factual base for every requirement that follows. Nothing here is inferred from marketing material or from what an electronics store "usually" does.</p>
+
+<h2>2.1 Runtime architecture</h2>
+
+<table class="compact">
+  <thead><tr><th style="width:44mm">Layer</th><th>Observed</th></tr></thead>
+  <tbody>
+    <tr><td>Client framework</td><td>Vue 3, compiled with webpack 5. Build name <code>bafredo-client</code>. Composition API with <code>&lt;script setup&gt;</code> (evident from the compiled <code>__name</code> component descriptors).</td></tr>
+    <tr><td>Routing</td><td>Vue Router 4, history mode, 25 public routes plus a nested <code>/dashboard</code> tree of 26 admin routes. All non-critical routes lazily loaded — 65 async chunks.</td></tr>
+    <tr><td>State</td><td>Pinia, 14 stores. Cart and wishlist mirrored into <code>localStorage</code>; auth session persisted to <code>localStorage</code> under the key <code>authDetails</code> as <code>{isAuthenticated, user, token}</code>.</td></tr>
+    <tr><td>CSS</td><td>Bootstrap 5.2.2 loaded from jsDelivr CDN, plus 43 component-scoped stylesheets. Single typeface: <strong>Montserrat</strong>. Brand green <code>#246345</code>.</td></tr>
+    <tr><td>API</td><td>Same-origin, mounted at <code>/api</code>. Base URL resolved at runtime: production host → <code>https://www.bafredo.co.tz/api</code>; otherwise <code>window.location.origin</code>. A development constant <code>https://dev.bafredo.co.tz/api</code> and a <code>http://localhost:2700</code> literal are both still present in the shipped production bundle.</td></tr>
+    <tr><td>Server data store</td><td>MongoDB with Mongoose. Proven by every API response carrying <code>_id</code> in 24-character hex ObjectId form plus a Mongoose <code>__v</code> version key, and by aggregation-shaped responses where <code>_id</code> holds a grouping key (a product name, or a month number) rather than a document identifier.</td></tr>
+    <tr><td>Realtime</td><td>Socket.IO client, connecting to the API origin with <code>auth: { _id }</code>. Used for admin notification of new orders.</td></tr>
+    <tr><td>Media</td><td>Cloudinary. Every image is stored once as WebP and served through three named transformations — see §2.5.</td></tr>
+    <tr><td>Analytics</td><td>Google Analytics 4 (<code>G-6MDZJR4J3C</code>), loaded in the HTML shell. An Ahrefs site-verification meta tag is present.</td></tr>
+    <tr><td>Auth</td><td>Bearer token in <code>localStorage</code>. Social sign-in via server-side redirect endpoints <code>/auth/google</code> and <code>/auth/facebook</code>, returning to a client route <code>/OAuthRedirecting</code> that extracts the token.</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <span class="lbl">Security observations carried forward as requirements</span>
+  Three things in the reference implementation must <em>not</em> be reproduced. (1) The session token is kept in <code>localStorage</code>, which is readable by any injected script; TechStar uses an httpOnly refresh cookie plus a short-lived in-memory access token (§11.2). (2) Development hostnames and a localhost port are shipped in the production bundle, disclosing internal topology; TechStar's build strips non-production configuration (§22.2). (3) The realtime socket authenticates by passing a raw user identifier as <code>auth._id</code>, which is a guessable value rather than a proof of identity — anyone can claim to be any user; TechStar authenticates sockets with the access token (§17.5).
+</div>
+
+<h2>2.2 Complete route inventory</h2>
+<p>All 51 routes, recovered from the router definition. Route names are the platform's own.</p>
+
+<h3>2.2.1 Public routes</h3>
+<table class="compact">
+  <thead><tr><th style="width:52mm">Path</th><th style="width:34mm">Route name</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/</code></td><td>home</td><td>Landing page: banner carousel, three product carousels, partners strip.</td></tr>
+    <tr><td><code>/products/all</code></td><td>products</td><td>Full catalogue grid with sort and price filter.</td></tr>
+    <tr><td><code>/products/:id</code></td><td>productsByCategory</td><td>Catalogue grid filtered to one subcategory (<code>:id</code> is a subcategory identifier).</td></tr>
+    <tr><td><code>/product/:id</code></td><td>productView</td><td>Product detail. <code>:id</code> is the URL-encoded <em>product name</em>, not an identifier.</td></tr>
+    <tr><td><code>/search</code></td><td>search_product</td><td>Search results, driven by a <code>?search=</code> query parameter.</td></tr>
+    <tr><td><code>/checkout</code></td><td>checkout</td><td>Single-page checkout: identity, shipping method, shipping details, payment method, order summary.</td></tr>
+    <tr><td><code>/orders</code></td><td>orders_all</td><td>Signed-in customer's order history.</td></tr>
+    <tr><td><code>/orders/:id</code></td><td>single_order</td><td>Order detail with status, items, totals, cancel and reorder.</td></tr>
+    <tr><td><code>/invoice/:id</code></td><td>shared_invoice</td><td>Printable invoice, shareable by link.</td></tr>
+    <tr><td><code>/friend_payment/:id</code></td><td>friend_payment</td><td>Delegated payment page — a third party pays an existing order.</td></tr>
+    <tr><td><code>/profile</code></td><td>profile</td><td>Account settings: profile, shipping address, password.</td></tr>
+    <tr><td><code>/blogs</code></td><td>blogsView</td><td>Article index.</td></tr>
+    <tr><td><code>/blog/:id</code></td><td>single_blog</td><td>Article with comment thread.</td></tr>
+    <tr><td><code>/service/:id</code></td><td>single_service</td><td>Service detail page (e.g. PCB printing).</td></tr>
+    <tr><td><code>/about-us</code></td><td>aboutUs</td><td>Story, vision, mission, core values, interactive map.</td></tr>
+    <tr><td><code>/contact-us</code></td><td>contactUs</td><td>Contact details and enquiry form.</td></tr>
+    <tr><td><code>/faqs</code></td><td>faqs</td><td>Accordion of frequently asked questions.</td></tr>
+    <tr><td><code>/privacy-policy</code></td><td>privacyPolicy</td><td>Privacy policy.</td></tr>
+    <tr><td><code>/terms-and-conditions</code></td><td>termsAndCondition</td><td>Terms and conditions.</td></tr>
+    <tr><td><code>/emailVerification/:id</code></td><td>emailVerification</td><td>Consumes an email verification token.</td></tr>
+    <tr><td><code>/resetPassword/:id</code></td><td>reset password</td><td>Consumes a password reset token.</td></tr>
+    <tr><td><code>/OAuthRedirecting</code></td><td>oauth_redirecting</td><td>Landing point after social sign-in; extracts token, then redirects.</td></tr>
+    <tr><td><code>/404</code></td><td>404</td><td>Not-found page.</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2.2 Admin routes (children of <code>/dashboard</code>)</h3>
+<table class="compact">
+  <thead><tr><th style="width:52mm">Path</th><th style="width:38mm">Route name</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/dashboard</code></td><td>dashboard</td><td>Analytics home: sales and orders charts, customer count, best sellers.</td></tr>
+    <tr><td><code>/dashboard/products</code></td><td>products</td><td>Product table with search, bulk delete, per-row discount.</td></tr>
+    <tr><td><code>/dashboard/create_product</code></td><td>create_product</td><td>Product creation with attribute matrix.</td></tr>
+    <tr><td><code>/dashboard/product/:id/edit</code></td><td>edit_product</td><td>Product editing.</td></tr>
+    <tr><td><code>/dashboard/categories</code></td><td>categories</td><td>Category table, create/edit modal, bulk delete.</td></tr>
+    <tr><td><code>/dashboard/subcategories</code></td><td>subcategories</td><td>Subcategory table, create/edit modal, bulk delete.</td></tr>
+    <tr><td><code>/dashboard/orders</code></td><td>orders</td><td>Order table with status filter tabs and search.</td></tr>
+    <tr><td><code>/dashboard/invoices</code></td><td>invoices</td><td>Invoice list.</td></tr>
+    <tr><td><code>/dashboard/create_invoice</code></td><td>create_invoice</td><td>Manual invoice builder with product search.</td></tr>
+    <tr><td><code>/dashboard/invoice/:id</code></td><td>invoice</td><td>Invoice detail, print, delete.</td></tr>
+    <tr><td><code>/dashboard/campaigns</code></td><td>campaigns</td><td>Campaign list with aggregate counters.</td></tr>
+    <tr><td><code>/dashboard/campaigns/sms/create</code></td><td>create_sms_campaign</td><td>SMS campaign composer.</td></tr>
+    <tr><td><code>/dashboard/campaigns/email/create</code></td><td>create_email_campaign</td><td>Email campaign composer.</td></tr>
+    <tr><td><code>/dashboard/campaigns/contacts</code></td><td>contacts</td><td>Contact list (customers as a marketing audience).</td></tr>
+    <tr><td><code>/dashboard/articles</code></td><td>articles</td><td>Blog article cards.</td></tr>
+    <tr><td><code>/dashboard/create_article</code></td><td>create_article</td><td>Article composer with rich text.</td></tr>
+    <tr><td><code>/dashboard/article/:id/edit</code></td><td>edit_article</td><td>Article editing.</td></tr>
+    <tr><td><code>/dashboard/banners</code></td><td>banners</td><td>Home banner table.</td></tr>
+    <tr><td><code>/dashboard/create_banner</code></td><td>create_banner</td><td>Banner builder with live preview.</td></tr>
+    <tr><td><code>/dashboard/banner/:id/edit</code></td><td>edit_banner</td><td>Banner editing, separate image-replacement modal.</td></tr>
+    <tr><td><code>/dashboard/services</code></td><td>services</td><td>Service cards.</td></tr>
+    <tr><td><code>/dashboard/create_service</code></td><td>create_service</td><td>Service composer.</td></tr>
+    <tr><td><code>/dashboard/service/:id/edit</code></td><td>edit_service</td><td>Service editing.</td></tr>
+    <tr><td><code>/dashboard/partners</code></td><td>partners</td><td>Partner logo cards.</td></tr>
+    <tr><td><code>/dashboard/create_partner</code></td><td>create_partner</td><td>Partner creation.</td></tr>
+    <tr><td><code>/dashboard/partner/:id/edit</code></td><td>edit_partner</td><td>Partner editing.</td></tr>
+    <tr><td><code>/dashboard/shipping_methods</code></td><td>shippingMethods</td><td>Shipping method table with create/edit modal.</td></tr>
+    <tr><td><code>/dashboard/searches</code></td><td>searches</td><td>Search-term analytics table.</td></tr>
+    <tr><td><code>/dashboard/currency</code></td><td>currency</td><td>Display currency and fraction digits.</td></tr>
+    <tr><td><code>/dashboard/settings</code></td><td>settings</td><td>Hero images for About, Privacy and Terms pages.</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="lbl">Admin sidebar, verbatim</span>
+  Dashboard · Products · Categories · Subcategories · Orders · Invoices · Campaigns · Blog · Shipping · Customers · Banners · Services · Searches · Partners · Currency Formatting · Settings · Sign out.
+  Note the asymmetry: a <em>Customers</em> entry exists in the navigation but the only customer-facing admin route is the campaign contacts list. TechStar closes this gap with a full customer management module (§14.7).
+</div>
+
+<h2>2.3 Complete API surface</h2>
+<p>Ninety endpoint/verb pairs recovered from the bundles. <span class="pill pub">public</span> confirmed reachable without a token; <span class="pill auth">token</span> requires a signed-in user; <span class="pill adm">admin</span> requires an administrator. Authentication class is inferred from the calling screen except where marked <em>verified</em>.</p>
+
+<h3>2.3.1 Identity and account</h3>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Verb</th><th style="width:52mm">Path</th><th style="width:18mm">Access</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill post">POST</span></td><td><code>/register</code></td><td><span class="pill pub">public</span></td><td>Returns 200 with <code>{token, _id, accountType, username, email, validEmail}</code>.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/login</code></td><td><span class="pill pub">public</span></td><td>Accepts email <em>or</em> phone in one field. Returns token plus profile including <code>phone</code>, <code>address</code>, <code>shippingDetails</code>, <code>profileImage</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/auth/google</code>, <code>/auth/facebook</code></td><td><span class="pill pub">public</span></td><td>Server-side OAuth redirect entry points.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/email/request</code></td><td><span class="pill auth">token</span></td><td>Re-send verification email.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/email/verify</code></td><td><span class="pill pub">public</span></td><td>Consume verification token.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/password/reset</code></td><td><span class="pill pub">public</span></td><td>Request a reset link.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/password/reset/:token</code></td><td><span class="pill pub">public</span></td><td>Set new password using token.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/password</code></td><td><span class="pill auth">token</span></td><td>Change password while signed in.</td></tr>
+    <tr><td><span class="pill get">GET</span> / <span class="pill patch">PATCH</span></td><td><code>/profile</code></td><td><span class="pill auth">token</span></td><td>Read and update profile including nested <code>shippingDetails</code>.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/profile/image</code></td><td><span class="pill auth">token</span></td><td>Multipart upload, field name <code>images</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3.2 Catalogue</h3>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Verb</th><th style="width:60mm">Path</th><th style="width:18mm">Access</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span></td><td><code>/categories?orderBy=</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>17 categories returned.</td></tr>
+    <tr><td><span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/categories</code></td><td><span class="pill adm">admin</span></td><td>DELETE takes <code>{categories:[ids]}</code> for bulk removal.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/category/:id</code></td><td><span class="pill adm">admin</span></td><td>Single update / delete.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/subcategories</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>102 subcategories, each embedding <code>{category:{_id,name}}</code> and a denormalised <code>numberOfProducts</code>.</td></tr>
+    <tr><td><span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/subcategories</code></td><td><span class="pill adm">admin</span></td><td>Bulk delete returns <code>retainedSubcategories</code>.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/subcategory/:id</code></td><td><span class="pill adm">admin</span></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products</code></td><td><span class="pill adm">admin</span></td><td>Flat, ungrouped product list for the admin table.</td></tr>
+    <tr><td><span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/products</code></td><td><span class="pill adm">admin</span></td><td>POST body is an <em>array</em> — one element per variant. DELETE takes <code>{products:[ids]}</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill del">DELETE</span></td><td><code>/product/:id</code></td><td>mixed</td><td>GET public, DELETE admin.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/product/:id/related</code></td><td><span class="pill pub">public</span></td><td>Related products, same subcategory.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span></td><td><code>/product_grouped?id=</code></td><td>mixed</td><td>GET returns all variants sharing a name. PATCH updates the group.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products/grouped</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>Aggregated catalogue feed. Query parameters <code>skip</code>, <code>limit</code>, <code>orderBy=orders</code>, <code>query=random</code>, <code>subcategory</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products/grouped/count</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>Returned <code>617</code>.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/discounts</code></td><td><span class="pill adm">admin</span></td><td>Percentage plus start and end date.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/search?query=&amp;orderBy=&amp;limit=</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>Returns grouped-product records.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/searches</code></td><td><span class="pill pub">public</span></td><td>Records the search term for analytics.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/searches?skip=&amp;limit=</code>, <code>/search_count</code></td><td><span class="pill adm">admin</span> <em>verified 401</em></td><td>Search analytics.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/best_selling?region=&amp;skip=&amp;limit=</code></td><td><span class="pill adm">admin</span></td><td>Best sellers, filterable by delivery region.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/product_reviews/:productId</code></td><td>mixed</td><td>Read public, write requires a token.</td></tr>
+    <tr><td><span class="pill del">DELETE</span></td><td><code>/review/:id</code></td><td><span class="pill auth">token</span></td><td></td></tr>
+  </tbody>
+</table>
+
+<h3>2.3.3 Commerce</h3>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Verb</th><th style="width:52mm">Path</th><th style="width:18mm">Access</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill post">POST</span></td><td><code>/carts</code></td><td><span class="pill auth">token</span></td><td>Server-side cart persistence: <code>{cartItems:[{_id, quantity}]}</code>.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/wishlists</code></td><td><span class="pill auth">token</span></td><td><code>{wishlistItems:[{_id}]}</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/orders</code></td><td><span class="pill auth">token</span></td><td>POST body: <code>{username, phone, products, shippingMethod, paymentMethod, paymentNumber, shippingDetails, delegatedPayerEmail}</code>. Response may carry a <code>url</code> the client redirects to.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/order/:id</code></td><td>mixed</td><td>PATCH changes status (admin) — DELETE is the customer cancel action.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/orders_stats?period=</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>Periods observed: <code>last12months</code>, and by inference <code>last7days</code>, <code>last30days</code>. Returns <code>[{_id, totalCosts, numberOfOrders}]</code>.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/payment/:orderId</code></td><td><span class="pill pub">public</span></td><td>Used by the delegated-payment page, which a non-account holder opens by link.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/invoices</code></td><td><span class="pill adm">admin</span></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill del">DELETE</span></td><td><code>/invoice/:id</code></td><td>mixed</td><td>GET is shareable by link.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/shipping_methods</code></td><td>mixed</td><td>GET public <em>verified</em>; POST admin.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/shipping_method/:id</code></td><td><span class="pill adm">admin</span></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/currency</code></td><td>mixed</td><td>GET public <em>verified</em>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/locations/regions</code>, <code>/locations/districts?region=</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>25 mainland regions; districts per region.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/users/count</code></td><td><span class="pill adm">admin</span> <em>verified 401</em></td><td>Dashboard customer counter.</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3.4 Content, marketing and settings</h3>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Verb</th><th style="width:52mm">Path</th><th style="width:18mm">Access</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/banners</code></td><td>mixed</td><td>GET public <em>verified</em>. POST is multipart with fields <code>background, link, button, title, subtitle, images</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/banner/:id</code></td><td>mixed</td><td></td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/banners/:id/image</code></td><td><span class="pill adm">admin</span></td><td>Image replaced separately from text.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/services</code></td><td>mixed</td><td>GET public <em>verified</em>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/service/:id</code></td><td>mixed</td><td></td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/latest_services</code></td><td><span class="pill pub">public</span> <em>verified</em></td><td>Feeds the Services dropdown.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/partners</code></td><td>mixed</td><td>GET public <em>verified</em>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/partner/:id</code></td><td>mixed</td><td></td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/articles</code></td><td>mixed</td><td>GET returned an empty array — the blog is live but unpopulated.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/article/:id</code></td><td>mixed</td><td></td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/latest_articles</code>, <code>/articles/comment_count</code></td><td>mixed</td><td></td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/comments</code>, <code>/comments/:articleId</code></td><td>mixed</td><td>Read public <em>verified</em>; write requires a token.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/contact_us</code></td><td><span class="pill pub">public</span></td><td>Contact enquiry.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/contacts</code></td><td><span class="pill adm">admin</span></td><td>Marketing audience list.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/campaigns/email</code>, <code>/campaigns/sms</code></td><td><span class="pill adm">admin</span></td><td>Plus <code>/campaigns/sms/:id</code> for detail.</td></tr>
+    <tr><td><span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/images</code></td><td><span class="pill adm">admin</span></td><td>Generic image endpoint used by every uploader.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/settings</code></td><td><span class="pill adm">admin</span> <em>verified 404 anonymously</em></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill patch">PATCH</span></td><td><code>/settings/pages/image</code></td><td><span class="pill adm">admin</span></td><td>Hero images for About, Privacy, Terms.</td></tr>
+  </tbody>
+</table>
+
+<h2>2.4 Client state model</h2>
+<p>The 14 Pinia stores, with the state each holds. TechStar's Zustand slices in §19.2 map one-to-one onto this list, with the corrections noted.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:26mm">Store</th><th style="width:66mm">State</th><th>Notable behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>auth</code></td><td><code>isAuthenticated, user, token, resetPasswordToken</code></td><td>Rehydrated from <code>localStorage.authDetails</code> at module load.</td></tr>
+    <tr><td><code>product</code></td><td><code>allProducts, allProductsByName, bestSellingProducts, newProducts, productSubcategories, randomProducts, relatedProducts, totalProductsCount, visitedProducts, fetchedSingleProduct, imagesOfFetchedSingleProduct</code></td><td>Eleven parallel collections of the same entity — a cache-coherency problem TechStar avoids by using a single query cache keyed by request.</td></tr>
+    <tr><td><code>cart</code></td><td><code>cart[]</code> of <code>{product:{_id,name,price,image}, quantity}</code></td><td>Entirely client-side until checkout; mirrored to <code>localStorage</code>. Getter <code>computedCartPrice</code> sums price × quantity.</td></tr>
+    <tr><td><code>wishlist</code></td><td><code>wishlist[]</code>, same shape as cart</td><td>Carries a quantity field it never uses meaningfully.</td></tr>
+    <tr><td><code>order</code></td><td><code>currentOrder, myOrders</code></td><td><code>currentOrder</code> persisted to <code>localStorage</code> so checkout survives a refresh.</td></tr>
+    <tr><td><code>category</code> / <code>subcategory</code></td><td><code>categories[]</code> / <code>subcategories[]</code></td><td>Both short-circuit if the array is already non-empty — a permanent cache with no invalidation.</td></tr>
+    <tr><td><code>banner</code></td><td><code>allBanners, homeBanners, fetchedBanner</code></td><td></td></tr>
+    <tr><td><code>service</code> / <code>partner</code></td><td><code>services/partners, latest*, fetched*, imagesOf*</code></td><td>Identical shape; strong candidates for one shared abstraction.</td></tr>
+    <tr><td><code>currency</code></td><td><code>currencyData</code></td><td>Drives <code>Intl.NumberFormat</code> money formatting everywhere.</td></tr>
+    <tr><td><code>location</code></td><td><code>regions, districts</code></td><td>Districts refetched on region change.</td></tr>
+    <tr><td><code>shippingMethods</code></td><td><code>allShippingMethods</code></td><td></td></tr>
+    <tr><td><code>navigation</code></td><td><code>authFormState, nextRoute</code></td><td>Opens the login/register modal and remembers where to send the user afterwards.</td></tr>
+    <tr><td><code>notification</code></td><td><code>header, text, isSuccess</code></td><td>Single global toast.</td></tr>
+    <tr><td><code>socket</code></td><td><code>socketId, socket</code></td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>2.5 Catalogue shape and scale</h2>
+
+<table class="compact">
+  <thead><tr><th style="width:52mm">Measure</th><th>Observed value</th></tr></thead>
+  <tbody>
+    <tr><td>Categories</td><td>17</td></tr>
+    <tr><td>Subcategories</td><td>102</td></tr>
+    <tr><td>Product groups</td><td>617</td></tr>
+    <tr><td>Largest subcategory</td><td>Passive devices — 86 products</td></tr>
+    <tr><td>Empty subcategories</td><td>13 of 102 carry zero products but remain visible in the mega-menu with a "0" badge</td></tr>
+    <tr><td>Currency</td><td>TZS, <code>maximumFractionDigits: 0</code></td></tr>
+    <tr><td>Price range observed</td><td>TZS 198 (0.001&nbsp;µF ceramic capacitor) to TZS 850,000 (digital signal generator)</td></tr>
+    <tr><td>Shipping methods</td><td>3 — Savings (TZS 15,000), Cash on delivery (TZS 5,000), Office Pickup (TZS 0)</td></tr>
+    <tr><td>Delivery geography</td><td>25 mainland regions; Dar es Salaam resolves to 6 districts</td></tr>
+    <tr><td>Blog articles</td><td>0 — module shipped, unused</td></tr>
+    <tr><td>Product reviews</td><td>0 — module shipped, unused</td></tr>
+    <tr><td>Services</td><td>1 — "PCB Printing"</td></tr>
+  </tbody>
+</table>
+
+<h3>2.5.1 SKU scheme</h3>
+<p>The reference platform uses a strict positional SKU, and it is worth keeping because it makes physical stock control in a component store tractable.</p>
+<pre>Category      2 digits   e.g. "05"      Sensors &amp; Conditioning Boards
+Subcategory   4 digits   e.g. "0510"    = category "05" + sequence "10" (Voltage)
+Product       7 digits   e.g. "0510003" = subcategory "0510" + sequence "003"
+
+Verified examples
+  0111004   Hardware Dev Tools (01) &gt; Raspberry Pi boards (0111) &gt; item 004
+  0510003   Sensors (05) &gt; Voltage (0510) &gt; item 003</pre>
+
+<h3>2.5.2 Media transformations</h3>
+<p>Each image is stored once and exposed at three sizes. Every product, banner, service and partner record carries the same triple.</p>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Key</th><th style="width:34mm">Transformation</th><th>Used by</th></tr></thead>
+  <tbody>
+    <tr><td><code>sm</code></td><td>thumbnail, width 200</td><td>Cart and wishlist rows, gallery thumbnails, admin table rows</td></tr>
+    <tr><td><code>md</code></td><td>thumbnail, width 600</td><td>Product cards in grids and carousels</td></tr>
+    <tr><td><code>lg</code></td><td>original</td><td>Product detail hero, banner artwork</td></tr>
+  </tbody>
+</table>
+<div class="warn">
+  <span class="lbl">Do not copy this detail</span>
+  The reference platform's <code>sm</code> and <code>lg</code> transformation URLs pin a stale version segment (<code>v1668076879</code>) while <code>md</code> omits it, so the three sizes are not guaranteed to be the same asset after a re-upload. It also applies a <em>face-detection</em> crop gravity (<code>g_face</code>) to photographs of circuit boards, which is meaningless here and can crop badly. TechStar's pipeline (§15.2) uses content-addressed derivative names and centre-weighted crops.
+</div>
+
+<h2>2.6 Third-party libraries in use</h2>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Library</th><th style="width:34mm">Purpose</th><th>React equivalent adopted by TechStar</th></tr></thead>
+  <tbody>
+    <tr><td>Bootstrap 5.2.2</td><td>Grid, components, utilities</td><td>Bootstrap 5.3 + React&nbsp;Bootstrap</td></tr>
+    <tr><td>Swiper</td><td>Banner and product carousels</td><td>Swiper React</td></tr>
+    <tr><td>PrimeVue DataTable</td><td>Admin tables, sorting, selection</td><td>TanStack Table + custom shell (§8.4)</td></tr>
+    <tr><td>Chart.js</td><td>Dashboard analytics</td><td>Chart.js via react-chartjs-2</td></tr>
+    <tr><td>Quill</td><td>Rich text for products, articles, services</td><td>TipTap (§8.4.6) — Quill's HTML output is harder to sanitise reliably</td></tr>
+    <tr><td>FilePond</td><td>Drag-and-drop image upload</td><td>FilePond React</td></tr>
+    <tr><td>Leaflet + OpenStreetMap</td><td>Map on About page</td><td>React-Leaflet</td></tr>
+    <tr><td>vue-multiselect</td><td>Searchable selects, tag entry</td><td>react-select</td></tr>
+    <tr><td>Vuelidate</td><td>Form validation</td><td>React Hook Form + Zod</td></tr>
+    <tr><td>Moment.js</td><td>Dates (290&nbsp;KB, deprecated upstream)</td><td>date-fns — 20× smaller, tree-shakeable</td></tr>
+    <tr><td>Socket.IO client</td><td>Realtime admin notifications</td><td>Socket.IO client</td></tr>
+    <tr><td>FontAwesome</td><td>Icons</td><td>Lucide React + Bootstrap Icons (§5.5)</td></tr>
+  </tbody>
+</table>
+
+<h2>2.7 Defects and gaps in the reference platform</h2>
+<p>Feature parity is the goal; bug parity is not. These are concrete faults observed in the reference implementation. Each is listed with the section where TechStar's corrected behaviour is specified. Fixing them costs little at design time and is expensive later.</p>
+
+<table>
+  <thead><tr><th style="width:8mm">#</th><th style="width:42mm">Defect</th><th>Consequence</th><th style="width:20mm">Fixed in</th></tr></thead>
+  <tbody>
+    <tr><td>R1</td><td>Product detail URLs use the product <em>name</em> as the path segment</td><td>Renaming a product breaks every inbound link, every shared URL and every search-engine result. Names containing <code>/</code>, <code>%</code>, <code>#</code> or <code>&amp;</code> require double-encoding; the code contains a manual <code>%25</code> unescape to work around this. Two products may not share a name, ever.</td><td>§6.6</td></tr>
+    <tr><td>R2</td><td>Variants are separate product rows re-grouped by name at read time</td><td>Grouping is a string join. A trailing space or a case difference silently splits one product into two. Observed in live data: <code>"Raspberry Pi 4  4gb  Model B Starter Kit  "</code> carries both double spaces and trailing whitespace.</td><td>§12.2</td></tr>
+    <tr><td>R3</td><td><code>addToCart</code> computes an index, then pushes when the item is absent, then indexes with the stale value</td><td>The first add of any item stores quantity 1 but skips the increment branch; subsequent adds work. Quantity handling is inconsistent between first and later additions.</td><td>§12.5</td></tr>
+    <tr><td>R4</td><td><code>visitProduct</code> deduplicates with <code>find(e =&gt; { e.name })</code> — a block body with no <code>return</code></td><td>The predicate always returns <code>undefined</code>, so the cache never hits and every visit refetches and appends a duplicate entry, growing memory for the session's lifetime.</td><td>§19.3</td></tr>
+    <tr><td>R5</td><td>Category and subcategory stores never invalidate</td><td>An administrator adding a category cannot see it in the storefront navigation without a hard reload.</td><td>§19.3</td></tr>
+    <tr><td>R6</td><td>Cart holds a price copied at add-to-cart time</td><td>If price or stock changes while an item sits in the cart, the customer checks out against a stale price. There is no re-validation before order creation.</td><td>§12.5</td></tr>
+    <tr><td>R7</td><td>No stock check between add-to-cart and order placement</td><td>Overselling. The product page shows available stock but nothing enforces it downstream.</td><td>§12.4</td></tr>
+    <tr><td>R8</td><td>Success is asserted by exact status code (<code>if (201 !== status) throw</code>)</td><td>A <code>200</code> from a proxy, or a <code>204</code>, is treated as failure. Inconsistent across stores: services and partners expect <code>201</code> on <em>delete</em>, which no correct server would return.</td><td>§10.1</td></tr>
+    <tr><td>R9</td><td>Session token in <code>localStorage</code>; socket authenticated by raw user id</td><td>Token theft via any injected script; socket identity is spoofable by anyone who knows or guesses an id.</td><td>§11.2, §17.5</td></tr>
+    <tr><td>R10</td><td>Development hostnames and <code>localhost:2700</code> shipped in the production bundle</td><td>Internal topology disclosure.</td><td>§22.2</td></tr>
+    <tr><td>R11</td><td>Empty subcategories rendered in the mega-menu with a "0" badge</td><td>Thirteen dead ends in primary navigation.</td><td>§7.1.3</td></tr>
+    <tr><td>R12</td><td>Bulk category delete cascades to all subcategories <em>and all their products</em></td><td>One mis-click destroys a large part of the catalogue. The confirmation prompt warns, but the action is irreversible and unaudited.</td><td>§9.5, §14.19</td></tr>
+    <tr><td>R13</td><td>No customer management screen despite a "Customers" sidebar entry</td><td>Administrators cannot view, search, suspend or assist an individual customer.</td><td>§14.7</td></tr>
+    <tr><td>R14</td><td>Two identical footer columns both headed "COMPANY INFORMATION"</td><td>Visible on every page. Cosmetic, but it is on every page.</td><td>§7.1.5</td></tr>
+    <tr><td>R15</td><td>Typos in shipped UI: "No products to diplay", "Sarturday", "Opps!"</td><td>Erodes trust at exactly the moments the user is already unsure.</td><td>Appendix C</td></tr>
+    <tr><td>R16</td><td>A product with price 0 is purchasable ("R-DRONE NAKED — TZS 0" is live)</td><td>Free orders. No validation prevents a zero or negative price.</td><td>§12.3</td></tr>
+    <tr><td>R17</td><td>No pagination on the full catalogue grid — <code>limit=10000</code></td><td>A single response carrying the entire catalogue. Fine at 617 products, fails at 6,000.</td><td>§16.5</td></tr>
+    <tr><td>R18</td><td>Order cancellation is <code>DELETE /order/:id</code></td><td>Cancellation should be a state transition that preserves the record, not a deletion. Financial and audit history is lost.</td><td>§12.7</td></tr>
+  </tbody>
+</table>

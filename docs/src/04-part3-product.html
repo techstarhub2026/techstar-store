@@ -1,0 +1,143 @@
+<h1 class="part"><span class="num">Part Three</span>Product Definition</h1>
+
+<h2>3.1 Vision</h2>
+<p>TechStar Store is the place a Tanzanian student, hobbyist, technician or engineer goes to find the part they need, understand what it does, and get it delivered or collected — without leaving the country's payment and logistics reality. It sells two adjacent things: <strong>STEM</strong> — kits, robots, drones, starter bundles, teaching aids — and <strong>electronics</strong> — components, modules, boards, instruments, tools and consumables.</p>
+
+<p>Those two halves have different buyers with different needs, and the design must serve both:</p>
+<ul>
+  <li>A <strong>STEM buyer</strong> browses. They arrive without a part number, respond to imagery and bundles, and need to be told what a thing is for. They are served by the home page carousels, the category tree, rich descriptions and "what's in the box" content.</li>
+  <li>An <strong>electronics buyer</strong> searches. They arrive knowing "74HC14" or "10&nbsp;kΩ 1/4&nbsp;W" and want the fastest path from search box to cart, with accurate stock and a clear price. They are served by search quality, SKU structure, variant selection and stock accuracy.</li>
+</ul>
+
+<h2>3.2 Personas</h2>
+<table>
+  <thead><tr><th style="width:32mm">Persona</th><th style="width:44mm">Goal</th><th>What the platform must get right</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Amina</strong><br>University student, Dar es Salaam</td><td>Buy an Arduino starter kit for a coursework project, on a budget, this week.</td><td>Browsable categories; clear kit contents; low-cost shipping options; mobile money without a bank card; a mobile experience that works on a mid-range Android phone over 3G.</td></tr>
+    <tr><td><strong>Joseph</strong><br>Electronics technician, Mwanza</td><td>Restock twenty different components in one order and have them shipped upcountry.</td><td>Fast repeat search; accurate stock; a cart that holds many small-value lines; upcountry shipping with a predictable cost; an invoice he can show his employer.</td></tr>
+    <tr><td><strong>Grace</strong><br>Secondary-school science teacher, Dodoma</td><td>Get a quotation for lab equipment that her school's procurement office will pay against.</td><td>Admin-issued invoices; delegated payment so the school pays; a shareable invoice link; clear terms.</td></tr>
+    <tr><td><strong>Daniel</strong><br>Startup hardware engineer</td><td>Source a specific sensor module and understand its interface before committing.</td><td>Rich technical descriptions; multiple product photographs; related products; reviews; realistic lead-time signals.</td></tr>
+    <tr><td><strong>Neema</strong><br>TechStar store manager</td><td>Keep the catalogue accurate, fulfil today's orders, and know what is selling.</td><td>Fast product entry including variants; an order queue with status; stock adjustment; a dashboard that answers "how are we doing" in one screen.</td></tr>
+    <tr><td><strong>Frank</strong><br>TechStar marketing</td><td>Tell 400 past customers about a new Raspberry Pi bundle.</td><td>Contact list; SMS and email campaigns; scheduling; search-term analytics to know what people wanted and did not find.</td></tr>
+  </tbody>
+</table>
+
+<h2>3.3 Capability map</h2>
+<p>Everything the platform does, grouped. Each capability names the part of this document that specifies it. "Parity" means the reference platform has it; "New" means TechStar adds it to close a gap identified in §2.7.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:30mm">Domain</th><th>Capabilities</th><th style="width:16mm">Status</th><th style="width:16mm">Spec</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="4">Catalogue</td><td>Category → subcategory → product hierarchy; mega-menu navigation</td><td>Parity</td><td>§7.1.3</td></tr>
+    <tr><td>Product groups with attribute-based variants, each with own price, stock, SKU</td><td>Improved</td><td>§12.2</td></tr>
+    <tr><td>Multi-image galleries with three derivative sizes</td><td>Parity</td><td>§15.2</td></tr>
+    <tr><td>Related products; best sellers; new arrivals; randomised discovery rail</td><td>Parity</td><td>§7.2</td></tr>
+    <tr><td rowspan="3">Discovery</td><td>Keyword search with term logging and admin analytics</td><td>Parity</td><td>§16</td></tr>
+    <tr><td>Sort by best selling, newest, price; min/max price filter</td><td>Parity</td><td>§7.3</td></tr>
+    <tr><td>Faceted filtering by availability and price band; paginated grids</td><td>New</td><td>§16.3</td></tr>
+    <tr><td rowspan="4">Shopping</td><td>Cart and wishlist, persistent across sessions and devices when signed in</td><td>Improved</td><td>§12.5</td></tr>
+    <tr><td>Guest checkout with name and phone only</td><td>Parity</td><td>§7.7</td></tr>
+    <tr><td>Shipping method selection with per-method cost and rules</td><td>Parity</td><td>§12.6</td></tr>
+    <tr><td>Server-side price and stock re-validation before order creation</td><td>New</td><td>§12.5</td></tr>
+    <tr><td rowspan="4">Payment</td><td>Mobile money by Lipa Namba with payment-number capture</td><td>Parity</td><td>§13.2</td></tr>
+    <tr><td>Cash on delivery</td><td>Parity</td><td>§13.4</td></tr>
+    <tr><td>Delegated payment — nominate a third party to pay by link</td><td>Parity</td><td>§12.9</td></tr>
+    <tr><td>Aggregator adapter for automatic confirmation and webhooks</td><td>New</td><td>§13.3</td></tr>
+    <tr><td rowspan="3">Orders</td><td>Order history, detail, reorder, cancel</td><td>Improved</td><td>§7.9</td></tr>
+    <tr><td>Explicit order state machine with an immutable event log</td><td>New</td><td>§12.7</td></tr>
+    <tr><td>Printable invoices, admin-issued and shareable by link</td><td>Parity</td><td>§12.10</td></tr>
+    <tr><td rowspan="3">Accounts</td><td>Email/phone + password; Google and Facebook sign-in</td><td>Parity</td><td>§11.3</td></tr>
+    <tr><td>Email verification; password reset; profile and avatar</td><td>Parity</td><td>§11.4</td></tr>
+    <tr><td>Saved shipping address with region → district pickers</td><td>Parity</td><td>§7.10</td></tr>
+    <tr><td rowspan="3">Content</td><td>Home banners with per-banner colours, copy and link</td><td>Parity</td><td>§14.9</td></tr>
+    <tr><td>Blog with comments; services pages; partner logos</td><td>Parity</td><td>§14.12</td></tr>
+    <tr><td>About, FAQ, Privacy, Terms with admin-managed hero images</td><td>Parity</td><td>§14.16</td></tr>
+    <tr><td rowspan="2">Marketing</td><td>SMS and email campaigns, immediate or scheduled, all or selected contacts</td><td>Parity</td><td>§17.4</td></tr>
+    <tr><td>Contact list with search</td><td>Parity</td><td>§14.13</td></tr>
+    <tr><td rowspan="5">Administration</td><td>Full create/read/update/delete on every entity in the system</td><td>Improved</td><td>§14</td></tr>
+    <tr><td>Sales and orders analytics over 7-day, 30-day and 12-month windows</td><td>Parity</td><td>§18</td></tr>
+    <tr><td>Customer management: search, detail, order history, suspend</td><td>New</td><td>§14.7</td></tr>
+    <tr><td>Staff accounts with roles and granular permissions</td><td>New</td><td>§14.17</td></tr>
+    <tr><td>Audit log of every administrative mutation</td><td>New</td><td>§14.18</td></tr>
+  </tbody>
+</table>
+
+<h2>3.4 Primary user journeys</h2>
+
+<h3>J1 — Browse to purchase, guest, mobile money</h3>
+<pre>Home
+  └─ banner "BUY NOW" → Product detail
+       └─ select variant (if any) → set quantity → ADD TO CART
+            └─ cart off-canvas slides in, badge increments
+                 └─ VIEW CART → CHECKOUT
+                      ├─ enter name + phone (no account required)
+                      ├─ choose shipping method  → cost added to total
+                      ├─ if method requires it: shipping details form
+                      │    (receiver name, region → district, street, postal code)
+                      ├─ choose payment method: Lipa Namba | Cash on delivery
+                      ├─ if Lipa Namba: enter paying phone number (255XXXXXXXXX)
+                      └─ PLACE ORDER
+                           └─ Order confirmation + payment instructions
+                                └─ customer pushes funds to Lipa Namba
+                                     └─ admin marks payment received
+                                          └─ SMS + email confirmation to customer</pre>
+
+<h3>J2 — Search to purchase, returning customer</h3>
+<pre>Header search "74HC14" → Search results (term logged for analytics)
+  └─ Product detail → ADD TO CART → cart merges with server-side cart
+       └─ CHECKOUT (identity, address and last shipping method prefilled)
+            └─ PLACE ORDER → order appears in /orders immediately</pre>
+
+<h3>J3 — Delegated payment (school or employer pays)</h3>
+<pre>Customer builds order → CHECKOUT
+  └─ enters a delegated payer email address
+       └─ PLACE ORDER → order created with status AWAITING_PAYMENT
+            └─ payer receives an email containing /friend_payment/:orderId
+                 └─ payer opens link (no account needed)
+                      └─ sees order summary + payment methods
+                           └─ enters payment number → MAKE PAYMENT
+                                └─ both customer and payer notified on confirmation</pre>
+
+<h3>J4 — Administrator fulfils the day</h3>
+<pre>Sign in → Dashboard (today's orders, revenue, low stock)
+  └─ Orders → filter "Pending"
+       └─ open order → verify payment reference → set status PAID
+            └─ set status PROCESSING → pick and pack (stock decremented on PAID)
+                 └─ set status SHIPPED → customer notified by SMS
+                      └─ set status DELIVERED → order closes</pre>
+
+<h3>J5 — Administrator adds a product with variants</h3>
+<pre>Products → NEW PRODUCT
+  └─ choose subcategory (SKU prefix derived automatically)
+  ├─ name, rich-text description, images (drag &amp; drop, max 100)
+  ├─ Add Attributes → define columns e.g. "Resistance"
+  │    └─ add rows: 220Ω | 500 | 200      (value | price | stock)
+  │                 1kΩ   | 500 | 350
+  │                 10kΩ  | 500 | 180
+  └─ Submit → one product group + three variants, SKUs auto-assigned</pre>
+
+<h2>3.5 Non-goals for version 1</h2>
+<p>Stated so that scope stays honest. Each is a deliberate exclusion, not an oversight.</p>
+<ul>
+  <li><strong>Multi-vendor marketplace.</strong> TechStar is the single seller. No vendor onboarding, no split settlement.</li>
+  <li><strong>Multi-warehouse inventory.</strong> One stock pool. Location-aware stock is a Phase 5 candidate.</li>
+  <li><strong>Multi-currency pricing.</strong> Prices are held in TZS. The money column type (§9.1) is chosen so that adding currencies later is additive, not a migration.</li>
+  <li><strong>Card payments.</strong> Mobile money and cash cover the market. Card acquiring can be added through the same payment adapter.</li>
+  <li><strong>Native mobile applications.</strong> The web experience is specified mobile-first and installable as a PWA (§21.3).</li>
+  <li><strong>Automated courier integration.</strong> Shipping is a flat per-method cost, as on the reference platform. Courier APIs are a Phase 5 candidate.</li>
+  <li><strong>Full Swahili translation.</strong> Strings are externalised from day one (D10) but only English and the Swahili payment instructions ship in v1.</li>
+</ul>
+
+<h2>3.6 Success metrics</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Metric</th><th style="width:26mm">Target</th><th>Why it matters / how measured</th></tr></thead>
+  <tbody>
+    <tr><td>Search success rate</td><td>&gt; 80%</td><td>Share of searches that lead to a product view. Measured from the search log (§16.4). Directly exposes catalogue gaps.</td></tr>
+    <tr><td>Cart-to-order conversion</td><td>&gt; 35%</td><td>Checkout is the narrowest point of the funnel; the single-page design exists to protect this number.</td></tr>
+    <tr><td>Payment confirmation lag</td><td>&lt; 30 min median</td><td>Time from order placement to payment marked received. The case for aggregator integration (§13.3) is made or lost here.</td></tr>
+    <tr><td>Stock accuracy</td><td>&gt; 98%</td><td>Orders not requiring a stock correction. Protects against the overselling defect R7.</td></tr>
+    <tr><td>Mobile Largest Contentful Paint</td><td>&lt; 2.5 s on 3G</td><td>Most traffic will be mid-range Android on mobile data. Budgets in §21.3.</td></tr>
+    <tr><td>Admin product entry time</td><td>&lt; 3 min per product</td><td>Catalogue growth is bounded by data entry speed. The variant matrix (§14.3.2) exists for this reason.</td></tr>
+    <tr><td>Order fulfilment lead time</td><td>&lt; 24 h to SHIPPED</td><td>Measured from the order event log (§12.7).</td></tr>
+  </tbody>
+</table>

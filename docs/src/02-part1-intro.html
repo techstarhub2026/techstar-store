@@ -1,0 +1,94 @@
+<h1 class="part"><span class="num">Part One</span>Introduction, Scope and Method</h1>
+
+<h2>1.1 What this document is</h2>
+<p>This is the complete build specification for <strong>TechStar Store</strong>, an online shop selling STEM kits, educational electronics and electronic components, parts, tools and instruments. It defines the product, the user experience, the visual system, the database, the API, the business rules, the administration console and the operational plan in enough detail that an engineering team can implement the platform without needing to invent behaviour.</p>
+
+<p>The brief was explicit: build a store that matches <code>bafredo.co.tz</code> feature-for-feature and screen-for-screen, rebranded as TechStar Store, on React and MySQL, with an administration area that can create, read, update and delete every object in the system. This document is written to that brief.</p>
+
+<p>Every statement about the reference platform in Part Two is derived from direct observation of the live site — its JavaScript bundles, its rendered DOM, its stylesheets and its public API responses — not from assumption. Where the reference platform's behaviour could not be observed because it sits behind an authenticated wall, this document says so explicitly and states the design decision TechStar will take instead.</p>
+
+<div class="note">
+  <span class="lbl">Reading order</span>
+  Parts 1–3 are for everyone: they define what is being built and why. Parts 4–8 are for designers and frontend engineers. Parts 9–13 are for backend engineers. Part 14 is for whoever builds the admin console — it is the largest single chapter because the brief asks for total CRUD coverage. Parts 15–22 are cross-cutting. Part 23 is for whoever plans the work. The appendices are lookup tables you will return to during implementation.
+</div>
+
+<h2>1.2 What was built versus what was researched</h2>
+<p>No application code has been written. This document is the deliverable. What <em>was</em> produced alongside it is a research archive, stored next to this PDF, containing the raw evidence behind every claim in Part Two:</p>
+
+<table class="compact">
+  <thead><tr><th style="width:52mm">Artefact</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td><code>research/api/*.json</code></td><td>Live responses captured from the reference platform's public API: category list, subcategory list, product samples, grouped-product samples, banners, services, partners, shipping methods, currency configuration, region and district lists, order statistics, and product counts.</td></tr>
+    <tr><td><code>research/screenshots/*.png</code></td><td>Full-page renders of the reference storefront at desktop (1440&nbsp;px) and mobile (390&nbsp;px) widths: home, catalogue, product detail, checkout, about, contact.</td></tr>
+    <tr><td><code>research/ui/source-ui-label-inventory.txt</code></td><td>Every user-facing string extracted from all 65 lazy-loaded JavaScript chunks — screen titles, field labels, button text, validation messages, empty-state copy, toast messages and confirmation prompts. This is the source for Appendices B and C.</td></tr>
+    <tr><td><code>research/ui/source-home-dom-outline.txt</code></td><td>A structural outline of the fully rendered home page DOM (2,732 nodes), used to derive the exact composition of the header, mega-menu, product card, off-canvas panels and footer.</td></tr>
+  </tbody>
+</table>
+
+<h2>1.3 How the reference platform was analysed</h2>
+<p>The reference site is a client-rendered single-page application. Its served HTML is an empty shell, so ordinary page fetching reveals nothing. Five techniques were used in combination.</p>
+
+<h3>1.3.1 Bundle extraction</h3>
+<p>The application ships one entry bundle (<code>app.js</code>, 144&nbsp;KB), one vendor bundle (2.0&nbsp;MB) and 65 lazily loaded route chunks (2.4&nbsp;MB total). The webpack chunk manifest inside the entry bundle maps numeric chunk IDs to content-hashed filenames; that manifest was parsed to enumerate and download all 65 chunks. Because production Vue builds preserve string literals verbatim, every route path, API path, form label, validation message and toast string survives minification intact.</p>
+
+<h3>1.3.2 Route and store recovery</h3>
+<p>Vue Router route records and Pinia store definitions were located by pattern in the entry bundle and extracted with brace-matched slicing, yielding 14 complete store definitions with their state shapes and action bodies. Because each action contains its own HTTP call, the store bodies double as an API contract.</p>
+
+<h3>1.3.3 API surface reconstruction</h3>
+<p>All calls flow through one helper of the form <code>request(path, method, body)</code>. Matching that call signature across the entry bundle and all 65 chunks recovered <strong>90 distinct endpoint/verb pairs</strong>, including path parameters and query strings, listed in full in §2.3.</p>
+
+<h3>1.3.4 Live API probing</h3>
+<p>The recovered public read endpoints were called directly. This produced real response payloads with real field names, types and nesting — the difference between guessing a schema and knowing one. Authenticated endpoints returned <code>401</code> and were not pursued; no credentials were used, no accounts were created, and no write operation was ever sent.</p>
+
+<h3>1.3.5 Headless rendering</h3>
+<p>Key pages were rendered in headless Chrome with a 20-second virtual-time budget, then captured both as full-page screenshots and as complete post-hydration DOM dumps. The DOM dumps give exact element nesting, utility classes, ARIA attributes and copy; the screenshots give proportion, rhythm and colour.</p>
+
+<div class="warn">
+  <span class="lbl">Scope of observation</span>
+  The reference platform's administration console at <code>/dashboard/*</code> is behind authentication and was never entered. Everything Part&nbsp;14 says about administration screens is reconstructed from the shipped client code for those screens — table column headers, form fields, modal titles, validation messages, bulk-action confirmation prompts and empty states are all recovered strings. What could <em>not</em> be recovered is server-side admin behaviour: exact permission rules, audit trails, and any admin-only response fields. Those are specified fresh in this document as TechStar's own design, and are marked as such.
+</div>
+
+<h2>1.4 Assumptions and decisions register</h2>
+<p>Where the brief left a choice open, a decision was made rather than a question asked, so that implementation is not blocked. Each is recorded here with its rationale and the alternative that was rejected. Any of these can be reversed; the cost of reversal is noted.</p>
+
+<table>
+  <thead><tr><th style="width:8mm">#</th><th style="width:40mm">Decision</th><th>Rationale</th><th style="width:44mm">Alternative &amp; reversal cost</th></tr></thead>
+  <tbody>
+    <tr><td>D1</td><td>Server runtime is <strong>Node.js 20 + Express 4 + TypeScript</strong></td><td>The brief fixed React and MySQL but not the server. One language across client and server halves the hiring surface, allows shared validation schemas and shared TypeScript types, and matches the reference platform's own Node/Mongo lineage so behaviour maps cleanly.</td><td>PHP&nbsp;8 + Laravel&nbsp;11, which would suit the XAMPP install already present on the workstation. Reversal is moderate: the data model, API contract, business rules and all UI work in this document are runtime-neutral and carry over unchanged. Appendix&nbsp;H gives the Laravel mapping.</td></tr>
+    <tr><td>D2</td><td>Data access via <strong>Prisma ORM</strong> over MySQL 8</td><td>Declarative schema doubles as living documentation, migrations are generated and reviewable, and the generated client is fully typed. Raw SQL remains available for the reporting queries in Part 18 where ORM query builders are a poor fit.</td><td>Knex query builder or raw <code>mysql2</code>. Low reversal cost — Appendix E gives the complete hand-written DDL, so the schema is not Prisma-dependent.</td></tr>
+    <tr><td>D3</td><td>Build tool is <strong>Vite</strong>, not Next.js</td><td>The reference product is a client-rendered SPA with an admin console behind auth; server-side rendering buys little for the admin half and adds hosting complexity. SEO for the catalogue is addressed by prerendering the public routes (§21.4) rather than by adopting a full SSR framework.</td><td>Next.js App Router for SSR/ISR on catalogue pages. Moderate reversal cost, best decided before Phase 2. If organic search is the primary acquisition channel, revisit this early.</td></tr>
+    <tr><td>D4</td><td>Styling is <strong>Bootstrap 5.3 + SCSS tokens</strong>, consumed through React&nbsp;Bootstrap</td><td>The reference UI is built on Bootstrap 5.2 utilities. Keeping the same primitive vocabulary means the layouts in Part 7 translate one-to-one, and the grid, off-canvas, modal, toast, accordion and dropdown behaviours all come for free and already match.</td><td>Tailwind CSS. High reversal cost mid-project, negligible if decided now. Tailwind would require every layout in Part 7 to be re-expressed.</td></tr>
+    <tr><td>D5</td><td>Client state is <strong>Zustand</strong> + <strong>TanStack Query</strong></td><td>Zustand is the closest React analogue to the reference platform's Pinia stores, so the 14 recovered store shapes port directly. TanStack Query handles server cache, retries and invalidation, which the reference platform hand-rolls (and gets wrong in places — see §2.7).</td><td>Redux Toolkit. Low reversal cost; more boilerplate for the same result.</td></tr>
+    <tr><td>D6</td><td>Product variants modelled as <strong>first-class rows in a variant table</strong>, not as separate product rows</td><td>The reference platform creates one product document per attribute combination and re-groups them at read time by name string. This is the root cause of several defects catalogued in §2.7. A proper parent/variant split fixes them without changing any screen.</td><td>Copy the reference model exactly. Not recommended; see §2.7 and §12.2 for the specific failures it causes.</td></tr>
+    <tr><td>D7</td><td>Images stored on <strong>local disk behind a storage adapter</strong>, with S3 and Cloudinary adapters provided</td><td>Keeps development and first production deployment simple and cheap, with no vendor lock-in. The adapter interface in §15.3 means switching to object storage later is a configuration change, not a rewrite.</td><td>Cloudinary from day one, as the reference platform uses. Low reversal cost either way, by design.</td></tr>
+    <tr><td>D8</td><td>Payments launch with <strong>manual mobile-money (Lipa Namba) plus cash on delivery</strong>, with an aggregator adapter ready</td><td>This is exactly what the reference platform does, and it requires no merchant integration to go live. The payment adapter interface in §13.3 means adding Selcom, ClickPesa, AzamPay or DPO later is an implementation of one interface plus a webhook route.</td><td>Aggregator-first. Higher upfront cost and a commercial onboarding dependency; better as Phase 4.</td></tr>
+    <tr><td>D9</td><td>Currency is <strong>TZS with zero fraction digits</strong>, configurable at runtime</td><td>Matches the reference platform's live currency configuration and Tanzanian retail convention. Money is stored as integer minor units regardless, so a future multi-currency change is additive.</td><td>Fixed hard-coded currency. Trivial difference; runtime configuration is specified because the admin screen for it exists in the brief.</td></tr>
+    <tr><td>D10</td><td>Interface language is <strong>English</strong>, with Swahili strings externalised from day one</td><td>The reference platform is English throughout except its mobile-money payment instructions, which are Swahili. Externalising strings costs almost nothing now and avoids a full retrofit when Swahili is added.</td><td>Hard-coded English. Low cost now, high cost later.</td></tr>
+  </tbody>
+</table>
+
+<h2>1.5 Legal and originality boundary</h2>
+<p>Building a competing store with the same feature set, the same information architecture and the same interaction patterns is ordinary commercial practice, and this document specifies exactly that. Three things must nevertheless be original to TechStar, and the specification is written on that basis:</p>
+<ul>
+  <li><strong>Brand assets.</strong> Name, logo, wordmark, tagline and colour identity are TechStar's own. Part 5 defines a distinct palette rather than reusing the reference platform's.</li>
+  <li><strong>Editorial and legal copy.</strong> Product descriptions, About, FAQ, Privacy Policy, Terms &amp; Conditions and blog articles must be written for TechStar. This document specifies the <em>structure</em> of those pages — section headings, ordering, field lengths — and never supplies the reference platform's prose as body text. Legal pages in particular must be drafted or reviewed against Tanzanian consumer and data-protection law for TechStar's own operations.</li>
+  <li><strong>Catalogue content.</strong> Product names, photography and descriptions must be TechStar's own or supplied under licence by TechStar's distributors. What Appendix A reproduces is the <em>taxonomy</em> — a category and subcategory tree for electronic components — which is an industry-standard classification and the right starting shape for any electronics retailer, not proprietary content.</li>
+  <li><strong>Registration identifiers.</strong> The reference platform publishes its own TIN and certificate of incorporation numbers in its footer. TechStar's footer must carry TechStar's own registration details or none at all.</li>
+</ul>
+
+<h2>1.6 Glossary</h2>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Term</th><th>Meaning in this document</th></tr></thead>
+  <tbody>
+    <tr><td>Reference platform</td><td><code>bafredo.co.tz</code>, the site TechStar Store is specified to match.</td></tr>
+    <tr><td>Product group</td><td>A named product as a shopper perceives it — one card in a grid, one detail page. May contain one or many variants.</td></tr>
+    <tr><td>Variant</td><td>A specific purchasable configuration of a product group, with its own price, stock and SKU. A resistor product group might have variants for 220&nbsp;Ω, 1&nbsp;kΩ and 10&nbsp;kΩ.</td></tr>
+    <tr><td>Attribute</td><td>A named dimension along which variants differ — Resistance, Voltage, Colour, Capacity.</td></tr>
+    <tr><td>SKU</td><td>Stock keeping unit. A structured 7-digit code, defined in §12.1.</td></tr>
+    <tr><td>Lipa Namba</td><td>Tanzanian mobile-money merchant till number. Customers push funds to it from M-Pesa, Tigo Pesa (Mixx by Yas), Airtel Money or Halopesa.</td></tr>
+    <tr><td>Delegated payment</td><td>Placing an order and nominating a third party — a parent, employer or sponsor — to pay it. Called "friend payment" on the reference platform.</td></tr>
+    <tr><td>Minor units</td><td>The smallest indivisible unit of a currency. All money in the database is stored as an integer count of minor units to avoid floating-point error.</td></tr>
+    <tr><td>Soft delete</td><td>Marking a row as deleted with a timestamp rather than removing it, so history and foreign keys survive.</td></tr>
+    <tr><td>Facet</td><td>A filterable attribute in the catalogue — category, subcategory, price band, availability.</td></tr>
+  </tbody>
+</table>

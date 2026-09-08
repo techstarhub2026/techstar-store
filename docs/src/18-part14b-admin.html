@@ -1,0 +1,205 @@
+<h2>14.8 Shipping methods</h2>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>List</td><td>Columns: drag handle · Name · Cost · Description (truncated) · Requires address · Accepts mobile payment · Cash on delivery · Free over · Regions · Active · Actions. Drag-reordering sets the order shown at checkout.</td></tr>
+    <tr><td>Create / edit modal</td><td><strong>Shipping method</strong> (name, required) · <strong>Shipping cost</strong> (required, ≥ 0, may be zero for pickup) · <strong>Description</strong> (required — it is shown to the customer at checkout and is how they choose) · <strong>Estimated delivery days</strong> min and max · <strong>Free over</strong> (optional) · <strong>Available regions</strong> (multi-select; empty means everywhere) · three checkboxes with the reference platform's own explanatory copy: <em>"Check the box if this shipping method requires the client to provide shipping details."</em>, <em>"Check the box if this shipping method can receive mobile payments."</em>, and <em>"This method is cash on delivery."</em> · <strong>Active</strong>.</td></tr>
+    <tr><td>Validation</td><td>"Shipping method is required" · "Shipping cost is required" · "Please enter a valid shipping cost" · "Description is required" · "A method with this name already exists".</td></tr>
+    <tr><td>Delete</td><td>Soft delete. A method referenced by existing orders is never hard-deleted; deactivating hides it from checkout while past orders keep their snapshot name and cost. Deleting the last active method is refused — checkout would have nothing to offer.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.9 Banners</h2>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>List</td><td>Columns: drag handle · Thumbnail · Title · Placement · Schedule (start–end, or "Always") · Status · Created · Actions. Reordering sets carousel order.</td></tr>
+    <tr><td>Builder</td><td>A two-column screen: form on the left, a <strong>live preview</strong> on the right rendering the banner exactly as the storefront will, updating on every keystroke. Fields: <strong>Title</strong> and <strong>Title colour</strong> · <strong>Subtitle</strong> and <strong>Subtitle colour</strong> · <strong>Background</strong> colour · <strong>Image</strong> (required) · <strong>Link</strong> — "Where does the banner redirect to" · <strong>Button text</strong>, <strong>Button background</strong>, <strong>Button text colour</strong> · <strong>Placement</strong> · <strong>Start</strong> and <strong>End</strong> date-times (both optional) · <strong>Active</strong>.</td></tr>
+    <tr><td>Colour fields</td><td>Each is a <code>ColorField</code> — swatch, picker and hex input in sync. A contrast checker beside the title and subtitle fields warns when the chosen text colour fails 4.5:1 against the background, showing the computed ratio. Advisory, not blocking; the reference platform has no such check and its banners rely on the author's eye.</td></tr>
+    <tr><td>Image guidance</td><td>Recommended 1200 × 800, transparent PNG or WebP for product cut-outs. The uploader warns when a file's aspect ratio would crop badly at the banner's dimensions.</td></tr>
+    <tr><td>Link validation</td><td>Must be a valid absolute or site-relative URL. Internal links are offered as a picker over products, categories and pages, so a typo cannot produce a dead banner.</td></tr>
+    <tr><td>Preview modal</td><td>"Preview" opens the banner full width at desktop and mobile widths side by side, matching the reference platform's preview modal.</td></tr>
+    <tr><td>Image replacement</td><td>Editing text and replacing the image are separate operations, as on the reference platform — replacing an image is a re-upload, and coupling it to a text save makes both slower.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.10 Services · 14.11 Partners</h2>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Module</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Services</td><td>Card grid list — image, heading, excerpt, edit and delete. Composer: <strong>Heading</strong> (required, maximum 15 words, with the reference platform's own rule "Heading should not exceed 15 words") · <strong>Excerpt</strong> · <strong>Content</strong> (rich text, required) · <strong>Image</strong> (required, "Drag &amp; drop your image") · <strong>Position</strong> · <strong>Active</strong>. Validation: "Service heading is required" · "Heading should not exceed 15 words" · "Service content is required" · "Image is required".</td></tr>
+    <tr><td>Partners</td><td>Card grid — logo, name, website. Composer: <strong>Partner name</strong> (required) · <strong>Partner's website link</strong> (required, valid URL) · <strong>Logo</strong> (required; square recommended, transparent background preferred) · <strong>Position</strong> · <strong>Active</strong>. Validation: "Partner name is required" · "Link to partner's website is required" · "Image is required".</td></tr>
+  </tbody>
+</table>
+
+<h2>14.12 Blog, comments and reviews</h2>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Module</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Articles</td><td>List as cards or a table, filterable by status and author. Composer: <strong>Heading</strong> (required, ≤ 15 words) · <strong>Description</strong> — the excerpt, required · <strong>Content</strong> (rich text, required, placeholder "Compose an epic article…") · <strong>Cover image</strong> (required) · <strong>Tags</strong> · <strong>Status</strong> · <strong>Publish date</strong> · <strong>SEO</strong> title and description with counters. Actions: Save draft · Preview (opens the storefront article route in a draft-token mode) · Publish · Unpublish.</td></tr>
+    <tr><td>Comments</td><td>Moderation queue with tabs Pending · Approved · Rejected · Spam. Columns: Author · Article · Excerpt · Submitted · Status. A detail drawer shows the full body with the article for context and Approve / Reject / Mark spam / Delete. Bulk moderation supported. Approving fires no notification to the commenter; rejecting is silent by design.</td></tr>
+    <tr><td>Reviews</td><td>Same queue shape. Columns: Product · Rating · Author · Excerpt · Verified-purchase badge · Submitted · Status. Approving recalculates the product's <code>review_count</code> and <code>average_rating</code> in the same transaction. Reviews are never edited by staff — only approved, rejected or deleted, with the reason recorded.</td></tr>
+    <tr><td>FAQs</td><td>Simple list with drag ordering and a grouping field. Composer: <strong>Question</strong> · <strong>Answer</strong> (rich text) · <strong>Group</strong> · <strong>Position</strong> · <strong>Active</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.13 Campaigns and contacts</h2>
+
+<h3>14.13.1 Campaign list</h3>
+<p>Four counters across the top — Total campaigns · Total contacts · SMS sent · Emails sent — then a table: Name · Channel · Audience · Scheduled · Status · Recipients · Sent · Delivered · Failed · Cost · Created by · Actions. Header actions "New SMS campaign" and "New email campaign". A detail drawer shows the full message, audience definition, schedule and the per-recipient delivery report.</p>
+
+<h3>14.13.2 SMS composer</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Field</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Campaign name</td><td>Required. Internal label only.</td></tr>
+    <tr><td>Send to</td><td>"All contacts" or "Specific contacts". Choosing specific reveals a multi-select over the contact list with search.</td></tr>
+    <tr><td>Additional contacts</td><td>Free entry of numbers, space or comma separated, with the reference platform's own hint: <em>"Press the space key to add additional numbers, e.g. 255729XXXXXX, 255729YYYYYY"</em>. Each is validated as 12 digits beginning <code>255</code>; invalid entries are rejected inline with "Invalid phone number. Please enter a 12-digit number."</td></tr>
+    <tr><td>Message</td><td>Required. A live counter in the reference platform's format — "Chars. Remaining (0) 0/160" — that also reports the number of SMS segments and switches to the 70-character limit when a non-GSM character is typed, since one accented character silently triples the cost of a campaign.</td></tr>
+    <tr><td>When to send</td><td>"Immediately" or "Later" with a date-time picker. Validation: "Date and time are required for sending the campaign later"; the time must be in the future.</td></tr>
+    <tr><td>Estimate</td><td>Before sending, a panel states recipient count, segments per message, total segments and estimated cost. Sending requires confirming that figure. The reference platform sends without any cost estimate, which on a metered channel is a real risk.</td></tr>
+    <tr><td>Test send</td><td>"Send test" delivers to one number without recording a campaign send.</td></tr>
+    <tr><td>Consent</td><td>Recipients without <code>sms_opt_in</code>, or with an unsubscribe timestamp, are excluded automatically and the exclusion count is shown. This is not optional.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.13.3 Email composer</h3>
+<p>The same shape with <strong>Subject</strong> in place of campaign name, a rich-text body with a variable palette (<code>{{name}}</code>, <code>{{firstName}}</code>), a desktop and mobile preview, and a test send. Additional recipients accept addresses with the hint <em>"Press the space key to add additional emails, e.g. person1@example.com, person2@example.com"</em>. Every email carries a one-click unsubscribe link and a physical postal address, both required for deliverability as much as for compliance.</p>
+
+<h3>14.13.4 Contacts</h3>
+<p>Table: Name · Email · Phone · Source · Email consent · SMS consent · Tags · Orders · Joined. Search across name, email and phone. Filters by source, consent and tag. Actions: import from CSV with a column-mapping step and a duplicate-handling choice; export; edit tags in bulk; unsubscribe. Customers are synchronised into contacts on registration and on order placement, carrying their consent flags with them.</p>
+
+<h2>14.14 Search analytics</h2>
+<p>Two tables. <strong>Top searches</strong>: Search query · Number of searches · Average result count · Click-through rate · Last searched. <strong>Zero-result searches</strong>, shown first and highlighted, since it is the actionable one: term, count, last searched, and a "Create product" shortcut that opens the product form with the term prefilled as the name. Both are filterable by date range and exportable. This turns the reference platform's read-only search table into a merchandising instrument.</p>
+
+<h2>14.15 Currency</h2>
+<p>A small screen matching the reference platform's: two cards showing the current <strong>Display currency</strong> and <strong>Fraction digits</strong>, and an "Update currency format" modal taking <strong>Currency type</strong> (ISO 4217 select) and <strong>Maximum fraction digits</strong> (0–4). A live preview shows a sample amount formatted with the pending settings before saving. Changing the display currency does <strong>not</strong> convert stored prices — a warning states this plainly, because the opposite assumption is the obvious one and would be catastrophic.</p>
+
+<h2>14.16 Settings</h2>
+<p>Grouped into tabs. Every field writes to <code>site_settings</code> and is audited.</p>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Tab</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td>Store</td><td>Store name · Legal entity name · Tagline · Logo · Favicon · Registration country · Registration agency · TIN · Certificate of incorporation number · Registered address · P.O. box.</td></tr>
+    <tr><td>Contact</td><td>Primary and secondary phone · Email · WhatsApp number and default message · Physical address · Map latitude and longitude · Opening hours.</td></tr>
+    <tr><td>Social</td><td>Facebook · Instagram · X · LinkedIn · YouTube · TikTok. Empty entries are hidden from the footer rather than rendered as dead icons.</td></tr>
+    <tr><td>Payments</td><td>M-Pesa till number · Mixx by Yas till number · Airtel Money till number · Other-network instructions · Merchant QR image · Per-network instruction blocks in Swahili and English, each a rich-text field · Cash-on-delivery maximum order value · Payment reservation window in hours.</td></tr>
+    <tr><td>Page images</td><td>Hero images for About, Privacy Policy and Terms &amp; Conditions, with a preview each — the reference platform's own settings screen, kept. Validation: "About Us page image is required" and equivalents.</td></tr>
+    <tr><td>Email</td><td>From name · From address · Reply-to · SMTP host, port, user, password, TLS mode · a "Send test email" action that reports the exact failure when it fails.</td></tr>
+    <tr><td>SMS</td><td>Provider · API credentials · Sender ID · a "Send test SMS" action · a low-balance warning threshold.</td></tr>
+    <tr><td>Catalogue</td><td>Products per page · Default sort · "New" badge window in days · Low-stock default threshold · Whether to hide empty subcategories in navigation (default on, §6.4.2).</td></tr>
+    <tr><td>Policies</td><td>Returns window in days · Warranty statement · The three standard invoice terms · Cancellation policy text.</td></tr>
+    <tr><td>Features</td><td>Toggles: reviews · comments · wishlist · guest checkout · delegated payment · back-in-stock notifications · maintenance mode with a message.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.17 Staff and roles</h2>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Screen</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Staff list</td><td>Name · Email · Roles · Last sign-in · Status · Created. Header action "Invite staff member".</td></tr>
+    <tr><td>Invite</td><td>Email plus role selection. Sends a single-use invitation valid 7 days; the recipient sets their own password. Staff accounts are never created with a password chosen by someone else.</td></tr>
+    <tr><td>Detail</td><td>Profile, roles (add and remove), effective permission list computed from the union of roles, active sessions with revoke, and that member's audit history.</td></tr>
+    <tr><td>Roles</td><td>List of roles with member counts. A role editor showing the full permission catalogue as a grouped checkbox matrix. System roles are visible but locked.</td></tr>
+    <tr><td>Guardrails</td><td>Nobody may edit their own roles. The last <code>owner</code> cannot be removed, demoted or suspended. Every change is audited with before and after permission sets. Granting <code>staff.manage</code> requires the <code>owner</code> role.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.18 Audit log</h2>
+<p>Read-only. Columns: Timestamp · Actor · Action · Entity type · Entity · IP address · Request id. Filterable by actor, action, entity type, entity and date range; cursor-paginated because it grows without bound. Expanding a row shows a field-level diff of <code>before</code> and <code>after</code>. Exportable to CSV for a compliance request. Every entity's own detail screen carries an <code>AuditTrail</code> panel showing just its own history, which is where it is actually consulted.</p>
+<p>What is logged: every create, update and delete on every entity; order status transitions; payment verifications and refunds; stock adjustments; permission and role changes; settings changes; customer record views; data exports; sign-in, sign-out and failed sign-in for staff accounts; and campaign sends. What is not logged: read access to non-personal data, which would swamp the useful signal.</p>
+
+<h2>14.19 The universal CRUD contract</h2>
+<p>Every module above conforms to this. It is what makes "full CRUD on anything" a coherent promise rather than fifteen slightly different screens.</p>
+
+<h3>14.19.1 Create</h3>
+<ul>
+  <li>Reached from a primary "New {entity}" button in the page header, or from a "+" in an empty state.</li>
+  <li>Modal for entities with 6 or fewer fields; a full page for anything larger.</li>
+  <li>Required fields marked with an asterisk and an explanatory legend. Optional fields are labelled "(optional)" rather than left ambiguous.</li>
+  <li>Validation on blur, then live once a field has errored, then in full on submit. Submit is disabled until dirty and valid.</li>
+  <li>On success: a toast "{Entity} created", and navigation either to the new record or back to the list with the new row highlighted for three seconds.</li>
+  <li>"Save and add another" wherever bulk entry is realistic — products, categories, subcategories, FAQs.</li>
+</ul>
+
+<h3>14.19.2 Read</h3>
+<ul>
+  <li>Every list is a <code>DataTable</code> (§8.4.1) with search, filters, sort, pagination and density, all reflected in the URL so a filtered view is shareable with a colleague.</li>
+  <li>Every list has a specified empty state naming the primary action.</li>
+  <li>Every detail screen carries created and updated timestamps, the creating and last-updating actor, and an audit panel.</li>
+  <li>Every list offers CSV export of the current filtered set, capped at 50,000 rows and delivered as a queued job with an email link when large.</li>
+</ul>
+
+<h3>14.19.3 Update</h3>
+<ul>
+  <li>Same form as create, prefilled, with the entity name in the heading.</li>
+  <li>Only changed fields are sent; the payload is a partial.</li>
+  <li>Optimistic concurrency: the form carries the record's <code>updatedAt</code>; a mismatch returns 409 and the UI offers "Reload and reapply my changes" with a field-level diff of what someone else altered.</li>
+  <li>Navigating away with unsaved changes prompts.</li>
+  <li>Inline editing is offered only for single scalar fields where it is genuinely faster — position, active flag, stock.</li>
+</ul>
+
+<h3>14.19.4 Delete</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Soft by default</td><td>Sets <code>deleted_at</code>. Recoverable from the entity's Trash view for 90 days.</td></tr>
+    <tr><td>Confirmation</td><td>Always. The dialog names the specific record — "Delete <em>Arduino Uno R3</em>?" — never "Delete this item?".</td></tr>
+    <tr><td>Consequences stated</td><td>The dialog lists what else is affected and the counts: "This product has 3 variants and appears in 2 open carts."</td></tr>
+    <tr><td>Blocked deletes</td><td>Where §9.5 says RESTRICT, the dialog explains why and offers the supported alternative rather than a bare refusal.</td></tr>
+    <tr><td>Bulk deletes</td><td>Require typing the exact count to confirm — "Type <strong>14</strong> to confirm" — using <code>ConfirmDialog</code>'s <code>requireTyping</code> mode. Slow enough to interrupt an automatic click, which is the point.</td></tr>
+    <tr><td>Undo</td><td>The success toast offers "Undo" for 8 seconds on single soft deletes.</td></tr>
+    <tr><td>Hard delete</td><td>Available only from the Trash view, only to <code>owner</code>, and never for orders, payments, invoices or audit records.</td></tr>
+    <tr><td>Audit</td><td>Deletion writes the full prior state to <code>audit_logs.before</code>, so a hard-deleted record can still be described even when it can no longer be restored.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.19.5 Cross-cutting behaviours</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Behaviour</th><th>Applies to</th></tr></thead>
+  <tbody>
+    <tr><td>Permission gating</td><td>Every action control is wrapped in <code>PermissionGate</code>. A missing permission hides the control entirely; a conditionally unavailable action is disabled with a tooltip explaining why. Server-side enforcement is independent and mandatory.</td></tr>
+    <tr><td>Optimistic UI</td><td>Toggles and reordering apply immediately and revert with an error toast on failure.</td></tr>
+    <tr><td>Keyboard</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd> global search · <kbd>/</kbd> focuses the list search · <kbd>N</kbd> new record · <kbd>Esc</kbd> closes any overlay · <kbd>Ctrl</kbd>+<kbd>S</kbd> saves a form.</td></tr>
+    <tr><td>Deep links</td><td>Every filtered list state, every drawer and every modal is addressable by URL.</td></tr>
+    <tr><td>Loading</td><td>Skeletons at final dimensions, never a full-page spinner over content that is already on screen.</td></tr>
+    <tr><td>Errors</td><td>Field errors inline; request errors as a dismissible banner above the form carrying the request id; nothing is ever lost from the form on failure.</td></tr>
+    <tr><td>Timestamps</td><td>Relative for anything under 7 days ("2 hours ago") with the absolute value on hover, absolute beyond that. Always in Africa/Dar_es_Salaam.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.19.6 Coverage matrix</h3>
+<p>The literal answer to "full CRUD on anything in the platform". <span class="pill get">C</span> create, <span class="pill pub">R</span> read, <span class="pill patch">U</span> update, <span class="pill del">D</span> delete, <strong>B</strong> bulk operations, <strong>X</strong> export.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Entity</th><th class="c" style="width:10mm">C</th><th class="c" style="width:10mm">R</th><th class="c" style="width:10mm">U</th><th class="c" style="width:10mm">D</th><th class="c" style="width:10mm">B</th><th class="c" style="width:10mm">X</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Products</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Import too</td></tr>
+    <tr><td>Product variants</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Via the matrix</td></tr>
+    <tr><td>Product images</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td>Reorder, alt text</td></tr>
+    <tr><td>Categories · Subcategories</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Delete restricted by children</td></tr>
+    <tr><td>Discounts</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td></td></tr>
+    <tr><td>Stock</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td>Adjustments only; ledger is immutable</td></tr>
+    <tr><td>Orders</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td>Created by staff for phone orders; cancelled, never deleted</td></tr>
+    <tr><td>Order items</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td>Only while <code>CONFIRMED</code> or earlier</td></tr>
+    <tr><td>Payments</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td><td>Verify, refund; never deleted</td></tr>
+    <tr><td>Invoices</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td>Delete only while draft</td></tr>
+    <tr><td>Customers</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td>Delete anonymises</td></tr>
+    <tr><td>Addresses</td><td class="c">—</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td>Customer-owned; staff read-only</td></tr>
+    <tr><td>Shipping methods</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td></td></tr>
+    <tr><td>Banners</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td></td></tr>
+    <tr><td>Services · Partners · FAQs</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td></td></tr>
+    <tr><td>Articles</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td></td></tr>
+    <tr><td>Comments · Reviews</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Moderation only; staff never author</td></tr>
+    <tr><td>Campaigns</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td>Edit only while draft or scheduled</td></tr>
+    <tr><td>Contacts</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Import and export</td></tr>
+    <tr><td>Media files</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td>Delete blocked while referenced</td></tr>
+    <tr><td>Search logs</td><td class="c">—</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Delete is a retention purge</td></tr>
+    <tr><td>Contact messages</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td>Status changes</td></tr>
+    <tr><td>Regions · Districts</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td>Seeded; rarely touched</td></tr>
+    <tr><td>Settings</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td><td>Keys are fixed by the schema</td></tr>
+    <tr><td>Currency</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td></td></tr>
+    <tr><td>Staff · Roles</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">—</td><td class="c">✓</td><td>System roles locked</td></tr>
+    <tr><td>Audit logs</td><td class="c">—</td><td class="c">✓</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td><td>Insert-only at the database level</td></tr>
+  </tbody>
+</table>
+<p class="kv">Where a cell reads "—", it is a deliberate refusal with a stated reason, not a missing feature. Financial and audit records are never editable or deletable, because a system in which they are is not a system anyone can rely on.</p>

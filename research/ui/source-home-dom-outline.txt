@@ -1,0 +1,2732 @@
+<html>
+  <head>
+    <meta>
+    <meta>
+    <meta> name='viewport'
+    <meta> name='ahrefs-site-verification'
+    <link> href='/favicon.png'
+    <title>
+      "BAFREDO Electronics Limited - Innovation. Creativity. Imagination."
+    <link> href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootst'
+    <link> href='/css/chunk-vendors.09f1f3e2.css'
+    <link> href='/css/app.286c1e45.css'
+  <body>
+    <noscript>
+      <strong>
+        "We're sorry but bafredo-client doesn't work properly without JavaScript enabled. Please enable it to continue."
+    <div> id='app'
+      <div>
+        <nav .navbar.navbar-expand-md.navbar-light.bg-secondary.d-none.d-md-block> id='nav_top'
+          <div .container.text-light>
+            <div .d-flex.w-100.justify-content-between>
+              <div .d-flex.justify-content-between>
+                <div .me-3.d-inline>
+                  <a .fs-10.text-light.text-decoration-none.ms-1> href='tel:+255747637665'
+                    "+255 (0) 746 624 875"
+                <div .me-3.d-inline>
+                  <img> alt='email' [img]
+                  <a .fs-10.text-light.text-decoration-none.ms-1> href='mailto:info@bafredo.co.tz'
+                    "info@bafredo.co.tz"
+                <div .d-inline.me-3>
+                  <img> alt='location' [img]
+                  <a .fs-10.text-light.text-decoration-none.ms-1> href='/about-us#map'
+                    "Dar es salaam, Tanzania"
+        <div .sticky-top>
+          <nav .navbar.navbar-expand-sm.navbar-dark.bg-dark.py-3>
+            <div .container.d-flex.justify-content-between.align-items-center.g-0>
+              <div .d-flex.align-items-center>
+                <button .bg-inherit.btn.btn-sm.border-0.d-inline.d-md-none> data-bs-target='#sideNav'
+                  <span .navbar-toggler-icon>
+                <a .router-link-active.router-link-exact-active.align-self-center.text-light.text-decoration-none> href='/'
+                  <div .d-flex>
+                    <img> [img]
+                    <div .logo-text.d-none.d-md-inline-block>
+                      <div .logo-top>
+                        <span .main-Logo.fw-bolder.text-success-pale>
+                          "BAFREDO"
+                        <span .fw-lighter>
+                          "Electronics"
+                        <span .text-success-pale>
+                          "."
+                      <div .logo-bottom.ms-2>
+                        <span>
+                          "Imagination. Creativity. Innovation."
+              <div .input-group.search-bar.position-relative.d-none.d-lg-flex>
+                <input .form-control.border-0.no-outline> type='text' placeholder='Please search here ...'
+                <button .input-group-text.bg-success.text-white.search-text.px-lg-5> type='button'
+                  "Search"
+              <div .d-flex.mt-3.mt-md-0>
+                <button .btn.zoom.nav-icon.d-lg-none.d-flex.align-items-center.text-light.me-2.no-outline> type='button' data-bs-target='#searchModal'
+                <div .zoom.nav-icon.d-flex.align-items-center.position-relative.text-light.text-decoration-none.me-3> data-bs-target='#offcanvasWishlist' role='button'
+                  <span .position-absolute.top-1.start-100.translate-middle.badge.rounded-pill.bg-success>
+                    "0"
+                <div .me-2.mx-md-2.zoom.nav-icon.d-flex.align-items-center.text-decoration-none.text-light.d-inline-block.position-relative> data-bs-target='#offcanvasRight' role='button'
+                  <span .position-absolute.top-1.start-100.translate-middle.badge.rounded-pill.bg-success>
+                    "0"
+                <button .zoom.btn.btn-sm.bg-success.text-white.ms-3.me-1> type='button' data-bs-target='#formModal'
+                  "Login | Register"
+          <nav .navbar.navbar-expand-md.navbar-light.bg-white.d-none.d-md-block.border-bottom.border-2> id='nav_top'
+            <div .container.text-dark.g-0> id='mainNav'
+              <div .d-flex.w-100.justify-content-start.py-2>
+                <a .text-dark.text-decoration-none.me-3> href='/products/all'
+                  "PRODUCTS"
+                <div .dropdown>
+                  <button .border-0.btn.text-dark.dropdown-toggle.me-2.pt-0> id='categoryButton' type='button'
+                    "SHOP"
+                  <div .dropdown-menu.me-5.shadow> id='dropdownMenu'
+                    <div .row.p-3>
+                      <div .col-7.border-end>
+                        <ul .list-unstyled>
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Sensors & Conditioning Boards"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Tools  &  consumables"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Integrated Circuits"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Components"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Lab Equipment"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Computers & Accessories"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Communication"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Microcontrollers & Microprocessors"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Heating, Cooling & Air Quality"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Data & Signal Processing"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Toys & Hobbies"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Energy"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Hardware Development Tools & Platforms"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Power Supply & Switching Boards"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Security & Surveillance"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Electronics Projects"
+                          <li .pb-3.mb-2>
+                            <div .d-flex.justify-content-between>
+                              "Industrial Control & Automation"
+                      <div .col-5>
+                        <ul .list-unstyled> id='subcategories'
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc477b54c17311f7df224'
+                                "Temperature/Humidity"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "5"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc469b54c17311f7df21f'
+                                "Light & Radiation"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "7"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc458b54c17311f7df21a'
+                                "Weight/Stress"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "5"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc44ab54c17311f7df215'
+                                "Distance"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "9"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc43db54c17311f7df210'
+                                "Dust"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "2"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc42eb54c17311f7df20b'
+                                "Motion"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "4"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc423b54c17311f7df206'
+                                "Voltage"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "3"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc415b54c17311f7df201'
+                                "Current"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "4"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc408b54c17311f7df1fc'
+                                "Object & Metal"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "1"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3f8b54c17311f7df1f7'
+                                "Biometric"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "7"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3eab54c17311f7df1f2'
+                                "Gas"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "4"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3d8b54c17311f7df1ed'
+                                "Touch"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "0"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3c6b54c17311f7df1e8'
+                                "Temperature"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "5"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3b5b54c17311f7df1e3'
+                                "Sound"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "6"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc3a8b54c17311f7df1de'
+                                "Vibration"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "2"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc39ab54c17311f7df1d9'
+                                "Pressure"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "1"
+                          <li .pb-3.mb-1>
+                            <div>
+                              <a .text-decoration-none.text-dark> href='/products/644bc38eb54c17311f7df1d4'
+                                "Liquid"
+                                <span .ms-1.rounded.text-white.bg-success.px-1>
+                                  "9"
+                <div .dropdown>
+                  <button .border-0.btn.text-dark.dropdown-toggle.me-2.pt-0> type='button'
+                    "SUPPORT"
+                  <div .dropdown-menu>
+                    <a .dropdown-item.text-dark.text-decoration-none> href='/contact-us'
+                      "CONTACT US"
+                    <a .dropdown-item.text-dark.text-decoration-none> href='/blogs'
+                      "BLOG"
+                <div .dropdown>
+                  <button .border-0.btn.text-dark.dropdown-toggle.me-2.pt-0> type='button'
+                    "SERVICES"
+                  <div .dropdown-menu.flex>
+                    <div>
+                      <a .text-dark.text-decoration-none.mx-3> href='/service/655645645ca45dcea1fdcadc'
+                        "PCB Printing"
+        <div> id='breadcrumb'
+        <div .offcanvas.offcanvas-end> id='offcanvasRight'
+          <div .offcanvas-header.bg-success.text-white>
+            <h5> id='offcanvasRightLabel'
+              "SHOPPING CART"
+            <button .btn-close.text-reset.bg-white> type='button' aria-label='Close'
+          <div .offcanvas-body>
+            <h1>
+              "Cart is Empty"
+        <div .offcanvas.offcanvas-end> id='offcanvasWishlist'
+          <div .offcanvas-header.bg-success.text-white>
+            <h5> id='offcanvasRightLabel'
+              "WISHLIST"
+            <button .btn-close.text-reset.bg-white> type='button' aria-label='Close'
+          <div .offcanvas-body>
+            <h1>
+              "Wishlist is empty"
+        <div .toast-container.position-fixed.bottom-0.end-0.p-3>
+          <div .toast> id='notificationToast' role='alert'
+            <div .toast-header>
+              <strong .me-auto>
+              <button .btn-close> type='button' aria-label='Close'
+            <div .toast-body.bg-white>
+        <div .modal.fade> id='formModal'
+          <div .modal-dialog>
+            <div .modal-content.border-0.bg-inherit>
+              <div .modal-body.p-0>
+                <img .bg-white.mx-auto.d-block.rounded-circle.border.border-success.p-2> alt='Bafredo electronics' [img]
+                <form .mt-3.w-100.shadow.bg-white> id='authForm'
+                  <div .auth-header.text-center.bg-success.text-white.py-3>
+                    <button .bg-inherit.border-0.float-end.text-white.me-4> type='button' aria-label='Close'
+                      "X"
+                    <p .fs-5>
+                      "LOGIN"
+                  <form .p-md-5.p-3>
+                    <div .mb-3>
+                      <label .form-label.fs-6>
+                        "EMAIL OR PHONE"
+                      <input .form-control.no-outline> type='text'
+                    <div .mb-3>
+                      <label .form-label.fs-6>
+                        "PASSWORD"
+                      <div .input-group.mx-auto.form-control.d-flex.justify-content-between>
+                        <input .input.border-0.no-outline> type='password'
+                        <div .input-group-append>
+                    <a .text-decoration-none.text-dark.d-block.mb-4>
+                      "Forgot password?"
+                    <button .zoom.btn.bg-success.text-white.w-100.mb-4> type='submit'
+                      <span>
+                        "LOGIN"
+                    <a .text-decoration-none.d-block.text-center>
+                      <span .text-dark>
+                        "Don't have an account?"
+                      "Create your account here"
+                    <button .zoom.btn.btn-primary.w-100.mt-4> type='button'
+                      <div .d-flex.align-items-center.justify-content-center>
+                        <img> [img]
+                        <span .ms-2>
+                          "Continue with Facebook"
+                    <button .zoom.btn.btn-outline-secondary.w-100.mt-4> type='button'
+                      <div .d-flex.align-items-center.justify-content-center>
+                        <img> [img]
+                        <span .ms-2>
+                          "Continue with Google"
+        <div .offcanvas.offcanvas-start> id='sideNav'
+          <div .offcanvas-header>
+            <h5 .offcanvas-title>
+            <button .btn-close> type='button' aria-label='Close'
+          <div .offcanvas-body>
+            <ul .list-unstyled>
+              <a .router-link-active.router-link-exact-active.text-decoration-none.text-dark> href='/'
+                <li .py-3>
+                  "Home"
+              <a .text-decoration-none.text-dark> href='/products/all'
+                <li .py-3>
+                  "Products"
+              <div .dropdown>
+                <div .my-3.d-flex.justify-content-between> id='categoryButton' type='button' data-bs-target='#categoryCollapse'
+                  "Shop"
+                <div .collapse> id='categoryCollapse'
+                  <div .row.p-3>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc61b54c17311f7df097'
+                        "Sensors & Conditioning Boards"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc61b54c17311f7df097'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc4ab54c17311f7df090'
+                        "Tools  &  consumables"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc4ab54c17311f7df090'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc9db54c17311f7df0ac'
+                        "Integrated Circuits"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc9db54c17311f7df0ac'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644e420c1e29a10d1bd13f82'
+                        "Components"
+                      <div .collapse.ms-2> id='subcategoryCollapse644e420c1e29a10d1bd13f82'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc3cb54c17311f7df089'
+                        "Lab Equipment"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc3cb54c17311f7df089'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbbf3b54c17311f7df06d'
+                        "Computers & Accessories"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbbf3b54c17311f7df06d'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc0db54c17311f7df074'
+                        "Communication"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc0db54c17311f7df074'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc84b54c17311f7df0a5'
+                        "Microcontrollers & Microprocessors"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc84b54c17311f7df0a5'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644a4a62b54c17311f7dee73'
+                        "Heating, Cooling & Air Quality"
+                      <div .collapse.ms-2> id='subcategoryCollapse644a4a62b54c17311f7dee73'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbbe2b54c17311f7df066'
+                        "Data & Signal Processing"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbbe2b54c17311f7df066'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc1ab54c17311f7df07b'
+                        "Toys & Hobbies"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc1ab54c17311f7df07b'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc2cb54c17311f7df082'
+                        "Energy"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc2cb54c17311f7df082'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbcabb54c17311f7df0b3'
+                        "Hardware Development Tools & Platforms"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbcabb54c17311f7df0b3'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbc72b54c17311f7df09e'
+                        "Power Supply & Switching Boards"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbc72b54c17311f7df09e'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbbcfb54c17311f7df05f'
+                        "Security & Surveillance"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbbcfb54c17311f7df05f'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644a4a24b54c17311f7dee6c'
+                        "Electronics Projects"
+                      <div .collapse.ms-2> id='subcategoryCollapse644a4a24b54c17311f7dee6c'
+                        <ul .list-unstyled>
+                    <div .pb-3.mb-2>
+                      <div .collapse.d-flex.justify-content-between.mb-3> type='button' data-bs-target='#subcategoryCollapse644bbbb8b54c17311f7df058'
+                        "Industrial Control & Automation"
+                      <div .collapse.ms-2> id='subcategoryCollapse644bbbb8b54c17311f7df058'
+                        <ul .list-unstyled>
+              <div .dropdown.py-1>
+                <div .my-3.d-flex.justify-content-between> id='categoryButton' type='button' data-bs-target='#supportCollapse'
+                  "Support"
+                <div .collapse> id='supportCollapse'
+                  <div .row.px-3>
+                    <a .text-decoration-none.text-dark> href='/blogs'
+                      <li .py-3>
+                        "Blog"
+                    <a .text-decoration-none.text-dark> href='/contact-us'
+                      <li .py-3>
+                        "Contact Us"
+              <div .dropdown.py-1>
+                <div .my-3.d-flex.justify-content-between> id='servicesButton' type='button' data-bs-target='#servicesCollapse'
+                  "Services"
+                <div .collapse> id='servicesCollapse'
+                  <div .row.px-3>
+                    <a .text-decoration-none.text-dark> href='/service/655645645ca45dcea1fdcadc'
+                      <li .py-3>
+                        "PCB Printing"
+        <div .modal.fade> id='searchModal'
+          <div .modal-dialog>
+            <div .modal-content>
+              <div .modal-header>
+                <h1 .modal-title.fs-5> id='exampleModalLabel'
+                  "Search Store"
+                <button .btn-close> type='button' aria-label='Close'
+              <div .modal-body>
+                <div .input-group.search-bar.position-relative>
+                  <input .form-control.border-0.no-outline> type='text' placeholder='Please search here ...'
+                  <button .input-group-text.bg-success.text-white.search-text.px-lg-5> type='button'
+                    "Search"
+        <main>
+          <swiper-container>
+            <swiper-slide .swiper-slide-prev> aria-label='1 / 4' role='group'
+              <div .container-fluid.g-0> id='banner'
+                <div .container.g-0.py-lg-3>
+                  <div .row.d-flex.py-4.px-2.g-0>
+                    <div .col-5.order-last.ps-lg-4.text-center>
+                      <img .w-100.object-contain.h-100> [img]
+                    <div .col-7.py-3.pe-lg-5.px-xl-5>
+                      <h1 .xl-font.mb-3> id='bannerTitle'
+                        "LoRa Board"
+                      <h3 .h1.d-none.d-lg-block> id='bannerSubtitle'
+                        "Energy-efficient, wide coverage and cost-effective wireless communication board for Internet of Things applications."
+                      <a .btn.mt-md-4> id='bannerButton' href='https://www.electroschematics.com/wp-content/uploads/2019/03'
+                        "BUY NOW"
+            <swiper-slide .swiper-slide-active> aria-label='2 / 4' role='group'
+              <div .container-fluid.g-0> id='banner'
+                <div .container.g-0.py-lg-3>
+                  <div .row.d-flex.py-4.px-2.g-0>
+                    <div .col-5.order-last.ps-lg-4.text-center>
+                      <img .w-100.object-contain.h-100> [img]
+                    <div .col-7.py-3.pe-lg-5.px-xl-5>
+                      <h1 .xl-font.mb-3> id='bannerTitle'
+                        "SIM 800C Modem"
+                      <h3 .h1.d-none.d-lg-block> id='bannerSubtitle'
+                        "Board with built-in quad-band GSM/GPRS for control and automation of remote devices over a wireless network."
+                      <a .btn.mt-md-4> id='bannerButton' href='https://bafredo.com/product/gsm-sm800l/'
+                        "BUY NOW"
+            <swiper-slide .swiper-slide-next> aria-label='3 / 4' role='group'
+              <div .container-fluid.g-0> id='banner'
+                <div .container.g-0.py-lg-3>
+                  <div .row.d-flex.py-4.px-2.g-0>
+                    <div .col-5.order-last.ps-lg-4.text-center>
+                      <img .w-100.object-contain.h-100> [img]
+                    <div .col-7.py-3.pe-lg-5.px-xl-5>
+                      <h1 .xl-font.mb-3> id='bannerTitle'
+                        "DIY Electronics Projects"
+                      <h3 .h1.d-none.d-lg-block> id='bannerSubtitle'
+                        "Let us build together amazing electronics gadgets that address pressing societal problems."
+                      <a .btn.mt-md-4> id='bannerButton' href='https://www.bafredo.co.tz/about-us'
+                        "VISIT OUR PROJECTS"
+            <swiper-slide> aria-label='4 / 4' role='group'
+              <div .container-fluid.g-0> id='banner'
+                <div .container.g-0.py-lg-3>
+                  <div .row.d-flex.py-4.px-2.g-0>
+                    <div .col-5.order-last.ps-lg-4.text-center>
+                      <img .w-100.object-contain.h-100> [img]
+                    <div .col-7.py-3.pe-lg-5.px-xl-5>
+                      <h1 .xl-font.mb-3> id='bannerTitle'
+                        "Arduino Board"
+                      <h3 .h1.d-none.d-lg-block> id='bannerSubtitle'
+                        "Embedded solution for controlling and monitoring real-world devices and conditions over the Internet."
+                      <a .btn.mt-md-4> id='bannerButton' href='https://www.bafredo.co.tz/product/Arduino%20Uno%20R3'
+                        "BUY NOW"
+          <div .container.my-md-5.g-0>
+            <div .row.mt-2.g-0>
+              <div .col>
+                <div .col-sm-10.ms-2>
+                  <h1>
+                    "OUR PRODUCTS"
+              <div .ms-2.row.my-2.d-none.d-md-block.g-0>
+                <p>
+                  "BAFREDO Electronics offers quality and affordable products and services to hobbyists and practitioners in electronics. We put customers at the center of all our innovations, and ensure that they get s"
+              <div .position-relative>
+                <div .h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-0.translate-middle.me-2>
+                  <button .me-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+                <div>
+                  <swiper-container .product-slider-random.my-3>
+                    <swiper-slide .swiper-slide-active> aria-label='1 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='CD4071BE' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "4000  Series"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "CD4071BE"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 3,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide .swiper-slide-next> aria-label='2 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='ACS712' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Current"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "ACS712"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 0"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='3 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Inductive Proximity Sensor' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Distance"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Inductive Proximity Sensor"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 30,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='4 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='AVR Programmer' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Programmers and debuggers"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "AVR Programmer"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='5 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='8 Pins IC Socket' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Connectors & sockets"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "8 Pins IC Socket"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='6 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='220K Ohm 1/4W 5% Carbon Film Resistor' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "220K Ohm 1/4W 5% Carbon Film Resistor"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 200"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='7 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='USB charging desktop chassis power supply ATX adapter board ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "USB charging desktop chassis power supply ATX adapter board power board lead module power supply output wiring"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 25,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='8 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='MIC Amplifier Module' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "OpAmps"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "MIC Amplifier Module"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 11,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='9 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='TL082CN' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "OpAmps"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "TL082CN"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 3,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='10 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='CD4053BE' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "4000  Series"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "CD4053BE"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 3,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='11 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='74HC02' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "7400 Series"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "74HC02"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 3,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='12 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='5mm Red LED' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Displays"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "5mm Red LED"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 200"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='13 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='AC Female Socket Connector' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Connectors & sockets"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "AC Female Socket Connector"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 0"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='14 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='QRB1113' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Switches & keypads"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "QRB1113"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 10,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='15 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='FR207 Standard Power Diode' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Semiconductors"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "FR207 Standard Power Diode"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 200"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='16 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='HC-SR05 Test Board' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Distance"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "HC-SR05 Test Board"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='17 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='74LS21' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "7400 Series"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "74LS21"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 5,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='18 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='L7806cv' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "DC--DC"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "L7806cv"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 1,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='19 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='680 Ohm 1/4W 5% Carbon Film Resistor' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "680 Ohm 1/4W 5% Carbon Film Resistor"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 200"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='20 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Current Clamp Sensor SCT-013-000 Current Transformer AC curr' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Current"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Current Clamp Sensor SCT-013-000 Current Transformer AC current sensor 100A"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 30,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='21 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='DS1307 RTC Module' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Timers"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "DS1307 RTC Module"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='22 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='PIR Motion Sensor Alarm for Home Security' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Motion"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "PIR Motion Sensor Alarm for Home Security"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 22,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='23 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='FS-CT6B Transmitter 2.4G 6CH Remote Controller ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Drones"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "FS-CT6B Transmitter 2.4G 6CH Remote Controller"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 300,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='24 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='117S Boat-Type Switch' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Switches & keypads"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "117S Boat-Type Switch"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                <div .d-flex.h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-100.translate-middle>
+                  <button .ms-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+            <div .row.mt-md-2.g-0>
+              <div .row.g-0>
+                <div .col>
+                  <div .col-sm-10.ms-2>
+                    <h1>
+                      "NEW ARRIVALS"
+              <div .ms-2.row.my-2.d-none.d-md-block.g-0>
+                <div>
+                  "We are always ahead of technology, striving for innovations that bring positive impact to the society."
+              <div .position-relative>
+                <div .h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-0.translate-middle.me-2>
+                  <button .me-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+                <div>
+                  <swiper-container .product-slider-newArrivals.my-3>
+                    <swiper-slide .swiper-slide-active> aria-label='1 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='PZEM-004T AC Energy Meter Voltage Current Power Monitoring M' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Voltage"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "PZEM-004T AC Energy Meter Voltage Current Power Monitoring Module with UART"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide .swiper-slide-next> aria-label='2 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 5  4gb Starter Kit' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 5  4gb Starter Kit"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 415,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='3 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 4  4gb  Model B Starter Kit  ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 4  4gb  Model B Starter Kit"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 400,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='4 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 4 8gb  Model B Starter Kit' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 4 8gb  Model B Starter Kit"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 445,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='5 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 5 8GB Starter Kit' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 5 8GB Starter Kit"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 460,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='6 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Thermometer and Hygrometer DYWSJ -30°C to +50°C - humidity t' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Temperature"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Thermometer and Hygrometer DYWSJ -30°C to +50°C - humidity temperature measurement"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 10,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='7 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Precision Hardware Tool (170 in 1)' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Toolbox"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Precision Hardware Tool (170 in 1)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 80,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='8 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='TK-S001  ScrewDriver' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Screw drivers"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "TK-S001  ScrewDriver"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 75,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='9 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='PAM8403 Super Mini 2×3W Class D Digital Amplifier Board 2.5–' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Sound"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "PAM8403 Super Mini 2×3W Class D Digital Amplifier Board 2.5–5V"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 7,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='10 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='XH-M542 Mono Digital Power Amplifier Board 12–26V' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Power supplies"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "XH-M542 Mono Digital Power Amplifier Board 12–26V"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='11 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='8mm LED Light Module' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Light & Radiation"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "8mm LED Light Module"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 5,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='12 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='3S 40A 11.1V–12.6V 18650 Lithium Battery Protection Board wi' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Batteries & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "3S 40A 11.1V–12.6V 18650 Lithium Battery Protection Board with Balance (BMS)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 10,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='13 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='12V 10A Power Switch Module' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Power supplies"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "12V 10A Power Switch Module"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='14 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='XMF2 Claw Machine Lock' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Electromechanics"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "XMF2 Claw Machine Lock"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 10,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='15 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi SD Cards  64gb' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Memory chips"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi SD Cards  64gb"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='16 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi Camera Rev 1.3 Cable' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Wires &cables"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi Camera Rev 1.3 Cable"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='17 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi Camera 3 NoIR' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi Camera 3 NoIR"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 100,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='18 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 4 Case' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 4 Case"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='19 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='PTC Heating AC/DC 12V Thermostatic Aluminum Shell Ceramic He' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Semiconductors"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "PTC Heating AC/DC 12V Thermostatic Aluminum Shell Ceramic Heating Plate Sheet Constant Temperature Heater (Power optional:80: 2W-5W,110: 3W-10W,220: 5W-28W)(220 528W)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 6,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='20 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='1.28" GC9A01 240 * 240 TFT LCD Display Module 1.28 Inch RGB ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Displays"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "1.28" GC9A01 240 * 240 TFT LCD Display Module 1.28 Inch RGB IPS LCD Screen Display Module Round LCD Clock Dial"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 16,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='21 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Hands Clamp Clip LED Lights Glass Magnifier with Soldering S' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Helping hands"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Hands Clamp Clip LED Lights Glass Magnifier with Soldering Stand Tools Best Promotion"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 45,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='22 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Wifi Adapter USB auf ESP8266 Serielles Modul TTL ESP-01 CH34' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "UART-to-USB"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Wifi Adapter USB auf ESP8266 Serielles Modul TTL ESP-01 CH340G"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 7,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='23 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='15W 3A High Power UPS Battery Boost Charging Module for Lith' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Power supplies"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "15W 3A High Power UPS Battery Boost Charging Module for Lithium Batteries, Power Supply Switching, UPS Function, LED Indicator, Short Circuit (5V)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 10,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='24 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='USB charging desktop chassis power supply ATX adapter board ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "USB charging desktop chassis power supply ATX adapter board power board lead module power supply output wiring"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 25,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                <div .d-flex.h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-100.translate-middle>
+                  <button .ms-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+            <div .row.mt-2.g-0>
+              <div .row.g-0>
+                <div .col>
+                  <div .col-sm-10.ms-2>
+                    <h1>
+                      "HOT-SELLING PRODUCTS"
+              <div .ms-2.row.my-2.d-none.d-md-block.g-0>
+                <div>
+                  "BAFREDO Electronics manufactures and supplies a range of innovative products that have received significant attention to many customers. Our pride is to see the products meet your aspiration."
+              <div .position-relative>
+                <div .h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-0.translate-middle.me-2>
+                  <button .me-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+                <div>
+                  <swiper-container .product-slider-bestSelling.my-3>
+                    <swiper-slide .swiper-slide-active> aria-label='1 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Electronic Component Basic Starter Kit ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Compatible Arduino® boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Electronic Component Basic Starter Kit"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 25,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide .swiper-slide-next> aria-label='2 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Arduino Uno Rev3' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Compatible Arduino® boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Arduino Uno Rev3"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 30,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='3 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Header Connector Strip 40 Pin 1×40 Single Row Female' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Connectors & sockets"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Header Connector Strip 40 Pin 1×40 Single Row Female"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='4 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Male-male Dupont cable' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Wires &cables"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Male-male Dupont cable"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 4,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='5 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Digital Temperature Controller Thermostat Meter Temp Sensor ' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Temperature/Humidity"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Digital Temperature Controller Thermostat Meter Temp Sensor Switch Regulator"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 35,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='6 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Starter Kit I for Arduino® Projects' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Compatible Arduino® boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Starter Kit I for Arduino® Projects"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 100,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='7 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Light Dependent Resistor' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Light Dependent Resistor"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='8 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi 5 8GB' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi 5 8GB"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 300,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='9 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='nodeMcu (ESP8266)' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Radio Frequency"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "nodeMcu (ESP8266)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 19,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='10 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='IR Infrared transceiver module (IR sensor)' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Distance"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "IR Infrared transceiver module (IR sensor)"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 6,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='11 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='I2C LCD Display Adapter' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Displays"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "I2C LCD Display Adapter"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 8,500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='12 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Female-female Dupont cable' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Wires &cables"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Female-female Dupont cable"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 4,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='13 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='SFM-27 Buzzer' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Electromechanics"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "SFM-27 Buzzer"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 5,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='14 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Soldering Iron' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Soldering tools & cleaners"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Soldering Iron"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='15 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='LCD 1604' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Displays"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "LCD 1604"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 18,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='16 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Blue Male-male connecting wire' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Wires &cables"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Blue Male-male connecting wire"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 100"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='17 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Stripboard Veroboard' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Prototyping boards & PCBs"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Stripboard Veroboard"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 5,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='18 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='HC-SR04' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Distance"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "HC-SR04"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 8,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='19 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='L298 Motor Driver' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Electromechanics"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "L298 Motor Driver"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 15,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='20 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='3.7 V Li-Ion 3000mAh Rechargeable Battery' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Passive devices"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "3.7 V Li-Ion 3000mAh Rechargeable Battery"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 5,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='21 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='Raspberry Pi4  8GB' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Raspberry Pi boards & accessories"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "Raspberry Pi4  8GB"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 230,000"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='22 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='1x40P Male-Male Straight Connector' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Connectors & sockets"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "1x40P Male-Male Straight Connector"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='23 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='117S Boat-Type Switch' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Switches & keypads"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "117S Boat-Type Switch"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 500"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                    <swiper-slide> aria-label='24 / 24' role='group'
+                      <div>
+                        <div .mx-1.product-card>
+                          <div .card>
+                            <img .card-img-top.object-cover> alt='DC6-12V MINI Aquarium water Pump' [img]
+                            <div .card-body>
+                              <p .sub-fs-sm.card-text.text-center.text-uppercase.text-truncate.my-1.my-md-2.small>
+                                "Electromechanics"
+                              <h5 .name-fs-sm.card-title.text-center.text-uppercase.text-truncate.small>
+                                "DC6-12V MINI Aquarium water Pump"
+                              <h5 .name-fs-sm.card-title.d-flex.justify-content-center.small>
+                                <span>
+                                  "TZS 0"
+                              <div .justify-content-center.align-items-center.d-none>
+                                <div .line>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <button .icon-btn.border-0>
+                                <div .line>
+                              <div .my-1.d-none.d-md-flex.justify-content-center>
+                                <button .icon-btn.border-0.px-3>
+                                <button .icon-btn.border-0.px-3>
+                          <div .justify-content-center.d-flex> id='addToCartBox'
+                            <div .add-to-cart-box.d-md-flex.justify-content-center.align-items-center.py-2.d-none>
+                              <div .inner-white-box.rounded-pill.bg-white.d-flex.justify-content-center.pt-1.small>
+                                <p .small>
+                                  "ADD TO CART"
+                <div .d-flex.h-100.d-none.d-md-flex.align-items-center.position-absolute.top-50.start-100.translate-middle>
+                  <button .ms-2.shadow.btn.btn.small.text-dark.bg-white.rounded-circle>
+            <div .d-flex.justify-content-center.align-items-center.my-3>
+              <a .bg-success.text-white.btn> href='/products/all'
+                <span>
+                  "VIEW MORE"
+            <div .mt-5.mt-4>
+              <h1 .mb-2.text-center>
+                "OUR PARTNERS"
+              <div .thumbnail.text-center.mt-3.d-flex.align-items-center.justify-content-start>
+                <div .mx-3>
+                  <img .card-img-top.object-cover.zoom> alt='BAFREDO Electronics qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq' [img]
+                  <div .card-body.mb-3>
+                    <h5 .name-fs-sm.card-title.fs-6.text-truncate.d-inline-block>
+                      "BAFREDO Electronics qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+                <div .mx-3>
+                  <img .card-img-top.object-cover.zoom> alt='Raspberry Pi' [img]
+                  <div .card-body.mb-3>
+                    <h5 .name-fs-sm.card-title.fs-6.text-truncate.d-inline-block>
+                      "Raspberry Pi"
+        <div .bg-color.text-light.pt-4> id='footer'
+          <div .container>
+            <div .row>
+              <div .col.mb-4>
+                <h1>
+                  "COMPANY INFORMATION"
+                <div .my-2>
+                  "BAFREDO Electronics Limited"
+                <div .my-2>
+                  "P. O. Box 33761"
+                <a .text-decoration-none.text-light.d-block> href='/about-us#map'
+                  "Dar es Salaam, Tanzania"
+                <a .my-2.text-decoration-none.text-light.d-block> href='tel:+255747637665'
+                  "+255 (0) 746 624 875"
+                <a .my-2.text-decoration-none.text-light.d-block> href='tel:+255222460157'
+                  "+255-22-246 0157"
+                <a .my-2.text-decoration-none.text-light.d-block> href='mailto:info@bafredo.co.tz'
+                  "info@bafredo.co.tz"
+              <div .col.mb-4>
+                <h1>
+                  "COMPANY INFORMATION"
+                <div .my-2>
+                  "Country of registration : Tanzania"
+                <div .my-2>
+                  "Registration Agency :"
+                  <a .text-decoration-none> href='https://www.brela.go.tz/'
+                    "BRELLA"
+                <div .my-2>
+                  "TIN NUMBER :"
+                  <a .certificate.text-decoration-none> href='/static/tin_number.pdf'
+                    "135-644-951"
+                <div .my-2>
+                  "Certificate of incorporation"
+                  <a .certificate.text-decoration-none> href='/static/certificate_of_incorporation.pdf'
+                    "120435"
+                <a .text-decoration-none.text-light.d-block> href='/about-us#map'
+                  "Dar es Salaam, Tanzania"
+                <a .my-2.text-decoration-none.text-light.d-block> href='tel:+255746624875'
+                  "+255 (0) 746 624 875"
+                <a .my-2.text-decoration-none.text-light.d-block> href='tel:+255222460157'
+                  "+255-22-246 0157"
+                <a .my-2.text-decoration-none.text-light.d-block> href='mailto:info@bafredo.co.tz'
+                  "info@bafredo.co.tz"
+              <div .col>
+                <h1>
+                  "POLICIES"
+                <div .d-flex.row>
+                  <a .my-1.text-decoration-none.text-white.router-link> href='/privacy-policy'
+                    "Privacy policy"
+                  <a .my-1.text-decoration-none.text-white.router-link> href='/terms-and-conditions'
+                    "Terms & Conditions"
+                <div .col.mt-4>
+                  <h1>
+                    "SUPPORT"
+                  <div .d-flex.row>
+                    <a .my-1.text-decoration-none.text-white.router-link> href='/faqs'
+                      "FAQ’s"
+                  <div .d-flex.row>
+                    <a .my-1.text-decoration-none.text-white.router-link> href='/about-us'
+                      "About Us"
+              <div .col>
+                <h1>
+                  "FOLLOW US"
+                <div .d-flex>
+                  <div .me-2.fs-2>
+                    <a> href='https://www.facebook.com/bafredonics/'
+                  <div .mx-2.fs-2>
+                    <a> href='https://www.youtube.com/channel/UC601Ys2fPPwhkmyhdp9MrhQ?vie'
+                  <div .mx-2.fs-2>
+                    <a> href='https://www.linkedin.com/company/bafredo-electronics-limited'
+                  <div .mx-2.fs-2>
+                    <a> href='https://www.instagram.com/bafredoelectronics/'
+                  <div .mx-2.fs-2>
+                    <a> href='https://twitter.com/bafredonics'
+        <div .bottom-nav.pt-2.d-flex.justify-content-center.align-items-center.text-white>
+          <p>
+            "Copyright 2026 BAFREDO Electronics Limited. All Rights Reserved."
+        <a .float> href='https://api.whatsapp.com/send/?phone=255746624875&text&type='

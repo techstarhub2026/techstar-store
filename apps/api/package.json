@@ -1,0 +1,54 @@
+{
+  "name": "@techstar/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "db:push": "dotenv -e ../../.env -- prisma db push",
+    "db:generate": "dotenv -e ../../.env -- prisma generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "dotenv -e ../../.env -- prisma studio",
+    "db:reset": "dotenv -e ../../.env -- prisma db push --force-reset && npm run db:seed",
+    "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
+    "predev": "node scripts/free-port.mjs",
+    "prestart": "node scripts/free-port.mjs",
+    "db:seed:site": "dotenv -e ../../.env -- tsx prisma/seed-site-content.mts",
+    "db:seed:services": "dotenv -e ../../.env -- tsx prisma/seed-services.mts",
+    "db:seed:offer": "dotenv -e ../../.env -- tsx prisma/seed-home-offer.mts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "ulid": "^2.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.2",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "dotenv-cli": "^7.4.4"
+  }
+}

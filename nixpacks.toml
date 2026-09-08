@@ -1,0 +1,22 @@
+# One service serving both the API and the built SPA from a single origin,
+# so the frontend's relative /api/v1 calls need no CORS and the refresh
+# cookie behaves as it does behind the Vite proxy in development.
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = [
+  # Prisma is invoked directly rather than via the db:generate script, which
+  # wraps it in `dotenv -e ../../.env` — that file exists only locally, and
+  # on Railway the environment is already populated.
+  "npx prisma generate --schema apps/api/prisma/schema.prisma",
+  "npm run build --workspace apps/api",
+  "npm run build --workspace apps/web",
+]
+
+[start]
+cmd = "node apps/api/dist/index.js"

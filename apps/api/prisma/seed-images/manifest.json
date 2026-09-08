@@ -1,0 +1,622 @@
+{
+  "note": "Demo assets only. Openly licensed images from Wikimedia Commons, retained with attribution. Replace with TechStar Store photography before launch.",
+  "fetchedAt": "2026-08-19T21:58:08.643Z",
+  "images": {
+    "arduino-uno": {
+      "file": "arduino-uno.jpg",
+      "bytes": 185002,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Arduino UNO board.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arduino_UNO_board.JPG",
+      "licence": "CC BY-SA 3.0",
+      "author": "Snewkirk7953"
+    },
+    "arduino-nano": {
+      "file": "arduino-nano.jpg",
+      "bytes": 132242,
+      "width": 900,
+      "height": 384,
+      "sourceTitle": "File:Arduino nano bottm.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arduino_nano_bottm.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "MakeMagazinDE"
+    },
+    "arduino-mega": {
+      "file": "arduino-mega.jpg",
+      "bytes": 172651,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Arduino MEGA 2560 R3, front side.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arduino_MEGA_2560_R3,_front_side.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Dsimic"
+    },
+    "raspberry-pi-4": {
+      "file": "raspberry-pi-4.jpg",
+      "bytes": 252495,
+      "width": 900,
+      "height": 601,
+      "sourceTitle": "File:Raspberry Pi 2 Model B v1.1 top new (bg cut out).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_2_Model_B_v1.1_top_new_(bg_cut_out).jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Multicherry"
+    },
+    "raspberry-pi-pico": {
+      "file": "raspberry-pi-pico.jpg",
+      "bytes": 306391,
+      "width": 900,
+      "height": 1029,
+      "sourceTitle": "File:Raspberry Pi Pico top and bottom.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_Pico_top_and_bottom.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Ogidya"
+    },
+    "raspberry-pi-zero": {
+      "file": "raspberry-pi-zero.jpg",
+      "bytes": 113391,
+      "width": 900,
+      "height": 616,
+      "sourceTitle": "File:Raspberry-Pi-Zero-FL.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Raspberry-Pi-Zero-FL.jpg",
+      "licence": "Public domain",
+      "author": "Evan-Amos"
+    },
+    "esp32": {
+      "file": "esp32.jpg",
+      "bytes": 382870,
+      "width": 900,
+      "height": 900,
+      "sourceTitle": "File:Espressif ESP-WROOM-32 Wi-Fi & Bluetooth Module.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Espressif_ESP-WROOM-32_Wi-Fi_%26_Bluetooth_Module.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Brian Krent"
+    },
+    "esp8266": {
+      "file": "esp8266.jpg",
+      "bytes": 164982,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:NodeMCU DEVKIT 0.8.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:NodeMCU_DEVKIT_0.8.JPG",
+      "licence": "CC BY-SA 4.0",
+      "author": "Vowstar"
+    },
+    "breadboard": {
+      "file": "breadboard.jpg",
+      "bytes": 133785,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Solderless Breadboard with LEDs.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Solderless_Breadboard_with_LEDs.jpg",
+      "licence": "Copyrighted free use",
+      "author": "en:User:Ilikefood"
+    },
+    "resistor": {
+      "file": "resistor.jpg",
+      "bytes": 46744,
+      "width": 900,
+      "height": 665,
+      "sourceTitle": "File:3 Resistors.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:3_Resistors.jpg",
+      "licence": "CC BY-SA 2.5",
+      "author": "Afrank99"
+    },
+    "capacitor": {
+      "file": "capacitor.jpg",
+      "bytes": 104745,
+      "width": 900,
+      "height": 524,
+      "sourceTitle": "File:Electrolytic capacitors-P1090328.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Electrolytic_capacitors-P1090328.JPG",
+      "licence": "CC0",
+      "author": "Elcap"
+    },
+    "inductor": {
+      "file": "inductor.jpg",
+      "bytes": 97218,
+      "sourceTitle": "File:Toroidal inductor.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Toroidal_inductor.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Peripitus"
+    },
+    "transistor": {
+      "file": "transistor.jpg",
+      "bytes": 278566,
+      "width": 900,
+      "height": 755,
+      "sourceTitle": "File:Transistors.agr.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Transistors.agr.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "ArnoldReinhold"
+    },
+    "ic-555": {
+      "file": "ic-555.jpg",
+      "bytes": 49778,
+      "width": 900,
+      "height": 718,
+      "sourceTitle": "File:NE555 DIP & SOIC.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:NE555_DIP_%26_SOIC.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Swift.Hg"
+    },
+    "ic-7400": {
+      "file": "ic-7400.jpg",
+      "bytes": 144847,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Integrated circuit on microchip.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Integrated_circuit_on_microchip.jpg",
+      "licence": "Public domain",
+      "author": "Unknown"
+    },
+    "ic-socket": {
+      "file": "ic-socket.jpg",
+      "bytes": 309909,
+      "width": 900,
+      "height": 644,
+      "sourceTitle": "File:IBM PC Motherboard (1981).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:IBM_PC_Motherboard_(1981).jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "German"
+    },
+    "potentiometer": {
+      "file": "potentiometer.jpg",
+      "bytes": 127866,
+      "width": 900,
+      "height": 720,
+      "sourceTitle": "File:Single-turn potentiometer with internals exposed, oblique view.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Single-turn_potentiometer_with_internals_exposed,_oblique_view.jpg",
+      "licence": "CC0",
+      "author": "Junkyardsparkle"
+    },
+    "servo-motor": {
+      "file": "servo-motor.jpg",
+      "bytes": 89993,
+      "width": 900,
+      "height": 534,
+      "sourceTitle": "File:Two hobby servo motors.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Two_hobby_servo_motors.jpg",
+      "licence": "Public domain",
+      "author": "Kborer"
+    },
+    "stepper-motor": {
+      "file": "stepper-motor.jpg",
+      "bytes": 132673,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Stepper motor 1.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Stepper_motor_1.jpg",
+      "licence": "CC BY 3.0",
+      "author": "Dolly1010"
+    },
+    "dc-motor": {
+      "file": "dc-motor.jpg",
+      "bytes": 123491,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Electric Motor Rotor.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Electric_Motor_Rotor.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Richard Wheeler (Zephyris)"
+    },
+    "buzzer": {
+      "file": "buzzer.jpg",
+      "bytes": 168416,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:2007-07-24 Piezoelectric buzzer.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2007-07-24_Piezoelectric_buzzer.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Gophi"
+    },
+    "ultrasonic-sensor": {
+      "file": "ultrasonic-sensor.jpg",
+      "bytes": 126603,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:HC SR04 Ultrasonic sensor 1480319 20 21 HDR Enhancer.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:HC_SR04_Ultrasonic_sensor_1480319_20_21_HDR_Enhancer.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Nevit Dilmen (talk)"
+    },
+    "temperature-sensor": {
+      "file": "temperature-sensor.jpg",
+      "bytes": 304585,
+      "width": 900,
+      "height": 1200,
+      "sourceTitle": "File:Dht11 term and humidity sensor.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dht11_term_and_humidity_sensor.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Crackopl"
+    },
+    "ldr-sensor": {
+      "file": "ldr-sensor.jpg",
+      "bytes": 118052,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Photoresistor with orange background-7536.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Photoresistor_with_orange_background-7536.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Raimond Spekking"
+    },
+    "ir-sensor": {
+      "file": "ir-sensor.jpg",
+      "bytes": 18380,
+      "width": 900,
+      "height": 389,
+      "sourceTitle": "File:Infrared Transceiver Circuit.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Infrared_Transceiver_Circuit.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "www.robotplatform.com"
+    },
+    "lcd-display": {
+      "file": "lcd-display.jpg",
+      "bytes": 97921,
+      "width": 900,
+      "height": 479,
+      "sourceTitle": "File:LCD display 16x2 alphanumeric.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LCD_display_16x2_alphanumeric.jpg",
+      "licence": "Public domain",
+      "author": "User:Mike1024"
+    },
+    "seven-segment": {
+      "file": "seven-segment.jpg",
+      "bytes": 54157,
+      "width": 900,
+      "height": 645,
+      "sourceTitle": "File:LED-7-Segment-Display.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LED-7-Segment-Display.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "RetroEditor"
+    },
+    "jumper-wires": {
+      "file": "jumper-wires.jpg",
+      "bytes": 112160,
+      "width": 900,
+      "height": 201,
+      "sourceTitle": "File:Cjam-lego-traffic-lights-pigtail.png",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cjam-lego-traffic-lights-pigtail.png",
+      "licence": "CC0",
+      "author": "Andy Oakley"
+    },
+    "usb-cable": {
+      "file": "usb-cable.jpg",
+      "bytes": 79228,
+      "width": 900,
+      "height": 837,
+      "sourceTitle": "File:USB Cable Type A-1 PNr\u00b00002.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:USB_Cable_Type_A-1_PNr%C2%B00002.jpg",
+      "licence": "CC BY-SA 3.0 at",
+      "author": "D-Kuru"
+    },
+    "micro-sd": {
+      "file": "micro-sd.jpg",
+      "bytes": 120116,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:MicroSD card 2GB focus-stacked.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:MicroSD_card_2GB_focus-stacked.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Afrank99"
+    },
+    "solder-wire": {
+      "file": "solder-wire.jpg",
+      "bytes": 160982,
+      "width": 900,
+      "height": 1023,
+      "sourceTitle": "File:Rosin core solder.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Rosin_core_solder.JPG",
+      "licence": "CC BY-SA 3.0",
+      "author": "Kevin Hadley"
+    },
+    "multimeter": {
+      "file": "multimeter.jpg",
+      "bytes": 453566,
+      "width": 900,
+      "height": 1580,
+      "sourceTitle": "File:Multimeter Gossen Metra Hit.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Multimeter_Gossen_Metra_Hit.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Harke"
+    },
+    "oscilloscope": {
+      "file": "oscilloscope.jpg",
+      "bytes": 137310,
+      "width": 900,
+      "height": 574,
+      "sourceTitle": "File:Digitaloszilloskop IMGP1971 WP.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Digitaloszilloskop_IMGP1971_WP.jpg",
+      "licence": "FAL",
+      "author": "smial"
+    },
+    "solar-panel": {
+      "file": "solar-panel.jpg",
+      "bytes": 426422,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Placa solar para ganado.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Placa_solar_para_ganado.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Unknown"
+    },
+    "battery-18650": {
+      "file": "battery-18650.jpg",
+      "bytes": 152564,
+      "width": 900,
+      "height": 833,
+      "sourceTitle": "File:Lithium-Ion Cell cylindric.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lithium-Ion_Cell_cylindric.JPG",
+      "licence": "CC BY-SA 3.0",
+      "author": "RudolfSimon"
+    },
+    "battery-holder": {
+      "file": "battery-holder.jpg",
+      "bytes": 47389,
+      "width": 900,
+      "height": 598,
+      "sourceTitle": "File:6x AA battery holder with DC plug.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:6x_AA_battery_holder_with_DC_plug.jpg",
+      "licence": "CC BY 2.0",
+      "author": "Limor from New York CIty, USA"
+    },
+    "pcb": {
+      "file": "pcb.jpg",
+      "bytes": 268884,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Printed Circuit Board 2.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Printed_Circuit_Board_2.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Balurbala"
+    },
+    "perfboard": {
+      "file": "perfboard.jpg",
+      "bytes": 101841,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:Copper trace side of stripboard, with leads protruding outward.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Copper_trace_side_of_stripboard,_with_leads_protruding_outward.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Morahman7vn"
+    },
+    "heat-sink": {
+      "file": "heat-sink.jpg",
+      "bytes": 153113,
+      "width": 900,
+      "height": 677,
+      "sourceTitle": "File:Prozessorkuehler komponenten IMGP5332 wp.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Prozessorkuehler_komponenten_IMGP5332_wp.jpg",
+      "licence": "FAL",
+      "author": "smial (talk)"
+    },
+    "screwdriver-set": {
+      "file": "screwdriver-set.jpg",
+      "bytes": 313770,
+      "width": 900,
+      "height": 1191,
+      "sourceTitle": "File:100pc security bit set.jpeg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:100pc_security_bit_set.jpeg",
+      "licence": "CC0",
+      "author": "David Condrey"
+    },
+    "pliers": {
+      "file": "pliers.jpg",
+      "bytes": 39045,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:Basic NeedleNose Pliers.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Basic_NeedleNose_Pliers.jpg",
+      "licence": "CC BY-SA 2.0",
+      "author": "oomlout"
+    },
+    "wire-stripper": {
+      "file": "wire-stripper.jpg",
+      "bytes": 242570,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:HOZANTOOL.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:HOZANTOOL.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "MS300"
+    },
+    "glue-gun": {
+      "file": "glue-gun.jpg",
+      "bytes": 142871,
+      "width": 900,
+      "height": 413,
+      "sourceTitle": "File:Glue gun for cartridge.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Glue_gun_for_cartridge.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Cjp24"
+    },
+    "drone": {
+      "file": "drone.jpg",
+      "bytes": 92390,
+      "width": 900,
+      "height": 572,
+      "sourceTitle": "File:2015 Dron DJI Phantom 3 Advanced.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2015_Dron_DJI_Phantom_3_Advanced.JPG",
+      "licence": "CC BY-SA 4.0",
+      "author": "Jacek Halicki"
+    },
+    "robot-kit": {
+      "file": "robot-kit.jpg",
+      "bytes": 189237,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Hydraulic toy robot arm.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hydraulic_toy_robot_arm.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Scoid"
+    },
+    "gsm-module": {
+      "file": "gsm-module.jpg",
+      "bytes": 99367,
+      "width": 900,
+      "height": 462,
+      "sourceTitle": "File:GSM-Shield for Arduino.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:GSM-Shield_for_Arduino.jpg",
+      "licence": "CC0",
+      "author": "Ordercrazy"
+    },
+    "gps-module": {
+      "file": "gps-module.jpg",
+      "bytes": 112904,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:Adafruit GPS Module Breakout.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Adafruit_GPS_Module_Breakout.jpg",
+      "licence": "CC BY-SA 2.0",
+      "author": "oomlout"
+    },
+    "bluetooth-module": {
+      "file": "bluetooth-module.jpg",
+      "bytes": 89864,
+      "width": 900,
+      "height": 540,
+      "sourceTitle": "File:Sparkfun Bluetooth breakout board.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sparkfun_Bluetooth_breakout_board.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "WillWare"
+    },
+    "camera_module": {
+      "file": "camera_module.jpg",
+      "bytes": 425290,
+      "width": 900,
+      "height": 720,
+      "sourceTitle": "File:Raspberry Pi A+ Camera Module (15924841321).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_A%2B_Camera_Module_(15924841321).jpg",
+      "licence": "CC BY 2.0",
+      "author": "Craig Berscheidt"
+    },
+    "cctv-camera": {
+      "file": "cctv-camera.jpg",
+      "bytes": 112282,
+      "sourceTitle": "File:CCTV Camera Philippines at Gigaworkz Technologies Inc.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:CCTV_Camera_Philippines_at_Gigaworkz_Technologies_Inc.JPG",
+      "licence": "CC BY-SA 4.0",
+      "author": "Gibson Torreon C"
+    },
+    "fingerprint-sensor": {
+      "file": "fingerprint-sensor.jpg",
+      "bytes": 86366,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Fingerprint scanner 2.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fingerprint_scanner_2.jpg",
+      "licence": "CC BY-SA 2.5",
+      "author": "Mark Pellegrini"
+    },
+    "load-cell": {
+      "file": "load-cell.jpg",
+      "bytes": 71204,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:LoadCell Waegezelle.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LoadCell_Waegezelle.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Make Magazin DE"
+    },
+    "buck-converter": {
+      "file": "buck-converter.jpg",
+      "bytes": 143146,
+      "width": 900,
+      "height": 656,
+      "sourceTitle": "File:LM2596 buck converter module, MP1584 buck converter module, and SDB628 boost converter module.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LM2596_buck_converter_module,_MP1584_buck_converter_module,_and_SDB628_boost_converter_module.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Matthew Berardi"
+    },
+    "connector-header": {
+      "file": "connector-header.jpg",
+      "bytes": 85903,
+      "width": 900,
+      "height": 900,
+      "sourceTitle": "File:Header - 2x5 Pin (Female, 1.27mm) (48103503488).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Header_-_2x5_Pin_(Female,_1.27mm)_(48103503488).jpg",
+      "licence": "CC BY 2.0",
+      "author": "SparkFun Electronics from Boulder, USA"
+    },
+    "terminal-block": {
+      "file": "terminal-block.jpg",
+      "bytes": 158046,
+      "width": 900,
+      "height": 1091,
+      "sourceTitle": "File:PhoenixConnector.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:PhoenixConnector.jpg",
+      "licence": "Public domain",
+      "author": "Unknown"
+    },
+    "ribbon-cable": {
+      "file": "ribbon-cable.jpg",
+      "bytes": 158431,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:Box of ribbon cables (17161239300).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Box_of_ribbon_cables_(17161239300).jpg",
+      "licence": "CC BY 2.0",
+      "author": "Kevin Savetz"
+    },
+    "fuse": {
+      "file": "fuse.jpg",
+      "bytes": 106811,
+      "width": 900,
+      "height": 610,
+      "sourceTitle": "File:Selection of Fuses.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Selection_of_Fuses.JPG",
+      "licence": "CC BY-SA 4.0",
+      "author": "Pfnicholls"
+    },
+    "transformer": {
+      "file": "transformer.jpg",
+      "bytes": 89564,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:Coil - Step 5. (1830120256).jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Coil_-_Step_5._(1830120256).jpg",
+      "licence": "CC BY 2.0",
+      "author": "Windell Oskay from Sunnyvale, CA, USA"
+    },
+    "logic-analyzer": {
+      "file": "logic-analyzer.jpg",
+      "bytes": 141519,
+      "width": 900,
+      "height": 675,
+      "sourceTitle": "File:HP 1650B Logic Analyzer.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:HP_1650B_Logic_Analyzer.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Whiteknight"
+    },
+    "calculator": {
+      "file": "calculator.jpg",
+      "bytes": 258368,
+      "width": 900,
+      "height": 1280,
+      "sourceTitle": "File:Sharp Scientific Calculator.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sharp_Scientific_Calculator.jpg",
+      "licence": "CC BY-SA 2.0",
+      "author": "Matti Blume"
+    },
+    "keyboard": {
+      "file": "keyboard.jpg",
+      "bytes": 188713,
+      "width": 900,
+      "height": 600,
+      "sourceTitle": "File:Lingbao JIGUANSHI Mechanical Gaming Keyboard.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lingbao_JIGUANSHI_Mechanical_Gaming_Keyboard.jpg",
+      "licence": "CC BY-SA 4.0",
+      "author": "Morn"
+    },
+    "mouse": {
+      "file": "mouse.jpg",
+      "bytes": 427024,
+      "width": 900,
+      "height": 1065,
+      "sourceTitle": "File:Optical mouse.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Optical_mouse.jpg",
+      "licence": "CC BY-SA 3.0",
+      "author": "Rasbak"
+    }
+  }
+}

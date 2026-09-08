@@ -1,0 +1,206 @@
+[
+ {
+  "name": "ARUSHA",
+  "districts": [
+   "Arusha City",
+   "Arumeru",
+   "Karatu",
+   "Longido",
+   "Monduli",
+   "Ngorongoro"
+  ]
+ },
+ {
+  "name": "DAR-ES-SALAAM",
+  "districts": [
+   "ILALA",
+   "ILALA CBD",
+   "KIGAMBONI",
+   "KINONDONI",
+   "TEMEKE",
+   "UBUNGO"
+  ]
+ },
+ {
+  "name": "DODOMA",
+  "districts": [
+   "Dodoma Urban",
+   "Bahi",
+   "Chamwino",
+   "Chemba",
+   "Kondoa",
+   "Kongwa",
+   "Mpwapwa"
+  ]
+ },
+ {
+  "name": "GEITA",
+  "districts": [
+   "Geita"
+  ]
+ },
+ {
+  "name": "IRINGA",
+  "districts": [
+   "Iringa"
+  ]
+ },
+ {
+  "name": "KAGERA",
+  "districts": [
+   "Kagera"
+  ]
+ },
+ {
+  "name": "KATAVI",
+  "districts": [
+   "Katavi"
+  ]
+ },
+ {
+  "name": "KIGOMA",
+  "districts": [
+   "Kigoma"
+  ]
+ },
+ {
+  "name": "KILIMANJARO",
+  "districts": [
+   "Moshi Urban",
+   "Moshi Rural",
+   "Hai",
+   "Rombo",
+   "Same",
+   "Mwanga",
+   "Siha"
+  ]
+ },
+ {
+  "name": "LINDI",
+  "districts": [
+   "Lindi"
+  ]
+ },
+ {
+  "name": "MANYARA",
+  "districts": [
+   "Manyara"
+  ]
+ },
+ {
+  "name": "MARA",
+  "districts": [
+   "Mara"
+  ]
+ },
+ {
+  "name": "MBEYA",
+  "districts": [
+   "Mbeya City",
+   "Chunya",
+   "Kyela",
+   "Mbarali",
+   "Rungwe",
+   "Mbeya Rural"
+  ]
+ },
+ {
+  "name": "MOROGORO",
+  "districts": [
+   "Morogoro Urban",
+   "Morogoro Rural",
+   "Kilombero",
+   "Kilosa",
+   "Mvomero",
+   "Ulanga",
+   "Gairo",
+   "Malinyi"
+  ]
+ },
+ {
+  "name": "MTWARA",
+  "districts": [
+   "Mtwara"
+  ]
+ },
+ {
+  "name": "MWANZA",
+  "districts": [
+   "Nyamagana",
+   "Ilemela",
+   "Buchosa",
+   "Kwimba",
+   "Magu",
+   "Misungwi",
+   "Sengerema",
+   "Ukerewe"
+  ]
+ },
+ {
+  "name": "NJOMBE",
+  "districts": [
+   "Njombe"
+  ]
+ },
+ {
+  "name": "PWANI",
+  "districts": [
+   "Pwani"
+  ]
+ },
+ {
+  "name": "RUKWA",
+  "districts": [
+   "Rukwa"
+  ]
+ },
+ {
+  "name": "RUVUMA",
+  "districts": [
+   "Ruvuma"
+  ]
+ },
+ {
+  "name": "SHINYANGA",
+  "districts": [
+   "Shinyanga"
+  ]
+ },
+ {
+  "name": "SIMIYU",
+  "districts": [
+   "Simiyu"
+  ]
+ },
+ {
+  "name": "SINGIDA",
+  "districts": [
+   "Singida"
+  ]
+ },
+ {
+  "name": "SONGWE",
+  "districts": [
+   "Songwe"
+  ]
+ },
+ {
+  "name": "TABORA",
+  "districts": [
+   "Tabora"
+  ]
+ },
+ {
+  "name": "TANGA",
+  "districts": [
+   "Tanga City",
+   "Handeni",
+   "Korogwe",
+   "Lushoto",
+   "Muheza",
+   "Pangani",
+   "Kilindi",
+   "Mkinga"
+  ]
+ }
+]

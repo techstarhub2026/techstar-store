@@ -1,0 +1,261 @@
+<h1 class="part"><span class="num">Part Fifteen</span>Media Pipeline</h1>
+
+<h2>15.1 Upload flow</h2>
+<pre>Browser                          API                          Worker
+───────                          ───                          ──────
+select / drop files
+  ├─ client-side pre-check
+  │   type, size, dimensions      (fail fast, no round trip)
+  └─ POST /admin/media  ──────▶  multer memory storage
+                                  ├─ magic-byte type sniff
+                                  ├─ size + dimension caps
+                                  ├─ sharp: decode → re-encode
+                                  │   (strips EXIF and any payload)
+                                  ├─ SHA-256 → dedupe check
+                                  ├─ write original as WebP q82
+                                  ├─ INSERT media_files
+                                  └─ enqueue derivatives ─────▶ generate sm/md/lg
+  ◀── 201 { id, lg, status:"processing" }                       update derivatives JSON
+                                                                emit socket event
+  ◀────────────────────── "ready" ───────────────────────────────┘</pre>
+<p>The response returns before derivatives exist so the interface is never blocked by image processing. The uploader shows a "processing" shimmer on the thumbnail until the ready event arrives, or until a poll confirms it.</p>
+
+<h2>15.2 Derivative sizes</h2>
+<table class="compact">
+  <thead><tr><th style="width:14mm">Key</th><th style="width:26mm">Width</th><th style="width:22mm">Fit</th><th>Used by</th></tr></thead>
+  <tbody>
+    <tr><td><code>sm</code></td><td>200 px</td><td>contain, white pad</td><td>Cart and wishlist rows, gallery thumbnails, admin table rows</td></tr>
+    <tr><td><code>md</code></td><td>600 px</td><td>contain, white pad</td><td>Product cards in grids and carousels</td></tr>
+    <tr><td><code>lg</code></td><td>1400 px max</td><td>inside, no upscale</td><td>Product detail hero, lightbox, banners</td></tr>
+  </tbody>
+</table>
+<p>All derivatives are WebP at quality 82, with a JPEG fallback generated only if analytics ever show meaningful traffic from browsers without WebP support — as of now, none does. Names are content-addressed: <code>{publicId}-{key}-{checksum8}.webp</code>, so a re-upload can never be served from a stale cache. Cache headers are <code>public, max-age=31536000, immutable</code>.</p>
+<div class="note">
+  <span class="lbl">Two corrections to the reference platform's pipeline</span>
+  It applies a <em>face-detection</em> crop (<code>g_face</code>) to photographs of circuit boards, which is meaningless and occasionally crops the subject out. TechStar uses <code>contain</code> with white padding, so a component photographed on a white background is never cut. And its three sizes carry inconsistent version segments, so they can drift apart after a re-upload; content-addressed names make that impossible.
+</div>
+
+<h2>15.3 Storage adapters</h2>
+<pre>interface StorageAdapter {
+  put(key: string, body: Buffer, contentType: string): Promise&lt;void&gt;
+  get(key: string): Promise&lt;Buffer&gt;
+  delete(key: string): Promise&lt;void&gt;
+  exists(key: string): Promise&lt;boolean&gt;
+  publicUrl(key: string): string
+}</pre>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Adapter</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>local</code></td><td>Writes under <code>MEDIA_ROOT</code>, outside the web root, sharded two levels by the ULID's first four characters so no directory grows unbounded. Served by Nginx with execution disabled. The default.</td></tr>
+    <tr><td><code>s3</code></td><td>Any S3-compatible endpoint. Objects private; served through CloudFront or an equivalent, or by signed URL.</td></tr>
+    <tr><td><code>cloudinary</code></td><td>For parity with the reference platform's hosting, should it ever be wanted. Derivatives are still generated locally so the URL contract does not change.</td></tr>
+  </tbody>
+</table>
+
+<h2>15.4 Cleanup and orphans</h2>
+<ul>
+  <li><code>media_files.reference_count</code> is incremented and decremented in the same transaction as the referencing row.</li>
+  <li>A nightly job soft-deletes files with zero references older than 24 hours — the delay covers an upload whose form was never submitted.</li>
+  <li>A weekly job hard-deletes soft-deleted files older than 30 days and removes their bytes.</li>
+  <li>A monthly reconciliation compares storage keys against database rows in both directions and reports discrepancies rather than acting on them.</li>
+  <li>Deleting a referenced file is refused by the API before the foreign key has to intervene, with a message naming what references it.</li>
+</ul>
+
+<h1 class="part"><span class="num">Part Sixteen</span>Search, Filtering, Sorting, Pagination</h1>
+
+<h2>16.1 Engine choice</h2>
+<div class="decision">
+  <span class="lbl">MySQL full-text at launch; a dedicated engine only when measurement demands it</span>
+  At 617 products — and at ten times that — MySQL's InnoDB full-text index with the tuning in §9.4 returns results in single-digit milliseconds. Adding Elasticsearch or Meilisearch on day one buys typo tolerance and synonyms at the cost of a second datastore to run, secure, back up and keep in sync. The trigger for revisiting is explicit: the catalogue passes 20,000 products, or the zero-result rate exceeds 15% and is traceable to matching rather than to genuine catalogue gaps. The search service is written behind an interface so the swap is contained.
+</div>
+
+<h2>16.2 Query grammar and ranking</h2>
+<p>A search runs four passes and returns them in this order, deduplicated. Ordering by relevance means ordering by which pass matched.</p>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Pass</th><th style="width:40mm">Match</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Exact SKU, or exact manufacturer part number</td><td>Someone typing <code>74HC14</code> or <code>0510003</code> wants that part and nothing else. This pass short-circuits: a hit here returns immediately.</td></tr>
+    <tr><td>2</td><td>Name prefix (<code>name LIKE 'term%'</code>)</td><td>Prefix matches are near-certain intent.</td></tr>
+    <tr><td>3</td><td>Name contains</td><td>Catches mid-string matches like "uno" in "Arduino Uno R3".</td></tr>
+    <tr><td>4</td><td><code>MATCH … AGAINST</code> in boolean mode over name, description, brand and MPN</td><td>Full-text relevance, with name weighted 4×, brand and MPN 2×, description 1×.</td></tr>
+  </tbody>
+</table>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Normalisation</td><td>Lowercase, trim, collapse whitespace, strip punctuation except <code>-</code>, <code>.</code> and <code>/</code>, which carry meaning in part numbers.</td></tr>
+    <tr><td>Multi-word</td><td>All terms required (boolean <code>+</code>), then relevance-ordered. "arduino uno" must not return every Arduino.</td></tr>
+    <tr><td>Short tokens</td><td><code>innodb_ft_min_token_size = 2</code> with an empty stopword table, so "IC", "DC" and "5V" are searchable.</td></tr>
+    <tr><td>Suggestions</td><td>Spelling suggestions come from a term dictionary built nightly from product names, matched by trigram similarity within an edit distance of 2, and only offered when the original returned nothing.</td></tr>
+    <tr><td>Synonyms</td><td>A small hand-maintained table for this trade: resistor ↔ resistance, capacitor ↔ cap, LED ↔ light emitting diode, pot ↔ potentiometer, uC ↔ microcontroller, PSU ↔ power supply. Editable in the admin console.</td></tr>
+    <tr><td>Filters</td><td>Applied as SQL predicates after matching, never in the application layer, so pagination totals stay correct.</td></tr>
+    <tr><td>Highlighting</td><td>Performed client-side on the returned names, so the server does not have to escape and return HTML.</td></tr>
+  </tbody>
+</table>
+
+<h2>16.3 Facets</h2>
+<p>Facet counts are computed in one additional aggregate query against the same filtered set, so a count never contradicts the grid beneath it. Price bands are derived from the actual distribution in scope — quartiles rounded to readable boundaries — rather than fixed bands that would be empty for most subcategories.</p>
+
+<h2>16.4 Search analytics</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Signal</th><th>Captured how, used for what</th></tr></thead>
+  <tbody>
+    <tr><td>Term and result count</td><td>Written once per distinct term per session, on submit — not per keystroke, which is what makes the reference platform's search table too noisy to act on.</td></tr>
+    <tr><td>Zero results</td><td>Surfaced first in the admin console with a "Create product" shortcut. This is the highest-value report in the system: it is customers telling you exactly what to stock.</td></tr>
+    <tr><td>Click-through</td><td><code>clicked_product_id</code> written when a result is opened. Terms with many searches and no clicks indicate matching that finds the wrong things.</td></tr>
+    <tr><td>Trends</td><td>Week-over-week movement per term, to catch seasonal and course-driven demand.</td></tr>
+  </tbody>
+</table>
+
+<h2>16.5 Pagination contracts</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Context</th><th>Strategy</th></tr></thead>
+  <tbody>
+    <tr><td>Catalogue, search, admin lists</td><td>Offset pagination with a total count. Page size default 24, maximum 100. Predictable page numbers matter more than raw speed at this scale. Fixes defect R17.</td></tr>
+    <tr><td>Audit log, order events, search logs</td><td>Cursor pagination on <code>(created_at, id)</code>. These grow without bound and a deep offset scan on them is a slow query waiting to happen.</td></tr>
+    <tr><td>Exports</td><td>Streamed in 1,000-row chunks; never materialised in memory.</td></tr>
+    <tr><td>Carousels</td><td>Fixed 24-item fetch, no pagination.</td></tr>
+  </tbody>
+</table>
+
+<h1 class="part"><span class="num">Part Seventeen</span>Messaging: Email, SMS, Realtime, Campaigns</h1>
+
+<h2>17.1 Transactional email</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Trigger</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>Welcome / verify email</td><td>Verification link, 24-hour validity stated.</td></tr>
+    <tr><td>Order placed</td><td>Order number, items, totals, delivery method and address, payment instructions for the chosen method.</td></tr>
+    <tr><td>Payment received (recorded)</td><td>Acknowledgement that details were received and verification is pending.</td></tr>
+    <tr><td>Payment confirmed</td><td>Receipt with the transaction reference.</td></tr>
+    <tr><td>Order shipped</td><td>Tracking reference where available, estimated delivery window.</td></tr>
+    <tr><td>Order delivered</td><td>Thank-you, plus a review invitation sent separately 3 days later.</td></tr>
+    <tr><td>Order cancelled / expired</td><td>Reason, and a one-click reorder link.</td></tr>
+    <tr><td>Delegated payment request</td><td>To the nominated payer: who asked, what for, how much, the payment link.</td></tr>
+    <tr><td>Password reset · Password changed</td><td>Reset link; and a security notice to the address on file after any change.</td></tr>
+    <tr><td>Back in stock</td><td>To everyone on <code>notify_requests</code> for that variant.</td></tr>
+    <tr><td>Invoice sent</td><td>PDF attached plus the share link.</td></tr>
+    <tr><td>Staff invitation</td><td>Single-use link, 7-day validity.</td></tr>
+    <tr><td>Low stock digest</td><td>Daily to staff holding <code>stock.read</code>.</td></tr>
+  </tbody>
+</table>
+<p>Templates are React Email components rendering to both HTML and plain text, sharing one layout: TechStar header, content, footer with contact details and, for marketing mail only, an unsubscribe link. Transactional mail carries no unsubscribe, because a receipt is not marketing. SPF, DKIM and DMARC must be configured before launch; without them, delivery to Gmail addresses is unreliable regardless of code quality.</p>
+
+<h2>17.2 SMS</h2>
+<p>SMS matters more than email in this market — a Tanzanian customer will see an SMS within minutes and an email possibly never. Sent for: order placed, payment confirmed, order shipped, order ready for pickup, and the 36-hour expiry warning. Kept under 160 GSM-7 characters so each is one segment. The adapter interface:</p>
+<pre>interface SmsProvider {
+  send(to: string, message: string, opts?: { senderId?: string })
+    : Promise&lt;{ messageId: string; segments: number; cost?: Money }&gt;
+  sendBulk(messages: { to: string; message: string }[])
+    : Promise&lt;BulkResult&gt;
+  deliveryStatus(messageId: string): Promise&lt;DeliveryStatus&gt;
+  balance(): Promise&lt;Money&gt;
+}</pre>
+<p>Implementations for Beem Africa and NextSMS, plus a console stub for development. Numbers are canonicalised to <code>255XXXXXXXXX</code> before sending. A sender ID must be registered with the operators in advance — allow two to three weeks for this in the launch plan, because it cannot be hurried and blocks go-live.</p>
+
+<h2>17.3 Realtime events</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Channel</th><th>Events</th></tr></thead>
+  <tbody>
+    <tr><td><code>admin:orders</code></td><td><code>order.placed</code>, <code>order.payment_recorded</code>, <code>order.cancelled</code> — drives the queue insertion and the chime.</td></tr>
+    <tr><td><code>admin:alerts</code></td><td><code>stock.low</code>, <code>webhook.failed</code>, <code>comment.pending</code>, <code>review.pending</code> — drives the bell badge.</td></tr>
+    <tr><td><code>order:{orderNumber}</code></td><td><code>status.changed</code>, <code>payment.confirmed</code> — drives the live strip on the confirmation page.</td></tr>
+    <tr><td><code>user:{publicId}</code></td><td><code>cart.updated</code> for multi-tab and multi-device consistency.</td></tr>
+  </tbody>
+</table>
+<p>Every connection is authenticated with the access token at handshake and re-authenticated on refresh; channel subscription is authorised per channel. This closes defect R9's second half. Redis is used as the Socket.IO adapter so events reach every application instance.</p>
+
+<h2>17.4 Campaign engine</h2>
+<pre>compose ─▶ save draft ─▶ resolve audience ─▶ estimate ─▶ confirm
+                                │                          │
+                                │  excludes: no consent,    │
+                                │  unsubscribed, invalid,   │
+                                │  duplicates               │
+                                ▼                          ▼
+                        campaign_recipients rows      enqueue BullMQ job
+                        (status: queued)                    │
+                                                            ▼
+                                            rate-limited worker
+                                            ├─ 20 SMS/s, 10 email/s
+                                            ├─ per-recipient retry ×3
+                                            │  with exponential backoff
+                                            ├─ update recipient status
+                                            └─ update campaign counters
+                                                            │
+                                                            ▼
+                                            delivery receipts (webhook)
+                                            update delivered / failed</pre>
+<p>A scheduled campaign is a delayed job; cancelling before it fires removes it. A campaign in <code>sending</code> can be paused, which stops the worker taking new recipients without losing those already sent. Every send is audited with actor, audience size and cost.</p>
+
+<h2>17.5 Queues</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Queue</th><th>Jobs · concurrency · retry</th></tr></thead>
+  <tbody>
+    <tr><td><code>email</code></td><td>Transactional sends · 5 · 3 attempts, exponential backoff</td></tr>
+    <tr><td><code>sms</code></td><td>Transactional sends · 5 · 3 attempts</td></tr>
+    <tr><td><code>campaign</code></td><td>Bulk fan-out · 2 · per-recipient retry</td></tr>
+    <tr><td><code>media</code></td><td>Derivative generation · 3 · 2 attempts</td></tr>
+    <tr><td><code>webhook</code></td><td>Payment event processing · 5 · 5 attempts</td></tr>
+    <tr><td><code>scheduled</code></td><td>Reservation expiry (every 5 min) · stock digest (daily 07:00) · media cleanup (nightly) · session purge (nightly) · search dictionary rebuild (nightly) · payment status sweep (every 30 min) · financial invariant check (nightly)</td></tr>
+  </tbody>
+</table>
+<p>Every queue has a dead-letter queue and an admin view listing failed jobs with their error and a retry action. A failed job that nobody can see is a silent outage.</p>
+
+<h1 class="part"><span class="num">Part Eighteen</span>Analytics and Reporting</h1>
+
+<h2>18.1 Metric definitions</h2>
+<p>Ambiguity in a metric definition is worse than not having the metric. These are normative.</p>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Metric</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>Revenue</td><td>Sum of <code>total_amount</code> for orders whose <code>paid_at</code> falls in the period. Recognised on payment, not on placement — an unpaid order is not revenue.</td></tr>
+    <tr><td>Orders</td><td>Count of orders whose <code>placed_at</code> falls in the period, excluding <code>EXPIRED</code>. Cancelled orders are included, because cancellation rate is itself a signal.</td></tr>
+    <tr><td>Average order value</td><td>Revenue ÷ paid order count.</td></tr>
+    <tr><td>Conversion</td><td>Orders placed ÷ distinct sessions that added at least one item to a cart.</td></tr>
+    <tr><td>Units sold</td><td>Sum of <code>order_items.quantity</code> for paid orders.</td></tr>
+    <tr><td>New customers</td><td>Users whose <code>created_at</code> falls in the period.</td></tr>
+    <tr><td>Repeat rate</td><td>Customers with two or more paid orders ÷ customers with at least one, over a trailing 12 months.</td></tr>
+    <tr><td>Search success</td><td>Searches with at least one result and a click ÷ all searches.</td></tr>
+    <tr><td>Payment lag</td><td>Median minutes from <code>placed_at</code> to <code>paid_at</code> for Lipa Namba orders.</td></tr>
+    <tr><td>Fulfilment lead time</td><td>Median hours from <code>paid_at</code> to <code>shipped_at</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>18.2 Aggregation approach</h2>
+<p>Dashboard queries run against a small set of hand-written SQL statements using window functions and CTEs — this is where the ORM is set aside deliberately. Two things keep them fast: a date-spine CTE so that periods with no orders still produce a zero row (otherwise charts silently skip days), and the denormalised <code>paid_at</code>, <code>shipped_at</code> and <code>delivered_at</code> columns on <code>orders</code>, which avoid joining the event log for every chart.</p>
+<pre>-- Revenue and order count by month, last 12 months, with zero-filled gaps
+WITH RECURSIVE spine AS (
+  SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 11 MONTH), '%Y-%m-01') AS d
+  UNION ALL
+  SELECT DATE_ADD(d, INTERVAL 1 MONTH) FROM spine
+  WHERE d &lt; DATE_FORMAT(CURDATE(), '%Y-%m-01')
+)
+SELECT  DATE_FORMAT(s.d, '%Y-%m')                AS bucket,
+        COALESCE(SUM(o.total_amount), 0)         AS revenue,
+        COUNT(o.id)                              AS orders
+FROM    spine s
+LEFT JOIN orders o
+       ON o.paid_at &gt;= s.d
+      AND o.paid_at &lt;  DATE_ADD(s.d, INTERVAL 1 MONTH)
+      AND o.payment_status = 'paid'
+GROUP BY bucket
+ORDER BY bucket;</pre>
+<p>Results are cached in Redis for 5 minutes, keyed by period and filter. Above roughly 100,000 orders, a nightly rollup into a <code>daily_metrics</code> table replaces the live aggregation; the API contract does not change when that happens.</p>
+
+<h2>18.3 Charts</h2>
+<p>Chart.js, following the house rules: one hue family for a single series; the categorical palette only when series are genuinely unrelated; axes always labelled with units; the y-axis always starting at zero for bar charts; no more than six series on one chart; and a "View as table" toggle on every chart so the data is reachable without sight. Money on axes is abbreviated (<code>TZS 1.2M</code>) and shown in full in tooltips.</p>
+
+<h2>18.4 Exports</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Export</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td>Orders</td><td>Number, date, customer, phone, email, region, district, method, payment method, payment status, fulfilment status, subtotal, shipping, total, paid, items count</td></tr>
+    <tr><td>Order lines</td><td>Order number, date, SKU, product, attributes, unit price, quantity, line total</td></tr>
+    <tr><td>Products</td><td>SKU, name, category, subcategory, brand, MPN, price, compare-at, cost, stock, reserved, status, units sold, created</td></tr>
+    <tr><td>Stock movements</td><td>Date, SKU, product, delta, balance after, reason, reference, actor, note</td></tr>
+    <tr><td>Customers</td><td>Name, email, phone, verified, region, orders, lifetime value, first order, last order, consent flags</td></tr>
+    <tr><td>Payments</td><td>Date, order, method, provider, reference, amount, status, payer phone, verified by</td></tr>
+    <tr><td>Searches</td><td>Term, searches, average results, click-through rate, last searched</td></tr>
+  </tbody>
+</table>
+<p>UTF-8 with a BOM so Excel opens Swahili and symbol characters correctly, comma-separated, dates in ISO 8601, money as plain integers without a currency symbol so spreadsheets can sum them. Exports over 5,000 rows run as a queued job and are delivered by an emailed download link valid 24 hours.</p>

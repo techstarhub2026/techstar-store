@@ -1,0 +1,186 @@
+<h1 class="part"><span class="num">Part Fourteen</span>Admin Console Specification</h1>
+
+<p>The brief asks for "full CRUD ability to manipulate anything in the platform". This part delivers that literally: every entity in the data model has a create, read, update and delete path in the console, plus the bulk operations, filters and safeguards that make those paths usable at scale. §14.19 states the universal contract that every module below conforms to, so the individual sections describe only what differs.</p>
+
+<h2>14.1 Shell and navigation</h2>
+<table>
+  <thead><tr><th style="width:30mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Sidebar</td><td>Fixed, 240&nbsp;px, on <code>--ts-ink</code>, collapsible to a 64&nbsp;px icon rail with the state persisted per user. TechStar wordmark at the top. Items are grouped with small uppercase muted labels. The active item carries a 3&nbsp;px primary-green left rule and a lighter background. Each item renders only if the signed-in staff member holds the governing permission — an empty group header is never shown.</td></tr>
+    <tr><td>Groups</td><td><strong>Overview</strong> — Dashboard. <strong>Catalogue</strong> — Products, Categories, Subcategories, Stock, Discounts, Media. <strong>Sales</strong> — Orders, Invoices, Payments, Customers, Shipping. <strong>Content</strong> — Banners, Articles, Comments, Reviews, Services, Partners, FAQs. <strong>Marketing</strong> — Campaigns, Contacts, Searches. <strong>System</strong> — Currency, Settings, Staff &amp; Roles, Audit Log. Then Sign out.</td></tr>
+    <tr><td>Badges</td><td>Live counts beside items needing attention: Orders (awaiting verification), Comments (pending), Reviews (pending), Stock (below threshold). Updated over the realtime channel.</td></tr>
+    <tr><td>Top bar</td><td>64&nbsp;px, white, bottom border. Left: breadcrumb, and the sidebar collapse toggle. Centre: global search — an omnibox over orders (by number or phone), products (by name or SKU), customers (by name, email or phone) and invoices, opened with <kbd>Ctrl</kbd>+<kbd>K</kbd>. Right: a "View store" link opening the storefront in a new tab; a notification bell with a dropdown of recent events; the account menu.</td></tr>
+    <tr><td>Content</td><td><code>--ts-surface-alt</code> background, 24&nbsp;px padding, max width 1600&nbsp;px. Every page opens with a <code>PageHeader</code>: title, optional description, and a right-aligned action cluster.</td></tr>
+    <tr><td>Responsive</td><td>Below <code>lg</code> the sidebar becomes an off-canvas behind a hamburger. Tables scroll horizontally inside their own container. The console is expected to be used on a tablet in the store; it is not designed for a phone, and says so if opened on one.</td></tr>
+    <tr><td>Notifications</td><td>Bell dropdown lists the last 20 events: new order, payment recorded, low stock, new comment, new review, campaign completed, webhook failure. Each links to the relevant record. Unread count badge; marking all read is one action.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.2 Dashboard</h2>
+<p><strong>Purpose.</strong> Answer "what needs my attention right now" and "how are we doing" in one screen, without scrolling past the fold for the first of those.</p>
+
+<h3>14.2.1 Attention strip</h3>
+<p>The top row, and the reason the page is opened. Each tile is a filtered link; a tile with a zero count renders muted rather than disappearing, so its absence is never mistaken for a missing feature.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Tile</th><th>Contents and threshold colouring</th></tr></thead>
+  <tbody>
+    <tr><td>Awaiting payment verification</td><td>Count of orders with payment status <code>pending_verification</code>. Amber past 2 hours, red past 24. Links to the filtered order queue.</td></tr>
+    <tr><td>Orders to fulfil</td><td><code>CONFIRMED</code> and <code>PROCESSING</code> counts.</td></tr>
+    <tr><td>Low stock</td><td>Variants at or below their threshold. Links to the stock report sorted ascending.</td></tr>
+    <tr><td>Pending moderation</td><td>Comments plus reviews awaiting a decision.</td></tr>
+    <tr><td>Failed webhooks</td><td>Unprocessed <code>payment_events</code>. Red whenever above zero — this tile should always read zero.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.2.2 Metric tiles</h3>
+<p>Four <code>StatCard</code>s, each with a period selector shared across the row (Today · Last 7 Days · Last 30 Days · Last 12 Months) and each showing the value, the change against the immediately preceding period of equal length, and a sparkline.</p>
+<ul>
+  <li><strong>Sales</strong> — sum of <code>total_amount</code> for orders paid in the period.</li>
+  <li><strong>Orders</strong> — count of orders placed in the period.</li>
+  <li><strong>Average order value</strong> — sales ÷ orders.</li>
+  <li><strong>Customers</strong> — new registrations in the period, clickable to a breakdown modal by region.</li>
+</ul>
+
+<h3>14.2.3 Charts and lists</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Panel</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Sales analytics</td><td>Bar chart of revenue by bucket — day for 7 and 30 days, month for 12 months. Primary green bars. Tooltip shows the amount and the order count. A "View as table" toggle exposes the same figures accessibly.</td></tr>
+    <tr><td>Orders analytics</td><td>Line chart of order count over the same buckets, on the same period selector.</td></tr>
+    <tr><td>Best selling</td><td>Top 10 products by units sold in the period, with thumbnail, name, units and revenue. A region filter answers "what sells upcountry versus in Dar", which is the reference platform's own <code>best_selling?region=</code> feature and a genuinely good one.</td></tr>
+    <tr><td>Recent orders</td><td>Last 10, with number, customer, total, status pill and time. Rows link to detail.</td></tr>
+    <tr><td>Top searches</td><td>Top 10 search terms in the period with their result counts. Terms returning zero are highlighted red — this list is the catalogue's own to-do list.</td></tr>
+    <tr><td>Empty state</td><td>Before any orders exist, the charts are replaced by a short onboarding checklist: add a category, add a product, configure shipping, set the payment till number, place a test order.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.3 Products</h2>
+
+<h3>14.3.1 Product list</h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Columns</td><td>Selection checkbox · 48&nbsp;px thumbnail · Name (with SKU prefix in monospace beneath) · Subcategory · Price (range when multi-variant) · Stock (total, coloured by threshold) · Variants (count) · Status pill (Draft / Active / Archived) · Sold (lifetime units) · Updated · Actions.</td></tr>
+    <tr><td>Search</td><td>Name, SKU, MPN and brand. Debounced, reflected in the URL.</td></tr>
+    <tr><td>Filters</td><td>Category, subcategory, status, stock state (in stock / low / out), discounted, created-date range.</td></tr>
+    <tr><td>Sort</td><td>Name, price, stock, units sold, created, updated.</td></tr>
+    <tr><td>Row actions</td><td>Edit · Duplicate · Set discount · View on storefront · Archive · Delete.</td></tr>
+    <tr><td>Bulk actions</td><td>Delete · Archive · Activate · Set discount · Move to subcategory · Export CSV. All bulk actions follow §14.19.4.</td></tr>
+    <tr><td>Header actions</td><td>"New product" primary · "Import" · "Export".</td></tr>
+    <tr><td>Empty</td><td>"No products yet" with "Add your first product" and a link to the import guide.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.3.2 Product create and edit — the variant matrix</h3>
+<p>This is the most important screen in the console: catalogue growth is bounded by how fast a product can be entered, and the target is under three minutes (§3.6). The reference platform's attribute-matrix design is good and is kept, with its rough edges removed.</p>
+<table>
+  <thead><tr><th style="width:30mm">Section</th><th>Fields and behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>1. Classification</td><td><strong>Subcategory</strong> — a searchable select grouped by category, required. Choosing it derives and displays the SKU prefix immediately, so the administrator sees the code the product will receive before saving.</td></tr>
+    <tr><td>2. Details</td><td><strong>Product name</strong> (required, 3–255, trimmed and whitespace-collapsed on blur, with a live duplicate-name warning that informs but does not block) · <strong>Short description</strong> (plain text, 500, used for meta description with a live SEO preview) · <strong>Description</strong> (rich text, required) · <strong>Brand</strong> · <strong>Manufacturer part number</strong> · <strong>Tags</strong> (create-as-you-type).</td></tr>
+    <tr><td>3. Photos</td><td>Drag-and-drop uploader, up to 100 files, 3&nbsp;MB each, JPEG/PNG/WebP/AVIF. Reorderable by drag; the first is the display image unless another is starred. Each accepts alt text. Upload begins on drop with per-file progress. Derivatives are generated asynchronously and the UI shows a "processing" state rather than a broken thumbnail.</td></tr>
+    <tr><td>4. Pricing &amp; stock — simple</td><td>When no attributes are defined: <strong>Price</strong> (required, &gt; 0) · <strong>Compare-at price</strong> (optional, must exceed price) · <strong>Cost</strong> (optional, staff-only) · <strong>Available stock</strong> (required, ≥ 0) · <strong>Low-stock threshold</strong> (default 5) · <strong>Barcode</strong>. One variant is created behind the scenes.</td></tr>
+    <tr><td>5. Pricing &amp; stock — variants</td><td>Introduced by "Add attributes", with the explanatory line the reference platform uses: <em>"Add specifications to your product here. Skip this step if the product does not have any special specifications."</em> The matrix then appears as a table whose columns are the attributes plus fixed <strong>Price</strong> and <strong>Stock</strong>. "+" adds an attribute column, prompting for its name and optional unit. "Add new values" adds a row. Each cell validates on blur. A row may be removed; "Delete table" clears the matrix back to the simple form after confirmation. Every row becomes one variant with an automatically assigned SKU shown read-only in a leading column.</td></tr>
+    <tr><td>6. Visibility</td><td><strong>Status</strong> — Draft / Active / Archived, default Draft, so a half-entered product is never live. <strong>Publish date</strong> (optional, schedules activation). <strong>Featured</strong> flag.</td></tr>
+    <tr><td>7. SEO</td><td><strong>URL slug</strong> — auto-generated, editable at creation. On edit it is read-only with a "Change URL" control that warns about link breakage and offers the 301 redirect described in §6.6. <strong>Meta title</strong> (70) and <strong>meta description</strong> (160) with counters and a search-result preview.</td></tr>
+    <tr><td>Footer</td><td>Sticky. "Cancel" · "Save as draft" · "Save and add another" · "Save" primary. Disabled until dirty and valid. Leaving with unsaved changes prompts.</td></tr>
+  </tbody>
+</table>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Validation</th><th>Message</th></tr></thead>
+  <tbody>
+    <tr><td>Subcategory missing</td><td>"Subcategory is required"</td></tr>
+    <tr><td>Name missing</td><td>"Product name is required"</td></tr>
+    <tr><td>Description missing</td><td>"Description is required"</td></tr>
+    <tr><td>No images</td><td>"At least one image is required"</td></tr>
+    <tr><td>Price ≤ 0</td><td>"Price must be greater than zero"</td></tr>
+    <tr><td>Compare-at ≤ price</td><td>"Compare-at price must be higher than the price"</td></tr>
+    <tr><td>Stock negative</td><td>"Stock cannot be negative"</td></tr>
+    <tr><td>Attribute value blank</td><td>"Every variant needs a value for each attribute"</td></tr>
+    <tr><td>Duplicate attribute set</td><td>"Two variants have the same combination of values"</td></tr>
+    <tr><td>Attribute name duplicated</td><td>"Attribute names must be unique within a product"</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Improvements over the reference implementation</span>
+  A draft status, so nothing goes live half-finished. A visible SKU before saving. A duplicate-name warning. Editable alt text. Variant SKUs shown in the matrix. A "Save and add another" path for bulk entry sessions. And the matrix keeps its state when validation fails — the reference platform's implementation loses unsaved rows on a failed submit, which is the single most expensive small defect in the whole console.
+</div>
+
+<h3>14.3.3 Stock management</h3>
+<p>A dedicated screen at <code>/admin/stock</code>, listing variants rather than products: thumbnail, product name, attribute values, SKU, on hand, reserved, available, threshold, last movement. Filterable to low or out of stock; sortable by available ascending, which is its default. Inline "Adjust" opens a dialog taking a signed delta or an absolute count, a reason from the fixed list (purchase, adjustment, damage, return, stocktake), and a note required for deltas above 10. Each variant has a "Movements" drawer showing its full ledger. Bulk adjustment by CSV upload — SKU, delta, reason — is provided for stocktakes, with a dry-run preview before commit.</p>
+
+<h3>14.3.4 Discounts</h3>
+<p>Reachable from a product row action and from a dedicated list. The modal takes <strong>Discount (%)</strong> or a fixed amount, <strong>Discount start date</strong> and <strong>Discount end date</strong> — the reference platform's three fields — plus scope (this variant / this product / this subcategory / this category) and an active toggle. A live preview shows the resulting price for the affected items and warns if the discount would take any price below one shilling. The list view shows all discounts with scope, value, window, affected item count and status, filterable to active, scheduled or expired.</p>
+
+<h2>14.4 Categories and subcategories</h2>
+<table>
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Category list</td><td>Columns: selection · Name · SKU code · Subcategories (count) · Products (count) · Position (drag handle) · Status · Created · Actions. Rows are drag-reorderable, which writes <code>position</code> and immediately changes the storefront mega-menu order.</td></tr>
+    <tr><td>Create / edit</td><td>A modal, as the reference platform does — it is the right weight for four fields. <strong>Category name</strong> (required, unique) · <strong>SKU (2 digits)</strong> (required, digits only, unique; auto-suggested as the next free code) · <strong>Description</strong> (optional) · <strong>Image</strong> (optional) · <strong>Active</strong>.</td></tr>
+    <tr><td>Validation</td><td>"Name is required" · "SKU is required" · "SKU should only contain digits" · "SKU must be exactly 2 digits" · "That SKU is already in use" · "A category with this name already exists".</td></tr>
+    <tr><td>Subcategory list</td><td>Columns: selection · Name · Category · SKU code · Products (count) · Position · Status · Actions. Filterable by category.</td></tr>
+    <tr><td>Subcategory create / edit</td><td><strong>Category</strong> (searchable select, required) · <strong>Sub-category name</strong> · <strong>SKU (4 digits)</strong>, auto-suggested as the parent's code plus the next free sequence, with the parent's two digits shown fixed and only the last two editable — which makes an invalid code impossible to type.</td></tr>
+    <tr><td>Delete</td><td>Refused while children exist, per §9.5. The dialog states the blocking count and offers the two supported paths: "Move products to another subcategory" or "Delete the products first". This is the fix for defect R12 — the reference platform instead offers to cascade-delete every product in the tree.</td></tr>
+    <tr><td>Move products</td><td>A dedicated action: choose a destination subcategory, review the count, confirm. SKUs are preserved (§12.1) and the move is audited.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.5 Orders</h2>
+
+<h3>14.5.1 Order queue</h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Status tabs</td><td>All · Awaiting payment · Awaiting verification · Confirmed · Processing · Shipped · Delivered · Completed · Cancelled · Expired — each with a live count. The reference platform offers only All / Completed / Pending / Cancelled, which cannot express the working day.</td></tr>
+    <tr><td>Columns</td><td>Order number (monospace) · Date · Customer name · Phone · Items (count) · Total · Payment status pill · Fulfilment status pill · Shipping method · Region · Actions.</td></tr>
+    <tr><td>Search</td><td>Order number, customer name, phone, email, payment number, or a product SKU within the order.</td></tr>
+    <tr><td>Filters</td><td>Date range, payment method, shipping method, region, amount range, has-delegated-payer.</td></tr>
+    <tr><td>Default sort</td><td>Placed date descending — except on the "Awaiting verification" tab, where it is ascending, oldest first, because that is a work queue and the oldest item is the most urgent.</td></tr>
+    <tr><td>Bulk actions</td><td>Update fulfilment status · Print packing slips · Export CSV. Deliberately no bulk cancel and no bulk delete — an order is a financial record.</td></tr>
+    <tr><td>Realtime</td><td>A new order inserts at the top with a brief highlight and an audible chime, subject to a per-user mute. This is what the reference platform's Socket.IO connection exists for.</td></tr>
+  </tbody>
+</table>
+
+<h3>14.5.2 Order detail</h3>
+<p>Two columns. Left (8 of 12): status bar, items, payment panel, fulfilment panel, timeline. Right (4 of 12): customer card, shipping card, totals card, internal notes.</p>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Panel</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Status bar</td><td>Order number, placed date, and the three status pills. A "Change status" control offering <em>only</em> the transitions legal from the current state (§12.7) — an illegal transition is not merely rejected, it is not offered. Each change requires a confirmation and accepts an optional note.</td></tr>
+    <tr><td>Items</td><td>Thumbnail, name (linking to the product), attributes, SKU, unit price, quantity, line total. Items whose product has since been deleted render from their snapshot with a muted "no longer in catalogue" marker.</td></tr>
+    <tr><td>Payment</td><td>Method, the number the customer said they would pay from, expected total, amount received. Recorded payments listed with status, provider reference, amount, verifier and timestamp. A "Verify payment" action opens the dialog from §12.8; a "Record manual payment" action covers cash. "Issue refund" is present when the order is paid, behind the <code>payment.refund</code> permission.</td></tr>
+    <tr><td>Fulfilment</td><td>Shipping method and cost, delivery address with a copy-all control, a tracking reference field, "Print packing slip", "Print invoice", and "Mark shipped" / "Mark delivered".</td></tr>
+    <tr><td>Timeline</td><td>The full <code>order_events</code> stream, newest first: actor, action, before and after, timestamp, and any note. Notifications sent appear here too, so "did we tell the customer?" is answerable.</td></tr>
+    <tr><td>Customer</td><td>Name, email, phone, and whether the account is registered or guest. For registered customers: total lifetime orders and value, and a link to their record. A "Contact" control offers WhatsApp, call and email with the order number prefilled.</td></tr>
+    <tr><td>Internal notes</td><td>Threaded, timestamped, attributed. Staff only, never exposed on any customer-facing endpoint.</td></tr>
+    <tr><td>Actions</td><td>Resend confirmation · Regenerate payment link · Cancel order (with reason) · Duplicate as a new order · Create invoice from this order.</td></tr>
+  </tbody>
+</table>
+
+<h2>14.6 Invoices</h2>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Screen</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>List</td><td>Columns: Invoice number · Order (linked, when derived from one) · Client name · Total · Status pill (Draft / Issued / Paid / Void) · Issued date · Due date · Actions. Search by number, client name or email. Filter by status and date range.</td></tr>
+    <tr><td>Builder</td><td><strong>Client details</strong> — name (required), email (required, valid), phone, address. <strong>Line items</strong> — a product search field with the reference platform's own placeholder, "Please search here …", adding catalogue lines with SKU, price and an editable quantity; plus "Add custom line" for free-text charges. <strong>Shipping method</strong> (optional). <strong>Notes</strong>. A live totals panel on the right.</td></tr>
+    <tr><td>Validation</td><td>"Client name is required" · "Email is required" · "Enter a valid email" · "Add at least one line item" · "Quantity must be at least 1".</td></tr>
+    <tr><td>Detail</td><td>Rendered as the printable document, with an action bar above: Print · Download PDF · Email to client · Share link (mint, copy, revoke) · Mark paid · Void · Delete (drafts only).</td></tr>
+    <tr><td>Print</td><td>A4, TechStar letterhead, registration details, client block, line table, totals, payment instructions and the three standard terms (§12.10).</td></tr>
+  </tbody>
+</table>
+
+<h2>14.7 Customers</h2>
+<p>Entirely new — the reference platform has a "Customers" sidebar entry and no screen behind it (defect R13). Without this, staff cannot answer a customer's question about their own account.</p>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Screen</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>List</td><td>Columns: Avatar · Name · Email (with a verified tick) · Phone · Orders (count) · Lifetime value · Last order · Registered · Status pill. Search by name, email or phone. Filters: verified, has ordered, region, registration date, marketing consent, status.</td></tr>
+    <tr><td>Detail — profile</td><td>All fields, with edit for name, email, phone and marketing consent. Shows verification state with a "Resend verification" action, and account status with suspend and reactivate.</td></tr>
+    <tr><td>Detail — orders</td><td>Full order history with totals, linking through to each order.</td></tr>
+    <tr><td>Detail — addresses</td><td>Saved addresses, read-only.</td></tr>
+    <tr><td>Detail — activity</td><td>Reviews and comments written, wishlist contents, last sign-in, active sessions with a "Revoke all sessions" action.</td></tr>
+    <tr><td>Detail — actions</td><td>Send password reset · Suspend (with reason; suspended users can sign in but cannot order, and are told why) · Export personal data (§11.8.2) · Anonymise account.</td></tr>
+    <tr><td>Guardrails</td><td>Staff cannot read or set a password. Every view of a customer record is written to the audit log — access to personal data is itself an auditable event.</td></tr>
+  </tbody>
+</table>

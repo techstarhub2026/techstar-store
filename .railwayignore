@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+.git
+dist
+**/dist
+*.pdf
+screenshots
+research
+docs
+uploads
+**/*.log

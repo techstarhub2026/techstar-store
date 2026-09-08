@@ -1,0 +1,187 @@
+<h3>9.3.18 <code>carts</code> and <code>cart_items</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Table</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>carts</code></td><td><code>id</code> · <code>user_id</code> BIGINT NULL FK CASCADE · <code>guest_token</code> CHAR(32) NULL UNIQUE · <code>currency</code> CHAR(3) · <code>last_activity_at</code> DATETIME(3) · <code>converted_order_id</code> BIGINT NULL FK SET NULL. <code>CHECK (user_id IS NOT NULL OR guest_token IS NOT NULL)</code>. Unique on <code>user_id</code> where not null — one open cart per account.</td></tr>
+    <tr><td><code>cart_items</code></td><td><code>id</code> · <code>cart_id</code> FK CASCADE · <code>product_variant_id</code> FK RESTRICT · <code>quantity</code> INT <code>CHECK (quantity &gt; 0)</code> · <code>unit_price_amount</code> BIGINT — the price seen when added, kept only to <em>detect</em> a change, never to charge against · <code>added_at</code>. Unique on <code>(cart_id, product_variant_id)</code> so adding an existing line increments rather than duplicating.</td></tr>
+  </tbody>
+</table>
+<p class="kv">Abandoned guest carts are purged after 30 days of inactivity; signed-in carts are kept indefinitely. Cart persistence server-side is what lets a customer start on a phone and finish on a laptop — the reference platform keeps carts only in <code>localStorage</code> and posts them at checkout, so that journey loses everything.</p>
+
+<h3>9.3.19 <code>wishlists</code> and <code>wishlist_items</code></h3>
+<p><code>wishlists</code>: <code>id</code> · <code>user_id</code> FK CASCADE UNIQUE · <code>guest_token</code> CHAR(32) NULL UNIQUE. <code>wishlist_items</code>: <code>id</code> · <code>wishlist_id</code> FK CASCADE · <code>product_id</code> FK CASCADE · <code>product_variant_id</code> BIGINT NULL FK SET NULL · <code>added_at</code>. Unique on <code>(wishlist_id, product_id, product_variant_id)</code>. No quantity column.</p>
+
+<h3>9.3.20 <code>shipping_methods</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Column</th><th style="width:34mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>name</code></td><td>VARCHAR(80) NOT NULL</td><td>"Savings", "Cash on delivery", "Office Pickup".</td></tr>
+    <tr><td><code>slug</code></td><td>VARCHAR(60) UNIQUE</td><td></td></tr>
+    <tr><td><code>description</code></td><td>VARCHAR(500) NOT NULL</td><td>Shown beneath the option at checkout, not hidden in a tooltip.</td></tr>
+    <tr><td><code>cost_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td><code>CHECK (cost_amount &gt;= 0)</code>.</td></tr>
+    <tr><td><code>requires_shipping_address</code></td><td>TINYINT(1) NOT NULL DEFAULT 1</td><td>Office pickup does not.</td></tr>
+    <tr><td><code>accepts_mobile_payment</code></td><td>TINYINT(1) NOT NULL DEFAULT 1</td><td>Cash on delivery does not — this flag is what hides the payment block at checkout.</td></tr>
+    <tr><td><code>is_cash_on_delivery</code></td><td>TINYINT(1) NOT NULL DEFAULT 0</td><td>Explicit rather than inferred from the name, so the order flow does not depend on a string.</td></tr>
+    <tr><td><code>free_over_amount</code></td><td>BIGINT NULL</td><td>Free shipping above this subtotal. Not present on the reference platform; a cheap, effective lever.</td></tr>
+    <tr><td><code>estimated_days_min/max</code></td><td>SMALLINT NULL</td><td>Renders "2–5 working days".</td></tr>
+    <tr><td><code>available_regions</code></td><td>JSON NULL</td><td><code>NULL</code> means everywhere. Lets an upcountry method be hidden for Dar es Salaam addresses.</td></tr>
+    <tr><td><code>position</code>, <code>is_active</code>, <code>deleted_at</code></td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<h3>9.3.21 <code>orders</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Column</th><th style="width:34mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>order_number</code></td><td>VARCHAR(24) NOT NULL UNIQUE</td><td><code>TS-{YYYY}-{000000}</code>, sequence per year. Human-quotable over the phone.</td></tr>
+    <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED NULL FK SET NULL</td><td><code>NULL</code> for guest orders. The order survives account deletion.</td></tr>
+    <tr><td><code>status</code></td><td>VARCHAR(24) NOT NULL</td><td>CHECK against the state machine in §12.7.</td></tr>
+    <tr><td><code>payment_status</code></td><td>VARCHAR(24) NOT NULL</td><td>CHECK IN ('unpaid','pending_verification','paid','partially_refunded','refunded','failed').</td></tr>
+    <tr><td><code>fulfilment_status</code></td><td>VARCHAR(24) NOT NULL</td><td>CHECK IN ('unfulfilled','processing','shipped','delivered','returned').</td></tr>
+    <tr><td><code>customer_name</code></td><td>VARCHAR(120) NOT NULL</td><td>Snapshot. Never joined from <code>users</code> for display.</td></tr>
+    <tr><td><code>customer_email</code></td><td>VARCHAR(255) NULL</td><td></td></tr>
+    <tr><td><code>customer_phone</code></td><td>VARCHAR(15) NOT NULL</td><td>The one field every order must have — it is how the store contacts the buyer.</td></tr>
+    <tr><td><code>shipping_method_id</code></td><td>BIGINT UNSIGNED NULL FK SET NULL</td><td></td></tr>
+    <tr><td><code>shipping_method_name</code></td><td>VARCHAR(80) NOT NULL</td><td>Snapshot.</td></tr>
+    <tr><td><code>subtotal_amount</code></td><td>BIGINT NOT NULL</td><td>Sum of line totals.</td></tr>
+    <tr><td><code>discount_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td></td></tr>
+    <tr><td><code>shipping_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td></td></tr>
+    <tr><td><code>tax_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td>Zero at launch; the column exists so adding VAT is not a migration of every historical row.</td></tr>
+    <tr><td><code>total_amount</code></td><td>BIGINT NOT NULL</td><td>Stored, not computed on read — the total charged must never change because a formula changed.</td></tr>
+    <tr><td><code>paid_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td>Sum of settled payments. Supports partial payment.</td></tr>
+    <tr><td><code>currency</code></td><td>CHAR(3) NOT NULL</td><td></td></tr>
+    <tr><td><code>payment_method</code></td><td>VARCHAR(24) NULL</td><td>CHECK IN ('lipa_namba','cash','aggregator').</td></tr>
+    <tr><td><code>payment_number</code></td><td>VARCHAR(15) NULL</td><td>The mobile-money number the buyer will pay from — the key to manual reconciliation (§13.6).</td></tr>
+    <tr><td><code>delegated_payer_email</code></td><td>VARCHAR(255) NULL</td><td>Set when a third party will pay.</td></tr>
+    <tr><td><code>payment_token_hash</code></td><td>CHAR(64) NULL UNIQUE</td><td>Backs <code>/pay/:token</code>.</td></tr>
+    <tr><td><code>payment_token_expires_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+    <tr><td><code>idempotency_key</code></td><td>CHAR(36) NULL UNIQUE</td><td>Prevents duplicate orders (§7.7.3).</td></tr>
+    <tr><td><code>customer_note</code></td><td>VARCHAR(500) NULL</td><td></td></tr>
+    <tr><td><code>internal_note</code></td><td>TEXT NULL</td><td>Staff only; never returned to a customer-facing endpoint.</td></tr>
+    <tr><td><code>cancelled_at</code>, <code>cancel_reason</code></td><td>DATETIME(3) / VARCHAR(255) NULL</td><td></td></tr>
+    <tr><td><code>placed_at</code>, <code>paid_at</code>, <code>shipped_at</code>, <code>delivered_at</code></td><td>DATETIME(3) NULL</td><td>Denormalised from the event log for cheap reporting.</td></tr>
+    <tr><td><code>source</code></td><td>VARCHAR(20) NOT NULL DEFAULT 'web'</td><td>'web' | 'admin' | 'phone'.</td></tr>
+  </tbody>
+</table>
+<p class="kv"><strong>Indexes.</strong> <code>uq_orders_order_number</code>, <code>idx_orders_user_placed</code>, <code>idx_orders_status_placed</code>, <code>idx_orders_payment_status</code>, <code>idx_orders_customer_phone</code>, <code>idx_orders_placed_at</code>, <code>uq_orders_idempotency_key</code>, <code>uq_orders_payment_token_hash</code>.</p>
+<div class="warn">
+  <span class="lbl">Three statuses, not one</span>
+  The reference platform carries a single order status ("Completed", "Pending", "Cancelled"), which cannot express the ordinary case of an order that is paid but not yet shipped, or shipped but not yet paid for on delivery. Splitting lifecycle, payment and fulfilment into three independent axes is what makes the admin console usable and the reports truthful.
+</div>
+
+<h3>9.3.22 <code>order_items</code></h3>
+<p><code>id</code> · <code>order_id</code> FK CASCADE · <code>product_id</code> BIGINT NULL FK SET NULL · <code>product_variant_id</code> BIGINT NULL FK SET NULL · <code>product_name</code> VARCHAR(255) <em>snapshot</em> · <code>variant_sku</code> VARCHAR(20) <em>snapshot</em> · <code>variant_attributes</code> JSON <em>snapshot</em> — e.g. <code>[{"name":"Resistance","value":"10kΩ"}]</code> · <code>image_url</code> VARCHAR(512) NULL <em>snapshot</em> · <code>unit_price_amount</code> BIGINT · <code>quantity</code> INT <code>CHECK (&gt; 0)</code> · <code>discount_amount</code> BIGINT DEFAULT 0 · <code>line_total_amount</code> BIGINT. Index on <code>order_id</code> and on <code>product_id</code> for "who bought this" reporting.</p>
+
+<h3>9.3.23 <code>order_shipping_addresses</code></h3>
+<p>One row per order, a frozen copy: <code>order_id</code> FK CASCADE UNIQUE · <code>receiver_name</code> · <code>email</code> · <code>phone</code> · <code>country</code> · <code>region</code> · <code>district</code> · <code>street_address</code> · <code>postal_code</code>. Absent for pickup orders. Kept in its own table rather than as columns on <code>orders</code> so that the order row stays narrow and the address can be omitted cleanly.</p>
+
+<h3>9.3.24 <code>order_events</code></h3>
+<p>The append-only audit trail of an order's life. <code>id</code> · <code>order_id</code> FK CASCADE · <code>event_type</code> VARCHAR(40) ('placed', 'payment_recorded', 'payment_verified', 'status_changed', 'note_added', 'cancelled', 'refunded', 'shipped', 'delivered', 'email_sent', 'sms_sent') · <code>from_value</code>, <code>to_value</code> VARCHAR(40) NULL · <code>actor_type</code> VARCHAR(16) ('customer','staff','system','webhook') · <code>actor_user_id</code> BIGINT NULL FK SET NULL · <code>message</code> VARCHAR(500) NULL · <code>metadata</code> JSON NULL · <code>created_at</code>. Index on <code>(order_id, created_at)</code>. <strong>Never updated, never deleted.</strong> This table is the source for the customer timeline (§7.9.2), the admin history panel and every dispute.</p>
+
+<h3>9.3.25 <code>payments</code> and <code>payment_events</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Table</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>payments</code></td><td><code>id</code> · <code>order_id</code> FK RESTRICT · <code>method</code> VARCHAR(24) · <code>provider</code> VARCHAR(40) NULL ('manual','selcom','clickpesa','azampay','dpo') · <code>amount</code> BIGINT · <code>currency</code> CHAR(3) · <code>status</code> VARCHAR(24) CHECK IN ('initiated','pending','succeeded','failed','cancelled','refunded') · <code>payer_phone</code> VARCHAR(15) NULL · <code>payer_name</code> VARCHAR(120) NULL · <code>provider_reference</code> VARCHAR(120) NULL — the mobile-money transaction id · <code>merchant_reference</code> VARCHAR(64) — our own reference sent to the provider · <code>verified_by</code> BIGINT NULL FK — the staff member who confirmed a manual payment · <code>verified_at</code> · <code>failure_reason</code> VARCHAR(255) NULL · <code>raw_payload</code> JSON NULL. Unique on <code>(provider, provider_reference)</code> where both are non-null — the single constraint that makes double-crediting impossible.</td></tr>
+    <tr><td><code>payment_events</code></td><td><code>id</code> · <code>payment_id</code> BIGINT NULL FK CASCADE · <code>provider</code> · <code>event_type</code> · <code>external_event_id</code> VARCHAR(120) UNIQUE — webhook idempotency · <code>signature_valid</code> TINYINT(1) · <code>payload</code> JSON · <code>processed_at</code> DATETIME(3) NULL · <code>processing_error</code> VARCHAR(500) NULL. Every inbound webhook is written here <em>before</em> it is acted upon, so a mis-processed callback can be replayed (§13.5).</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3.26 <code>stock_movements</code></h3>
+<p>Every change to stock, ever. <code>id</code> · <code>product_variant_id</code> FK RESTRICT · <code>delta</code> INT NOT NULL (signed) · <code>balance_after</code> INT NOT NULL · <code>reason</code> VARCHAR(32) CHECK IN ('purchase','sale','reservation','release','adjustment','return','damage','stocktake') · <code>reference_type</code> VARCHAR(32) NULL · <code>reference_id</code> BIGINT NULL · <code>actor_user_id</code> BIGINT NULL FK SET NULL · <code>note</code> VARCHAR(255) NULL · <code>created_at</code>. Index on <code>(product_variant_id, created_at)</code>. Stock is never adjusted without a corresponding movement row, in the same transaction — which is what makes "why is this figure wrong?" an answerable question.</p>
+
+<h3>9.3.27 <code>invoices</code> and <code>invoice_items</code></h3>
+<p><code>invoices</code>: <code>id</code> · <code>invoice_number</code> VARCHAR(24) UNIQUE (<code>INV-{YYYY}-{000000}</code>) · <code>order_id</code> BIGINT NULL FK SET NULL — an invoice may be raised without an order, which is exactly the quotation case (persona Grace) · <code>client_name</code> VARCHAR(120) · <code>client_email</code> VARCHAR(255) · <code>client_phone</code> VARCHAR(15) NULL · <code>client_address</code> VARCHAR(500) NULL · <code>shipping_method_name</code> VARCHAR(80) NULL · <code>subtotal_amount</code> · <code>shipping_amount</code> · <code>tax_amount</code> · <code>total_amount</code> · <code>currency</code> · <code>status</code> VARCHAR(20) CHECK IN ('draft','issued','paid','void') · <code>issued_at</code> · <code>due_at</code> NULL · <code>paid_at</code> NULL · <code>share_token_hash</code> CHAR(64) UNIQUE NULL · <code>notes</code> TEXT NULL · <code>created_by</code> FK → users · <code>deleted_at</code>.</p>
+<p><code>invoice_items</code>: <code>id</code> · <code>invoice_id</code> FK CASCADE · <code>product_variant_id</code> BIGINT NULL FK SET NULL · <code>description</code> VARCHAR(255) · <code>sku</code> VARCHAR(20) NULL · <code>unit_price_amount</code> BIGINT · <code>quantity</code> INT · <code>line_total_amount</code> BIGINT · <code>position</code> INT. Free-text lines are permitted so an invoice can carry a service charge that is not a catalogue product.</p>
+
+<h3>9.3.28 Content tables</h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Table</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>banners</code></td><td><code>id</code> · <code>title</code> VARCHAR(120) · <code>title_color</code> CHAR(7) · <code>subtitle</code> VARCHAR(300) NULL · <code>subtitle_color</code> CHAR(7) · <code>background_color</code> CHAR(7) · <code>image_id</code> FK RESTRICT · <code>link_url</code> VARCHAR(512) NULL · <code>button_text</code> VARCHAR(40) NULL · <code>button_background</code> CHAR(7) · <code>button_text_color</code> CHAR(7) · <code>placement</code> VARCHAR(20) DEFAULT 'home' · <code>position</code> INT · <code>starts_at</code>, <code>ends_at</code> DATETIME(3) NULL — scheduled banners, which the reference platform lacks · <code>is_active</code> · <code>deleted_at</code>.</td></tr>
+    <tr><td><code>services</code></td><td><code>id</code> · <code>heading</code> VARCHAR(160) · <code>slug</code> UNIQUE · <code>excerpt</code> VARCHAR(500) NULL · <code>content_html</code> MEDIUMTEXT · <code>content_text</code> MEDIUMTEXT · <code>image_id</code> FK · <code>position</code> · <code>is_active</code> · <code>published_at</code> · <code>deleted_at</code>.</td></tr>
+    <tr><td><code>partners</code></td><td><code>id</code> · <code>name</code> VARCHAR(120) · <code>logo_id</code> FK · <code>website_url</code> VARCHAR(512) · <code>position</code> · <code>is_active</code> · <code>deleted_at</code>.</td></tr>
+    <tr><td><code>articles</code></td><td><code>id</code> · <code>title</code> VARCHAR(200) · <code>slug</code> UNIQUE · <code>excerpt</code> VARCHAR(500) · <code>content_html</code> MEDIUMTEXT · <code>content_text</code> MEDIUMTEXT · <code>cover_image_id</code> FK · <code>author_id</code> FK → users · <code>status</code> CHECK IN ('draft','published','archived') · <code>published_at</code> · <code>view_count</code> · <code>comment_count</code> · <code>meta_title</code>, <code>meta_description</code> · <code>deleted_at</code>. FULLTEXT on <code>(title, content_text)</code>.</td></tr>
+    <tr><td><code>comments</code></td><td><code>id</code> · <code>article_id</code> FK CASCADE · <code>user_id</code> FK SET NULL · <code>parent_id</code> BIGINT NULL FK CASCADE (one level of replies) · <code>author_name</code> VARCHAR(120) <em>snapshot</em> · <code>body</code> TEXT · <code>status</code> CHECK IN ('pending','approved','rejected','spam') · <code>moderated_by</code>, <code>moderated_at</code> · <code>ip_address</code> VARBINARY(16) · <code>deleted_at</code>.</td></tr>
+    <tr><td><code>reviews</code></td><td><code>id</code> · <code>product_id</code> FK CASCADE · <code>user_id</code> FK SET NULL · <code>order_item_id</code> BIGINT NULL FK SET NULL — presence of this is what earns the "Verified purchase" badge · <code>rating</code> TINYINT <code>CHECK (rating BETWEEN 1 AND 5)</code> · <code>title</code> VARCHAR(80) NULL · <code>body</code> TEXT · <code>status</code> as comments · <code>helpful_count</code> INT · <code>moderated_by</code>, <code>moderated_at</code> · <code>deleted_at</code>. Unique on <code>(product_id, user_id)</code> — one review per customer per product.</td></tr>
+    <tr><td><code>faqs</code></td><td><code>id</code> · <code>question</code> VARCHAR(300) · <code>answer_html</code> TEXT · <code>group</code> VARCHAR(60) · <code>position</code> · <code>is_active</code>.</td></tr>
+    <tr><td><code>site_settings</code></td><td><code>key</code> VARCHAR(80) PK · <code>value</code> JSON · <code>group</code> VARCHAR(40) · <code>description</code> VARCHAR(255) · <code>updated_by</code> FK. A typed key–value store, read once at boot and cached in Redis. Holds store identity, contact details, social links, page hero image ids, payment till numbers and instruction blocks, currency configuration, and feature flags.</td></tr>
+    <tr><td><code>regions</code> / <code>districts</code></td><td><code>regions</code>: <code>id</code> · <code>name</code> VARCHAR(64) UNIQUE · <code>code</code> · <code>position</code>. <code>districts</code>: <code>id</code> · <code>region_id</code> FK CASCADE · <code>name</code> VARCHAR(64) · <code>position</code>. Unique on <code>(region_id, name)</code>. Seeded from Appendix F.</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3.29 Marketing and analytics tables</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Table</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>contacts</code></td><td><code>id</code> · <code>user_id</code> BIGINT NULL FK SET NULL · <code>name</code> VARCHAR(120) · <code>email</code> VARCHAR(255) NULL · <code>phone</code> VARCHAR(15) NULL · <code>source</code> VARCHAR(24) ('registration','order','manual','import','contact_form') · <code>email_opt_in</code>, <code>sms_opt_in</code> TINYINT(1) · <code>unsubscribed_at</code> DATETIME(3) NULL · <code>tags</code> JSON · <code>deleted_at</code>. Unique on <code>email</code> and on <code>phone</code> where non-null. A marketing audience distinct from the user table, because a contact may come from a form or an import and never hold an account.</td></tr>
+    <tr><td><code>campaigns</code></td><td><code>id</code> · <code>channel</code> CHECK IN ('sms','email') · <code>name</code> VARCHAR(160) — the subject line for email · <code>audience</code> CHECK IN ('all','specific','tag','segment') · <code>audience_filter</code> JSON NULL · <code>body_text</code> TEXT — SMS body or email plain-text part · <code>body_html</code> MEDIUMTEXT NULL · <code>additional_recipients</code> JSON NULL — ad-hoc numbers or addresses typed in the composer · <code>scheduled_for</code> DATETIME(3) NULL · <code>status</code> CHECK IN ('draft','scheduled','sending','sent','failed','cancelled') · <code>recipient_count</code>, <code>sent_count</code>, <code>failed_count</code>, <code>delivered_count</code> INT · <code>cost_amount</code> BIGINT NULL — SMS is metered, so the spend belongs on the record · <code>created_by</code> FK · <code>sent_at</code> · <code>deleted_at</code>.</td></tr>
+    <tr><td><code>campaign_recipients</code></td><td><code>id</code> · <code>campaign_id</code> FK CASCADE · <code>contact_id</code> BIGINT NULL FK SET NULL · <code>destination</code> VARCHAR(255) — the address or number actually used · <code>status</code> CHECK IN ('queued','sent','delivered','failed','bounced','unsubscribed') · <code>provider_message_id</code> VARCHAR(120) NULL · <code>error</code> VARCHAR(255) NULL · <code>sent_at</code>, <code>delivered_at</code>. Index on <code>(campaign_id, status)</code>.</td></tr>
+    <tr><td><code>search_logs</code></td><td><code>id</code> · <code>term</code> VARCHAR(160) · <code>normalised_term</code> VARCHAR(160) — lowercase, trimmed, whitespace collapsed; this is what is aggregated · <code>result_count</code> INT · <code>user_id</code> BIGINT NULL · <code>session_id</code> CHAR(32) · <code>clicked_product_id</code> BIGINT NULL FK SET NULL — the click-through that makes success measurable · <code>created_at</code>. Index on <code>(normalised_term, created_at)</code> and on <code>(result_count, created_at)</code> to find zero-result searches fast.</td></tr>
+    <tr><td><code>contact_messages</code></td><td><code>id</code> · <code>name</code> · <code>email</code> · <code>subject</code> VARCHAR(200) NULL · <code>message</code> TEXT · <code>send_copy</code> TINYINT(1) · <code>status</code> CHECK IN ('new','read','replied','archived','spam') · <code>handled_by</code> FK NULL · <code>ip_address</code> · <code>user_agent</code>.</td></tr>
+    <tr><td><code>notify_requests</code></td><td><code>id</code> · <code>product_variant_id</code> FK CASCADE · <code>email</code> VARCHAR(255) · <code>user_id</code> BIGINT NULL · <code>notified_at</code> DATETIME(3) NULL. Unique on <code>(product_variant_id, email)</code>. Backs "Notify me when available" — and doubles as a demand signal for restocking.</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3.30 <code>audit_logs</code></h3>
+<p><code>id</code> · <code>actor_user_id</code> BIGINT NULL FK SET NULL · <code>actor_email</code> VARCHAR(255) <em>snapshot</em> · <code>action</code> VARCHAR(60) ('product.create', 'order.status_change', 'user.suspend') · <code>entity_type</code> VARCHAR(60) · <code>entity_id</code> BIGINT NULL · <code>entity_label</code> VARCHAR(255) — a human-readable name captured at the time · <code>before</code> JSON NULL · <code>after</code> JSON NULL · <code>ip_address</code> VARBINARY(16) · <code>user_agent</code> VARCHAR(255) · <code>request_id</code> CHAR(26) · <code>created_at</code>. Indexes on <code>(entity_type, entity_id, created_at)</code>, <code>(actor_user_id, created_at)</code> and <code>(action, created_at)</code>. Append-only, enforced by database privileges: the application's runtime user is granted <code>INSERT</code> and <code>SELECT</code> on this table and nothing else. Retained 24 months.</p>
+
+<h2>9.4 Indexing strategy</h2>
+<p>Indexes are specified for the queries that actually run, listed here with the query each serves. Anything not on this list is speculative and should not be created.</p>
+<table class="compact">
+  <thead><tr><th style="width:56mm">Query</th><th>Index</th></tr></thead>
+  <tbody>
+    <tr><td>Catalogue grid, subcategory scope, sorted by newest</td><td><code>products(subcategory_id, status, published_at DESC)</code></td></tr>
+    <tr><td>Catalogue grid, sorted by best selling</td><td><code>products(status, order_count DESC)</code></td></tr>
+    <tr><td>Catalogue grid, price filter</td><td><code>products(status, min_price_amount)</code></td></tr>
+    <tr><td>Product detail by slug</td><td><code>products(slug)</code> unique</td></tr>
+    <tr><td>Retired-slug redirect</td><td><code>product_slug_history(slug)</code> unique</td></tr>
+    <tr><td>Keyword search</td><td><code>FULLTEXT products(name, description_text, brand, manufacturer_part_number)</code>; plus <code>product_variants(sku)</code> unique for the exact-SKU fast path</td></tr>
+    <tr><td>Variant lookup for a product</td><td><code>product_variants(product_id, is_active, position)</code></td></tr>
+    <tr><td>Low-stock dashboard alert</td><td><code>product_variants(stock_quantity)</code> — scanned with a threshold predicate</td></tr>
+    <tr><td>Customer order history</td><td><code>orders(user_id, placed_at DESC)</code></td></tr>
+    <tr><td>Admin order queue by status</td><td><code>orders(status, placed_at DESC)</code></td></tr>
+    <tr><td>Payment reconciliation by phone</td><td><code>orders(customer_phone)</code>, <code>payments(payer_phone)</code></td></tr>
+    <tr><td>Revenue over a period</td><td><code>orders(payment_status, paid_at)</code></td></tr>
+    <tr><td>Order timeline</td><td><code>order_events(order_id, created_at)</code></td></tr>
+    <tr><td>Stock ledger for one variant</td><td><code>stock_movements(product_variant_id, created_at DESC)</code></td></tr>
+    <tr><td>Approved reviews for a product</td><td><code>reviews(product_id, status, created_at DESC)</code></td></tr>
+    <tr><td>Zero-result searches</td><td><code>search_logs(result_count, created_at)</code></td></tr>
+    <tr><td>Search-term aggregation</td><td><code>search_logs(normalised_term, created_at)</code></td></tr>
+    <tr><td>Campaign delivery report</td><td><code>campaign_recipients(campaign_id, status)</code></td></tr>
+    <tr><td>Audit history for one entity</td><td><code>audit_logs(entity_type, entity_id, created_at DESC)</code></td></tr>
+    <tr><td>Session validation and cleanup</td><td><code>sessions(refresh_token_hash)</code> unique, <code>sessions(expires_at)</code></td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Full-text configuration</span>
+  MySQL's default full-text minimum token length is 3, which silently drops two-character searches. Electronics part numbers are full of short tokens. Set <code>innodb_ft_min_token_size = 2</code> and add an <code>innodb_ft_user_stopword_table</code> that is empty, because the default stopword list removes real terms. Verify after any server upgrade — a reverted setting fails silently and shows up only as poor search results.
+</div>
+
+<h2>9.5 Referential integrity and delete semantics</h2>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Relationship</th><th style="width:20mm">On delete</th><th>Reasoning</th></tr></thead>
+  <tbody>
+    <tr><td>category → subcategories</td><td>RESTRICT</td><td>A category with subcategories cannot be removed. This is the direct fix for defect R12: the reference platform cascades a category delete through its subcategories and into every one of their products.</td></tr>
+    <tr><td>subcategory → products</td><td>RESTRICT</td><td>Same reasoning. The admin console offers "move products to another subcategory" as the supported path.</td></tr>
+    <tr><td>product → variants, images, attributes</td><td>CASCADE</td><td>These have no meaning apart from their product.</td></tr>
+    <tr><td>variant → order_items</td><td>SET NULL</td><td>Historical orders survive; the snapshot columns keep them readable.</td></tr>
+    <tr><td>variant → cart_items</td><td>RESTRICT</td><td>Forces the deletion path to clear affected carts explicitly and notify their owners, rather than silently emptying a cart.</td></tr>
+    <tr><td>user → orders</td><td>SET NULL</td><td>Financial records outlive accounts. The snapshot fields preserve who bought what.</td></tr>
+    <tr><td>user → sessions, tokens, addresses, cart</td><td>CASCADE</td><td>Personal data goes with the account.</td></tr>
+    <tr><td>order → items, events, address</td><td>CASCADE</td><td>Only relevant if an order is ever hard-deleted, which the application never does.</td></tr>
+    <tr><td>order → payments</td><td>RESTRICT</td><td>An order with a recorded payment cannot be deleted, under any circumstances.</td></tr>
+    <tr><td>media_file → any reference</td><td>RESTRICT</td><td>A referenced file cannot be deleted; the reference count enforces it before the constraint has to.</td></tr>
+    <tr><td>article → comments</td><td>CASCADE</td><td></td></tr>
+    <tr><td>campaign → recipients</td><td>CASCADE</td><td></td></tr>
+  </tbody>
+</table>
+<div class="decision">
+  <span class="lbl">Soft delete is the default; hard delete is an operation</span>
+  Every customer-facing and administrator-facing delete sets <code>deleted_at</code>. Rows are removed from the database only by a scheduled purge — 90 days for catalogue entities, never for anything with a financial or audit dimension. The admin console gains a "Trash" view per entity with restore. This one rule converts the reference platform's most dangerous action, a bulk category delete that destroys a swathe of catalogue with no recovery, into a reversible mistake.
+</div>
+
+<h2>9.6 Full DDL</h2>
+<p>The complete, executable <code>CREATE TABLE</code> script — all 50 tables with every column, constraint, index and foreign key — is <strong>Appendix E</strong>. It is written to run against a clean MySQL 8.0 schema in a single pass, ordered so that no foreign key references a table that does not yet exist.</p>

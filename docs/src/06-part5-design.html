@@ -1,0 +1,198 @@
+<h1 class="part"><span class="num">Part Five</span>Brand and Design System</h1>
+
+<p>The reference platform's visual system is deliberately plain: a dark utility bar, a dark header with a wide search field, a white category strip, generous white space, flat white product cards on a white page, and a single saturated green used for every affordance. It is not fashionable and it is exactly right for the job — a components catalogue is read, not admired, and the restraint keeps 617 product photographs from fighting each other.</p>
+
+<p>TechStar keeps that system's structure and proportion precisely, and replaces only the identity: name, wordmark and hue. Everything specified below is normative. Where a value is inherited from the reference platform because it works, that is stated.</p>
+
+<h2>5.1 Brand definition</h2>
+<table class="compact">
+  <thead><tr><th style="width:32mm">Attribute</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td><strong>TechStar Store</strong>. Written as two words, both capitalised, no hyphen, no camel case. "TechStar" alone is acceptable in body copy after first use.</td></tr>
+    <tr><td>Wordmark</td><td><code>TECHSTAR</code> in Montserrat ExtraBold, letter-spacing <code>0.02em</code>, followed by <code>Store</code> in Montserrat Light at the same optical size, closed by a full stop in the primary green. Mirrors the reference lockup's weight contrast without copying its forms.</td></tr>
+    <tr><td>Mark</td><td>A four-point star formed from two overlapping chevrons, in primary green on white or white on primary green. Square-safe at 32&nbsp;px for the favicon; readable at 16&nbsp;px.</td></tr>
+    <tr><td>Tagline</td><td><em>Build. Learn. Innovate.</em> — three words, full stops, set in the wordmark's light weight beneath it at roughly 28% of its cap height, in the accent amber.</td></tr>
+    <tr><td>Voice</td><td>Direct and technical. Say what a thing does and what it costs. No exclamation marks in interface copy. Error messages state the problem and the fix, never blame the user.</td></tr>
+    <tr><td>Clear space</td><td>Minimum clear space around the lockup equals the cap height of <code>T</code> on all sides.</td></tr>
+    <tr><td>Minimum size</td><td>Full lockup no smaller than 120&nbsp;px wide. Below that, the mark alone.</td></tr>
+  </tbody>
+</table>
+
+<h2>5.2 Colour</h2>
+
+<h3>5.2.1 Brand palette</h3>
+<table class="compact">
+  <thead><tr><th style="width:16mm">Swatch</th><th style="width:36mm">Token</th><th style="width:22mm">Hex</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><span class="swatch" style="background:#F7921E"></span></td><td><code>--ts-primary</code></td><td><code>#F7921E</code></td><td>Primary actions, active nav, price emphasis, badges, off-canvas headers, admin table headers. The single dominant colour.</td></tr>
+    <tr><td><span class="swatch" style="background:#F7921E"></span></td><td><code>--ts-primary-dark</code></td><td><code>#F7921E</code></td><td>Hover and active states of primary buttons; headings in the admin console.</td></tr>
+    <tr><td><span class="swatch" style="background:#F7921E"></span></td><td><code>--ts-primary-pale</code></td><td><code>#F7921E</code></td><td>Icons and accents on dark backgrounds — the utility bar icons and the wordmark's inner strokes.</td></tr>
+    <tr><td><span class="swatch" style="background:#F7921E"></span></td><td><code>--ts-primary-tint</code></td><td><code>#F7921E</code></td><td>Selected table rows, active filter chips, subtle success surfaces.</td></tr>
+    <tr><td><span class="swatch" style="background:#F2A007"></span></td><td><code>--ts-accent</code></td><td><code>#F2A007</code></td><td>Sale and discount badges, "new" flags, the tagline, dashboard highlight bars. Used sparingly — never for a primary action.</td></tr>
+    <tr><td><span class="swatch" style="background:#1F1F1F"></span></td><td><code>--ts-ink</code></td><td><code>#1F1F1F</code></td><td>Main header bar and footer background.</td></tr>
+    <tr><td><span class="swatch" style="background:#2E2E2E"></span></td><td><code>--ts-ink-soft</code></td><td><code>#2E2E2E</code></td><td>Top utility bar; footer legal strip.</td></tr>
+  </tbody>
+</table>
+
+<h3>5.2.2 Neutrals and semantics</h3>
+<table class="compact">
+  <thead><tr><th style="width:16mm">Swatch</th><th style="width:34mm">Token</th><th style="width:22mm">Hex</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><span class="swatch" style="background:#FFFFFF"></span></td><td><code>--ts-surface</code></td><td><code>#FFFFFF</code></td><td>Page background, card background.</td></tr>
+    <tr><td><span class="swatch" style="background:#F6F7F8"></span></td><td><code>--ts-surface-alt</code></td><td><code>#F6F7F8</code></td><td>Order summary panel, admin page background, zebra rows.</td></tr>
+    <tr><td><span class="swatch" style="background:#ECEFF1"></span></td><td><code>--ts-surface-sunken</code></td><td><code>#ECEFF1</code></td><td>Product image wells, disabled inputs.</td></tr>
+    <tr><td><span class="swatch" style="background:#D8DEE3"></span></td><td><code>--ts-border</code></td><td><code>#D8DEE3</code></td><td>Card and input borders, dividers.</td></tr>
+    <tr><td><span class="swatch" style="background:#8B98A2"></span></td><td><code>--ts-text-muted</code></td><td><code>#8B98A2</code></td><td>Subcategory eyebrow on cards, timestamps, placeholder text.</td></tr>
+    <tr><td><span class="swatch" style="background:#4A5560"></span></td><td><code>--ts-text-secondary</code></td><td><code>#4A5560</code></td><td>Body copy in dense areas, table cells, form labels.</td></tr>
+    <tr><td><span class="swatch" style="background:#212529"></span></td><td><code>--ts-text</code></td><td><code>#212529</code></td><td>Default body text and headings.</td></tr>
+    <tr><td><span class="swatch" style="background:#1E8E4A"></span></td><td><code>--ts-success</code></td><td><code>#1E8E4A</code></td><td>Success toasts, in-stock, paid, delivered.</td></tr>
+    <tr><td><span class="swatch" style="background:#C0392B"></span></td><td><code>--ts-danger</code></td><td><code>#C0392B</code></td><td>Errors, destructive actions, out of stock, cancelled.</td></tr>
+    <tr><td><span class="swatch" style="background:#D98200"></span></td><td><code>--ts-warning</code></td><td><code>#D98200</code></td><td>Pending payment, low stock, scheduled campaigns.</td></tr>
+    <tr><td><span class="swatch" style="background:#1D6FA5"></span></td><td><code>--ts-info</code></td><td><code>#1D6FA5</code></td><td>Informational notices, processing state.</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="lbl">Contrast</span>
+  Every foreground/background pair used for text must reach WCAG 2.1 AA — 4.5:1 for body, 3:1 for text at 18.66&nbsp;px bold or 24&nbsp;px regular. Two pairs need care and are specified explicitly: <code>--ts-text-muted</code> on white reaches 3.1:1, so it is permitted only for non-essential metadata at 14&nbsp;px or larger, never for a label a user must read to act; and white on <code>--ts-accent</code> fails, so accent badges use <code>--ts-text</code> for their label, not white.
+</div>
+
+<h3>5.2.3 Status colour mapping</h3>
+<table class="compact">
+  <thead><tr><th style="width:44mm">State</th><th style="width:28mm">Token</th><th>Rendering</th></tr></thead>
+  <tbody>
+    <tr><td>Order — Pending / Awaiting payment</td><td><code>--ts-warning</code></td><td>Amber pill, dark text</td></tr>
+    <tr><td>Order — Paid / Processing</td><td><code>--ts-info</code></td><td>Blue pill, white text</td></tr>
+    <tr><td>Order — Shipped</td><td><code>--ts-primary</code></td><td>Green pill, white text</td></tr>
+    <tr><td>Order — Delivered / Completed</td><td><code>--ts-success</code></td><td>Green pill, white text, check icon</td></tr>
+    <tr><td>Order — Cancelled / Refunded</td><td><code>--ts-danger</code></td><td>Red outline pill, red text</td></tr>
+    <tr><td>Stock — In stock (&gt; 5)</td><td><code>--ts-success</code></td><td>Green dot + count</td></tr>
+    <tr><td>Stock — Low (1–5)</td><td><code>--ts-warning</code></td><td>Amber dot + "Only n left"</td></tr>
+    <tr><td>Stock — Out (0)</td><td><code>--ts-danger</code></td><td>Red dot + "Out of stock"; Add to cart disabled</td></tr>
+  </tbody>
+</table>
+
+<h2>5.3 Typography</h2>
+<p><strong>Montserrat</strong> is the single family, inherited from the reference platform and kept: it is geometric, has a wide weight range, renders legibly at small sizes on Android, and is free. Self-host WOFF2 subsets rather than loading from a CDN — it removes a third-party request from the critical path and keeps the page working when the CDN is slow, which on Tanzanian mobile networks is often.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:34mm">Role</th><th style="width:16mm">Size</th><th style="width:16mm">Weight</th><th style="width:18mm">Line height</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Display / banner title</td><td>40 / 28&nbsp;px</td><td>800</td><td>1.05</td><td>Desktop / mobile. Colour set per banner record.</td></tr>
+    <tr><td>Page heading (h1)</td><td>28 / 22&nbsp;px</td><td>700</td><td>1.2</td><td>Uppercase in section headers, as the reference does ("OUR PRODUCTS").</td></tr>
+    <tr><td>Section heading (h2)</td><td>22 / 18&nbsp;px</td><td>700</td><td>1.25</td><td></td></tr>
+    <tr><td>Card / panel heading (h3)</td><td>17 / 16&nbsp;px</td><td>600</td><td>1.3</td><td></td></tr>
+    <tr><td>Body</td><td>15&nbsp;px</td><td>400</td><td>1.6</td><td>Maximum measure 72 characters.</td></tr>
+    <tr><td>Body small</td><td>13&nbsp;px</td><td>400</td><td>1.5</td><td>Table cells, helper text.</td></tr>
+    <tr><td>Product card title</td><td>13&nbsp;px</td><td>600</td><td>1.35</td><td>Uppercase, truncated to one line with ellipsis.</td></tr>
+    <tr><td>Product card eyebrow</td><td>11&nbsp;px</td><td>400</td><td>1.3</td><td>Uppercase, muted — the subcategory name.</td></tr>
+    <tr><td>Price</td><td>15&nbsp;px</td><td>600</td><td>1.3</td><td>Primary green. Discounted price shows the original struck through in muted grey immediately before it.</td></tr>
+    <tr><td>Button</td><td>14&nbsp;px</td><td>600</td><td>1</td><td>Uppercase, letter-spacing <code>0.04em</code>.</td></tr>
+    <tr><td>Label</td><td>12&nbsp;px</td><td>600</td><td>1.3</td><td>Uppercase, letter-spacing <code>0.05em</code>, secondary text colour.</td></tr>
+    <tr><td>Caption / meta</td><td>11&nbsp;px</td><td>400</td><td>1.4</td><td>Muted.</td></tr>
+    <tr><td>Monospace</td><td>13&nbsp;px</td><td>400</td><td>1.5</td><td>SKUs, order numbers, payment references. <code>ui-monospace, "Cascadia Mono", Consolas, monospace</code>.</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="lbl">Font loading</span>
+  Ship four weights only — 300, 400, 600, 800 — as Latin-subset WOFF2, roughly 22&nbsp;KB each. Preload the 400 and 600 files. Use <code>font-display: swap</code> with a metric-matched fallback stack so the layout does not reflow when the webfont arrives.
+</div>
+
+<h2>5.4 Spacing, radius, elevation</h2>
+<p>A 4&nbsp;px base scale. Bootstrap's spacer utilities are remapped onto it so <code>.p-3</code>, <code>.my-4</code> and friends produce these values.</p>
+<table class="compact">
+  <thead><tr><th style="width:20mm">Token</th><th style="width:16mm">Value</th><th>Typical use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--sp-1</code></td><td>4&nbsp;px</td><td>Icon-to-label gap</td></tr>
+    <tr><td><code>--sp-2</code></td><td>8&nbsp;px</td><td>Inside chips and badges; between form label and control</td></tr>
+    <tr><td><code>--sp-3</code></td><td>12&nbsp;px</td><td>Card inner padding at mobile; grid gutter at mobile</td></tr>
+    <tr><td><code>--sp-4</code></td><td>16&nbsp;px</td><td>Default card padding; grid gutter</td></tr>
+    <tr><td><code>--sp-5</code></td><td>24&nbsp;px</td><td>Between stacked form fields; panel padding</td></tr>
+    <tr><td><code>--sp-6</code></td><td>32&nbsp;px</td><td>Between page sections at mobile</td></tr>
+    <tr><td><code>--sp-7</code></td><td>48&nbsp;px</td><td>Between page sections at desktop</td></tr>
+    <tr><td><code>--sp-8</code></td><td>64&nbsp;px</td><td>Above the footer; around empty states</td></tr>
+  </tbody>
+</table>
+<table class="compact">
+  <thead><tr><th style="width:26mm">Token</th><th style="width:26mm">Value</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--radius-sm</code></td><td>3&nbsp;px</td><td>Inputs, buttons, badges</td></tr>
+    <tr><td><code>--radius-md</code></td><td>6&nbsp;px</td><td>Cards, panels, modals</td></tr>
+    <tr><td><code>--radius-pill</code></td><td>999&nbsp;px</td><td>Status pills, cart count badge, the card's "ADD TO CART" reveal</td></tr>
+    <tr><td><code>--shadow-1</code></td><td><code>0 1px 2px rgba(16,24,32,.06)</code></td><td>Resting card</td></tr>
+    <tr><td><code>--shadow-2</code></td><td><code>0 4px 12px rgba(16,24,32,.10)</code></td><td>Hovered card, dropdown, popover</td></tr>
+    <tr><td><code>--shadow-3</code></td><td><code>0 12px 32px rgba(16,24,32,.16)</code></td><td>Modal, off-canvas panel</td></tr>
+  </tbody>
+</table>
+
+<h2>5.5 Iconography</h2>
+<p><strong>Lucide React</strong> as the primary set, with Bootstrap Icons filling gaps. Both are outline sets at a 24&nbsp;px grid with a 1.5&nbsp;px stroke; both tree-shake to only the icons imported, which the reference platform's FontAwesome bundle does not. Brand logos for social links and payment networks come from Simple Icons.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Meaning</th><th style="width:30mm">Icon</th><th>Placement</th></tr></thead>
+  <tbody>
+    <tr><td>Cart</td><td><code>shopping-cart</code></td><td>Header, with a pill badge showing item count</td></tr>
+    <tr><td>Wishlist</td><td><code>heart</code></td><td>Header with count badge; product card action</td></tr>
+    <tr><td>Quick view</td><td><code>eye</code></td><td>Product card action, opens the preview modal</td></tr>
+    <tr><td>Search</td><td><code>search</code></td><td>Header field; mobile search trigger</td></tr>
+    <tr><td>Account</td><td><code>user</code></td><td>Header when signed in</td></tr>
+    <tr><td>Menu</td><td><code>menu</code></td><td>Mobile, opens the left off-canvas navigation</td></tr>
+    <tr><td>Chevrons</td><td><code>chevron-left/right/down</code></td><td>Carousel arrows, dropdown indicators, pagination</td></tr>
+    <tr><td>Edit / delete</td><td><code>square-pen</code> / <code>trash-2</code></td><td>Admin row actions</td></tr>
+    <tr><td>Add</td><td><code>plus</code></td><td>Admin create buttons; quantity stepper</td></tr>
+    <tr><td>Success / error / warning</td><td><code>check-circle</code> / <code>alert-circle</code> / <code>alert-triangle</code></td><td>Toasts, field errors, confirmations</td></tr>
+    <tr><td>Print</td><td><code>printer</code></td><td>Invoice and order detail</td></tr>
+    <tr><td>WhatsApp</td><td>Simple Icons <code>whatsapp</code></td><td>Fixed floating button, bottom-right, all storefront pages</td></tr>
+  </tbody>
+</table>
+
+<h2>5.6 Grid and breakpoints</h2>
+<p>Bootstrap's 12-column grid at its default breakpoints, with a container capped at 1200&nbsp;px. Product grid column counts are specified per breakpoint because they are the single most visible responsive decision in the product.</p>
+<table class="compact">
+  <thead><tr><th style="width:16mm">Name</th><th style="width:24mm">Min width</th><th style="width:24mm">Container</th><th style="width:26mm">Product grid</th><th>Layout behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>xs</code></td><td>0</td><td>fluid, 12&nbsp;px gutter</td><td>2 columns</td><td>Off-canvas navigation; search collapses to an icon that opens a modal; utility bar hidden; footer columns stack.</td></tr>
+    <tr><td><code>sm</code></td><td>576&nbsp;px</td><td>540&nbsp;px</td><td>2 columns</td><td>As above with larger type.</td></tr>
+    <tr><td><code>md</code></td><td>768&nbsp;px</td><td>720&nbsp;px</td><td>3 columns</td><td>Utility bar appears; horizontal category strip replaces the off-canvas; card hover actions become available.</td></tr>
+    <tr><td><code>lg</code></td><td>992&nbsp;px</td><td>960&nbsp;px</td><td>4 columns</td><td>Inline header search field appears; checkout splits into form + sticky summary; product detail splits gallery / buy-box.</td></tr>
+    <tr><td><code>xl</code></td><td>1200&nbsp;px</td><td>1140&nbsp;px</td><td>6 columns</td><td>Full mega-menu with two panels; carousels show 6 cards.</td></tr>
+    <tr><td><code>xxl</code></td><td>1400&nbsp;px</td><td>1140&nbsp;px</td><td>6 columns</td><td>Container does not grow past 1140&nbsp;px — product photography does not benefit from more width and the measure gets unreadable.</td></tr>
+  </tbody>
+</table>
+
+<h2>5.7 Motion</h2>
+<table class="compact">
+  <thead><tr><th style="width:36mm">Interaction</th><th style="width:26mm">Duration / easing</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Button / link hover</td><td>120&nbsp;ms ease-out</td><td>Background and border colour only. No movement.</td></tr>
+    <tr><td>Card hover</td><td>160&nbsp;ms ease-out</td><td>Shadow 1 → 2; the "ADD TO CART" pill slides up from the card's lower edge, as on the reference platform. Desktop only — suppressed below <code>md</code> and on coarse pointers.</td></tr>
+    <tr><td>Off-canvas cart / wishlist / nav</td><td>250&nbsp;ms cubic-bezier(.25,.8,.25,1)</td><td>Slide from the edge with a scrim fade. Focus moves into the panel; <kbd>Esc</kbd> closes; focus returns to the trigger.</td></tr>
+    <tr><td>Modal</td><td>200&nbsp;ms ease-out</td><td>Fade plus 8&nbsp;px upward translate.</td></tr>
+    <tr><td>Toast</td><td>200&nbsp;ms in, auto-dismiss 5&nbsp;s</td><td>Bottom-right. Errors do not auto-dismiss.</td></tr>
+    <tr><td>Carousel</td><td>400&nbsp;ms ease-in-out</td><td>Banner autoplay 6&nbsp;s, pauses on hover and on focus within.</td></tr>
+    <tr><td>Skeleton shimmer</td><td>1.4&nbsp;s linear, infinite</td><td>Any content area whose load exceeds 300&nbsp;ms.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Reduced motion</span>
+  Under <code>prefers-reduced-motion: reduce</code>, all transitions collapse to 0&nbsp;ms, carousel autoplay is disabled, and the shimmer becomes a static tint. This is a hard requirement, not an enhancement.
+</div>
+
+<h2>5.8 Component tokens</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Component</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Button, primary</td><td>Height 40&nbsp;px (48&nbsp;px on touch), padding 0 20&nbsp;px, radius <code>sm</code>, background <code>--ts-primary</code>, white uppercase 14/600 label. Hover <code>--ts-primary-dark</code>. Focus: 2&nbsp;px outline in <code>--ts-primary</code> offset 2&nbsp;px. Disabled: 45% opacity, no pointer events. Loading: label replaced by a 16&nbsp;px spinner, width held constant so the layout does not jump.</td></tr>
+    <tr><td>Button, secondary</td><td>Same geometry; transparent background, 1&nbsp;px <code>--ts-primary</code> border, <code>--ts-primary</code> label. Hover fills with <code>--ts-primary-tint</code>.</td></tr>
+    <tr><td>Button, danger</td><td>Same geometry; <code>--ts-danger</code>. Always paired with a confirmation dialog when the action is irreversible.</td></tr>
+    <tr><td>Input</td><td>Height 40&nbsp;px, padding 0 12&nbsp;px, 1&nbsp;px <code>--ts-border</code>, radius <code>sm</code>, 15&nbsp;px text. Focus: border <code>--ts-primary</code> plus a 3&nbsp;px tint ring. Invalid: border <code>--ts-danger</code>, message beneath in 12&nbsp;px <code>--ts-danger</code> preceded by an <code>alert-circle</code> icon, wired with <code>aria-describedby</code>.</td></tr>
+    <tr><td>Select</td><td>As input, with a <code>chevron-down</code> 16&nbsp;px inset 12&nbsp;px from the right. Searchable selects (subcategory, contacts) use react-select styled to match.</td></tr>
+    <tr><td>Product card</td><td>White, 1&nbsp;px <code>--ts-border</code>, radius <code>md</code>, shadow 1. Image well is a 1:1 square with <code>object-fit: contain</code> on <code>--ts-surface-sunken</code> — components photographed on white must not be cropped. Body padding 12&nbsp;px: eyebrow, title, price, then a two-icon action row (wishlist, quick view). Hover reveals the ADD TO CART pill.</td></tr>
+    <tr><td>Badge</td><td>Pill radius, 11/700 uppercase, padding 2&nbsp;px 8&nbsp;px. Discount badges sit top-left of the image well; "NEW" top-right.</td></tr>
+    <tr><td>Table (admin)</td><td>Header row <code>--ts-primary-dark</code> with white 12/600 uppercase labels. Rows 44&nbsp;px, zebra on <code>--ts-surface-alt</code>, hover <code>--ts-primary-tint</code>. Selection checkbox in the first column; sticky header on scroll; horizontal scroll inside its own container below <code>lg</code>.</td></tr>
+    <tr><td>Off-canvas</td><td>Width 380&nbsp;px desktop, 100% below <code>sm</code>. Header <code>--ts-primary</code> with a white uppercase title and a white close button. Body scrolls; a footer pinned to the bottom holds the subtotal and the primary action.</td></tr>
+    <tr><td>Modal</td><td>Centred, max-width 520&nbsp;px (900&nbsp;px for the product quick-view). Radius <code>md</code>, shadow 3. Header <code>--ts-primary</code>, white title, white close control.</td></tr>
+    <tr><td>Toast</td><td>Bottom-right, 320&nbsp;px, white, shadow 2, a 4&nbsp;px left rule in the semantic colour, bold title plus body, close button.</td></tr>
+    <tr><td>Empty state</td><td>Centred: 48&nbsp;px muted icon, a 17/600 heading, one sentence of guidance, and one primary action. Every list, grid and table in the product has one, and each is specified in Part 7 or 14 — never a bare blank area.</td></tr>
+  </tbody>
+</table>

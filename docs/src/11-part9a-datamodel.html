@@ -1,0 +1,229 @@
+<h1 class="part"><span class="num">Part Nine</span>Data Model — MySQL</h1>
+
+<h2>9.1 Modelling principles</h2>
+<p>These rules are applied without exception across all 50 tables. Where a rule differs from what the reference platform does, the reason is given — the reference platform stores documents in MongoDB, and a direct transliteration of that shape into MySQL would inherit its defects.</p>
+
+<table>
+  <thead><tr><th style="width:36mm">Principle</th><th>Rule and rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Primary keys</td><td><code>BIGINT UNSIGNED AUTO_INCREMENT</code>. Compact, ordered, and ideal for InnoDB's clustered index. Public identifiers are separate: slugs for catalogue entities, human-readable numbers for orders and invoices, and random tokens for shareable links. A primary key is never exposed in a URL (§6.6).</td></tr>
+    <tr><td>Public identifiers</td><td>Every entity that appears in a URL carries either a <code>slug VARCHAR(96)</code> with a unique index, or a formatted number such as <code>TS-2026-000148</code>. This is what makes defect R1 structurally impossible.</td></tr>
+    <tr><td>Money</td><td><code>BIGINT</code> holding <strong>minor units</strong> — for TZS, whole shillings, since TZS has no subunit in practice. Never <code>FLOAT</code> or <code>DOUBLE</code>. Every money column is named with an <code>_amount</code> suffix and is accompanied by a <code>currency CHAR(3)</code> on the owning row wherever the value is customer-facing, so a future multi-currency change is additive.</td></tr>
+    <tr><td>Timestamps</td><td><code>created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)</code> and <code>updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)</code> on every table. All stored in <strong>UTC</strong>; the application converts to Africa/Dar_es_Salaam (UTC+3) for display. <code>DATETIME</code> not <code>TIMESTAMP</code>, to avoid the 2038 limit.</td></tr>
+    <tr><td>Soft deletes</td><td><code>deleted_at DATETIME(3) NULL</code> on every entity a customer or an order can reference. A deleted product must still render correctly inside a three-year-old order. Queries filter <code>deleted_at IS NULL</code> by default through a Prisma middleware, with an explicit escape hatch for the admin console's trash view.</td></tr>
+    <tr><td>Character set</td><td><code>utf8mb4</code> with <code>utf8mb4_0900_ai_ci</code> collation, database-wide. Product names contain <code>®</code>, <code>µ</code>, <code>Ω</code> and emoji appear in reviews; <code>utf8</code> (three-byte) would truncate them.</td></tr>
+    <tr><td>Engine</td><td>InnoDB throughout. Foreign keys and transactional integrity are required by the order and stock logic in Part 12.</td></tr>
+    <tr><td>Enumerations</td><td><code>VARCHAR</code> with a <code>CHECK</code> constraint, not MySQL's <code>ENUM</code>. Adding a value to a native <code>ENUM</code> rewrites the table; a check constraint is altered cheaply, and the values stay legible in a dump.</td></tr>
+    <tr><td>Booleans</td><td><code>TINYINT(1) NOT NULL DEFAULT 0</code>. Named affirmatively — <code>is_active</code>, never <code>is_not_disabled</code>.</td></tr>
+    <tr><td>Nullability</td><td><code>NOT NULL</code> is the default. <code>NULL</code> is used only where "unknown" is genuinely different from "empty" — a guest order's email is <code>NULL</code>; a product with no description holds <code>''</code>.</td></tr>
+    <tr><td>Denormalised counters</td><td><code>product_count</code>, <code>order_count</code>, <code>review_count</code>, <code>average_rating</code> are maintained in the same transaction as the fact that changes them, never recomputed on read. The reference platform does the same and it is right — but it must be transactional, or the counts drift.</td></tr>
+    <tr><td>Snapshots</td><td>Orders and invoices store a <strong>copy</strong> of the name, SKU, price and attributes at the moment of purchase, alongside a nullable reference to the live entity. An order must be reprintable after the product is renamed, repriced or deleted. This is not redundancy; it is the correct model for a financial record.</td></tr>
+    <tr><td>Naming</td><td><code>snake_case</code>, plural table names, singular column names, foreign keys as <code>&lt;singular_table&gt;_id</code>. Indexes named <code>idx_&lt;table&gt;_&lt;cols&gt;</code>, uniques <code>uq_</code>, foreign keys <code>fk_&lt;table&gt;_&lt;ref&gt;</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>9.2 Entity–relationship overview</h2>
+<pre>IDENTITY                               CATALOGUE
+users ─┬─ user_addresses                categories ──&lt; subcategories ──&lt; products
+       ├─ oauth_accounts                                                    │
+       ├─ sessions                      products ─┬─ product_images         │
+       ├─ email_verification_tokens               ├─ product_attributes ──&lt; │
+       ├─ password_reset_tokens                   │      product_variants ──┘
+       ├─&lt; user_roles &gt;── roles                   ├─&lt; variant_attribute_values
+       │        │                                 ├─&lt; product_tags &gt;── tags
+       │        └─&lt; role_permissions &gt;── permissions   ├─ product_slug_history
+       │                                           └─&lt; discounts
+       │
+COMMERCE                                        product_variants
+       ├─ carts ──&lt; cart_items ─────────────────────────┤
+       ├─ wishlists ──&lt; wishlist_items ─────────────────┤
+       │                                                │
+       └─&lt; orders ─┬─&lt; order_items ─────────────────────┘
+                   ├─&lt; order_events            shipping_methods ──┐
+                   ├─&lt; payments ──&lt; payment_events                │
+                   ├── order_shipping_address                     │
+                   └─── shipping_method_id ───────────────────────┘
+
+             stock_movements &gt;── product_variants
+             invoices ──&lt; invoice_items
+
+CONTENT                                 MARKETING &amp; ANALYTICS
+banners      articles ──&lt; comments      campaigns ──&lt; campaign_recipients
+services     reviews &gt;── products       contacts
+partners     faqs                       search_logs
+site_settings  currency_settings        contact_messages
+media_files    regions ──&lt; districts    notify_requests
+                                        audit_logs</pre>
+
+<h2>9.3 Table-by-table specification</h2>
+<p>Columns are given as <em>name · type · constraints · notes</em>. Every table also carries <code>created_at</code> and <code>updated_at</code> as defined in §9.1; these are omitted below for brevity and are present in the DDL in Appendix E.</p>
+
+<h3>9.3.1 <code>users</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Column</th><th style="width:38mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>public_id</code></td><td>CHAR(26) UNIQUE</td><td>ULID. Used in admin URLs and support conversations, so the sequential primary key is never exposed.</td></tr>
+    <tr><td><code>email</code></td><td>VARCHAR(255) NULL UNIQUE</td><td>Nullable because a phone-only account is valid. Stored lowercase; uniqueness is case-insensitive by collation.</td></tr>
+    <tr><td><code>email_verified_at</code></td><td>DATETIME(3) NULL</td><td>Replaces the reference platform's boolean <code>validEmail</code> — knowing <em>when</em> is worth the same storage.</td></tr>
+    <tr><td><code>phone</code></td><td>VARCHAR(15) NULL UNIQUE</td><td>Stored canonically as <code>255XXXXXXXXX</code>, digits only, no plus.</td></tr>
+    <tr><td><code>phone_verified_at</code></td><td>DATETIME(3) NULL</td><td>For a future SMS OTP flow.</td></tr>
+    <tr><td><code>username</code></td><td>VARCHAR(80) NOT NULL</td><td>Display name. Not unique — two customers may both be "John Mushi".</td></tr>
+    <tr><td><code>password_hash</code></td><td>VARCHAR(255) NULL</td><td>Argon2id. <code>NULL</code> for OAuth-only accounts.</td></tr>
+    <tr><td><code>account_type</code></td><td>VARCHAR(16) NOT NULL DEFAULT 'customer'</td><td>CHECK IN ('customer','staff'). Fine-grained authority comes from roles.</td></tr>
+    <tr><td><code>status</code></td><td>VARCHAR(16) NOT NULL DEFAULT 'active'</td><td>CHECK IN ('active','suspended','closed').</td></tr>
+    <tr><td><code>profile_image_id</code></td><td>BIGINT UNSIGNED NULL FK → media_files</td><td>ON DELETE SET NULL.</td></tr>
+    <tr><td><code>marketing_opt_in</code></td><td>TINYINT(1) NOT NULL DEFAULT 0</td><td>Consent for campaigns. Absent from the reference platform, which mails every contact — a compliance risk.</td></tr>
+    <tr><td><code>last_login_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+    <tr><td><code>failed_login_count</code></td><td>SMALLINT UNSIGNED NOT NULL DEFAULT 0</td><td>Drives progressive lockout (§11.6).</td></tr>
+    <tr><td><code>locked_until</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+    <tr><td><code>deleted_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+  </tbody>
+</table>
+<p class="kv"><strong>Constraints.</strong> <code>CHECK (email IS NOT NULL OR phone IS NOT NULL)</code> — an account must be reachable by at least one channel. <strong>Indexes.</strong> <code>uq_users_email</code>, <code>uq_users_phone</code>, <code>uq_users_public_id</code>, <code>idx_users_status_created</code>, <code>idx_users_account_type</code>.</p>
+
+<h3>9.3.2 <code>user_addresses</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Column</th><th style="width:38mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED FK → users</td><td>ON DELETE CASCADE.</td></tr>
+    <tr><td><code>label</code></td><td>VARCHAR(40) NULL</td><td>"Home", "Office".</td></tr>
+    <tr><td><code>receiver_name</code></td><td>VARCHAR(120) NOT NULL</td><td>Often not the account holder.</td></tr>
+    <tr><td><code>email</code></td><td>VARCHAR(255) NULL</td><td></td></tr>
+    <tr><td><code>phone</code></td><td>VARCHAR(15) NOT NULL</td><td>The courier's contact number.</td></tr>
+    <tr><td><code>country</code></td><td>VARCHAR(64) NOT NULL DEFAULT 'Tanzania'</td><td></td></tr>
+    <tr><td><code>region</code></td><td>VARCHAR(64) NOT NULL</td><td>Denormalised name, not an FK — regions rarely change and the historical name must survive a rename.</td></tr>
+    <tr><td><code>district</code></td><td>VARCHAR(64) NOT NULL</td><td></td></tr>
+    <tr><td><code>street_address</code></td><td>VARCHAR(255) NOT NULL</td><td></td></tr>
+    <tr><td><code>postal_code</code></td><td>VARCHAR(20) NULL</td><td></td></tr>
+    <tr><td><code>is_default</code></td><td>TINYINT(1) NOT NULL DEFAULT 0</td><td>Application-enforced: at most one default per user.</td></tr>
+    <tr><td><code>deleted_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+  </tbody>
+</table>
+
+<h3>9.3.3 <code>oauth_accounts</code></h3>
+<p><code>id</code> · <code>user_id</code> FK CASCADE · <code>provider</code> VARCHAR(20) CHECK IN ('google','facebook') · <code>provider_user_id</code> VARCHAR(191) · <code>email</code> VARCHAR(255) NULL · <code>raw_profile</code> JSON NULL · <code>linked_at</code> DATETIME(3). Unique on <code>(provider, provider_user_id)</code>; index on <code>user_id</code>. A user may link both providers.</p>
+
+<h3>9.3.4 <code>sessions</code></h3>
+<p><code>id</code> · <code>user_id</code> FK CASCADE · <code>refresh_token_hash</code> CHAR(64) UNIQUE (SHA-256 — the raw token is never stored) · <code>user_agent</code> VARCHAR(255) · <code>ip_address</code> VARBINARY(16) · <code>expires_at</code> DATETIME(3) · <code>revoked_at</code> DATETIME(3) NULL · <code>replaced_by_id</code> BIGINT NULL (rotation chain, §11.2). Indexes on <code>(user_id, revoked_at)</code> and <code>expires_at</code> for the cleanup job.</p>
+
+<h3>9.3.5 <code>email_verification_tokens</code> and <code>password_reset_tokens</code></h3>
+<p>Identical shape: <code>id</code> · <code>user_id</code> FK CASCADE · <code>token_hash</code> CHAR(64) UNIQUE · <code>expires_at</code> DATETIME(3) · <code>used_at</code> DATETIME(3) NULL · <code>requested_ip</code> VARBINARY(16). Verification tokens live 24 hours, reset tokens 60 minutes. Issuing a new token invalidates all outstanding ones for that user.</p>
+
+<h3>9.3.6 <code>roles</code>, <code>permissions</code>, <code>role_permissions</code>, <code>user_roles</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Table</th><th>Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>roles</code></td><td><code>id</code> · <code>key</code> VARCHAR(40) UNIQUE · <code>name</code> VARCHAR(80) · <code>description</code> VARCHAR(255) · <code>is_system</code> TINYINT(1) — system roles cannot be deleted.</td></tr>
+    <tr><td><code>permissions</code></td><td><code>id</code> · <code>key</code> VARCHAR(60) UNIQUE (e.g. <code>product.create</code>) · <code>group</code> VARCHAR(40) · <code>description</code> VARCHAR(255).</td></tr>
+    <tr><td><code>role_permissions</code></td><td><code>role_id</code> · <code>permission_id</code>, composite PK, both FK CASCADE.</td></tr>
+    <tr><td><code>user_roles</code></td><td><code>user_id</code> · <code>role_id</code>, composite PK · <code>granted_by</code> BIGINT NULL · <code>granted_at</code>.</td></tr>
+  </tbody>
+</table>
+<p class="kv">Seeded roles: <strong>owner</strong> (all permissions, undeletable, at least one must always exist), <strong>manager</strong> (everything except staff and settings), <strong>catalogue</strong> (products, categories, media), <strong>fulfilment</strong> (orders, invoices, customers read-only), <strong>marketing</strong> (campaigns, contacts, articles, banners), <strong>support</strong> (orders and customers read-only, comment and review moderation).</p>
+
+<h3>9.3.7 <code>categories</code></h3>
+<p><code>id</code> · <code>name</code> VARCHAR(120) NOT NULL · <code>slug</code> VARCHAR(96) UNIQUE · <code>sku_code</code> CHAR(2) UNIQUE (the two-digit prefix, §12.1) · <code>description</code> VARCHAR(500) NULL · <code>image_id</code> FK → media_files NULL · <code>position</code> INT NOT NULL DEFAULT 0 (manual ordering) · <code>subcategory_count</code> INT UNSIGNED NOT NULL DEFAULT 0 · <code>product_count</code> INT UNSIGNED NOT NULL DEFAULT 0 · <code>is_active</code> TINYINT(1) NOT NULL DEFAULT 1 · <code>deleted_at</code>. Indexes: <code>uq_categories_slug</code>, <code>uq_categories_sku_code</code>, <code>idx_categories_position</code>.</p>
+
+<h3>9.3.8 <code>subcategories</code></h3>
+<p><code>id</code> · <code>category_id</code> FK → categories RESTRICT · <code>name</code> VARCHAR(140) · <code>slug</code> VARCHAR(96) UNIQUE · <code>sku_code</code> CHAR(4) UNIQUE · <code>description</code> VARCHAR(500) NULL · <code>image_id</code> NULL · <code>position</code> INT · <code>product_count</code> INT UNSIGNED · <code>is_active</code> TINYINT(1) · <code>deleted_at</code>. Indexes: <code>uq_subcategories_slug</code>, <code>uq_subcategories_sku_code</code>, <code>idx_subcategories_category</code>.</p>
+<div class="note">
+  <span class="lbl">Why exactly two levels</span>
+  A general tree with a self-referencing parent is more flexible and worse here. The SKU scheme is positional and assumes two levels; the mega-menu is a two-panel design that assumes two levels; and the observed taxonomy — 17 categories, 102 subcategories — has never needed a third. Two explicit tables give simpler queries, cheaper counts and stronger constraints. If a third level is ever required, it is an additive migration, not a redesign.
+</div>
+
+<h3>9.3.9 <code>products</code> (the product group)</h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Column</th><th style="width:38mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>subcategory_id</code></td><td>BIGINT UNSIGNED FK RESTRICT</td><td>A subcategory holding products cannot be hard-deleted.</td></tr>
+    <tr><td><code>name</code></td><td>VARCHAR(255) NOT NULL</td><td>Trimmed and internal whitespace collapsed on write — the direct fix for the dirty names observed in the reference data (R2).</td></tr>
+    <tr><td><code>slug</code></td><td>VARCHAR(96) NOT NULL UNIQUE</td><td>Generated once; never regenerated (§6.6).</td></tr>
+    <tr><td><code>sku_prefix</code></td><td>CHAR(7) NOT NULL UNIQUE</td><td>The group's seven-digit code; variants extend it (§12.1).</td></tr>
+    <tr><td><code>short_description</code></td><td>VARCHAR(500) NULL</td><td>Plain text, used for meta descriptions and card tooltips.</td></tr>
+    <tr><td><code>description_html</code></td><td>MEDIUMTEXT NOT NULL</td><td>Sanitised on write.</td></tr>
+    <tr><td><code>description_text</code></td><td>MEDIUMTEXT NOT NULL</td><td>Plain-text projection, maintained on write, used by the full-text index — searching HTML matches tag names.</td></tr>
+    <tr><td><code>brand</code></td><td>VARCHAR(120) NULL</td><td></td></tr>
+    <tr><td><code>manufacturer_part_number</code></td><td>VARCHAR(80) NULL</td><td>Indexed. An electronics buyer searches by MPN as often as by name.</td></tr>
+    <tr><td><code>display_image_id</code></td><td>BIGINT UNSIGNED NULL FK</td><td>The card and hero image.</td></tr>
+    <tr><td><code>status</code></td><td>VARCHAR(16) NOT NULL DEFAULT 'draft'</td><td>CHECK IN ('draft','active','archived'). The reference platform has no draft state, so a half-entered product is immediately live.</td></tr>
+    <tr><td><code>total_stock</code></td><td>INT NOT NULL DEFAULT 0</td><td>Maintained sum across variants. Drives the in-stock facet without a join.</td></tr>
+    <tr><td><code>min_price_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td>Maintained. Drives "From TZS 200" and price-range filtering.</td></tr>
+    <tr><td><code>max_price_amount</code></td><td>BIGINT NOT NULL DEFAULT 0</td><td>Maintained.</td></tr>
+    <tr><td><code>order_count</code></td><td>INT UNSIGNED NOT NULL DEFAULT 0</td><td>Lifetime units sold; drives best-seller ordering.</td></tr>
+    <tr><td><code>view_count</code></td><td>INT UNSIGNED NOT NULL DEFAULT 0</td><td></td></tr>
+    <tr><td><code>review_count</code></td><td>INT UNSIGNED NOT NULL DEFAULT 0</td><td></td></tr>
+    <tr><td><code>average_rating</code></td><td>DECIMAL(3,2) NOT NULL DEFAULT 0</td><td>Maintained on review approval.</td></tr>
+    <tr><td><code>meta_title</code>, <code>meta_description</code></td><td>VARCHAR(70) / VARCHAR(160) NULL</td><td>SEO overrides; fall back to name and short description.</td></tr>
+    <tr><td><code>published_at</code></td><td>DATETIME(3) NULL</td><td>Drives "NEW" badging independently of <code>created_at</code>.</td></tr>
+    <tr><td><code>deleted_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+  </tbody>
+</table>
+<p class="kv"><strong>Indexes.</strong> <code>uq_products_slug</code>, <code>uq_products_sku_prefix</code>, <code>idx_products_subcategory_status</code>, <code>idx_products_status_published</code>, <code>idx_products_order_count</code>, <code>idx_products_min_price</code>, <code>idx_products_mpn</code>, and <code>ft_products_search</code> — a <code>FULLTEXT</code> index on <code>(name, description_text, brand, manufacturer_part_number)</code>.</p>
+
+<h3>9.3.10 <code>product_slug_history</code></h3>
+<p><code>id</code> · <code>product_id</code> FK CASCADE · <code>slug</code> VARCHAR(96) UNIQUE · <code>retired_at</code>. Looked up on a 404 to serve a 301 to the current slug. Retired slugs are reserved forever and can never be claimed by another product.</p>
+
+<h3>9.3.11 <code>product_images</code></h3>
+<p><code>id</code> · <code>product_id</code> FK CASCADE · <code>media_file_id</code> FK RESTRICT · <code>variant_id</code> BIGINT NULL FK SET NULL (an image may belong to one specific variant) · <code>alt_text</code> VARCHAR(255) NULL · <code>position</code> INT NOT NULL DEFAULT 0. Unique on <code>(product_id, media_file_id)</code>; index on <code>(product_id, position)</code>.</p>
+
+<h3>9.3.12 <code>product_attributes</code></h3>
+<p>The attribute <em>columns</em> a product's variant matrix defines. <code>id</code> · <code>product_id</code> FK CASCADE · <code>name</code> VARCHAR(80) ("Resistance", "Capacity", "Colour") · <code>position</code> INT · <code>unit</code> VARCHAR(20) NULL ("Ω", "µF", "mm"). Unique on <code>(product_id, name)</code>.</p>
+
+<h3>9.3.13 <code>product_variants</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Column</th><th style="width:38mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>product_id</code></td><td>BIGINT UNSIGNED FK CASCADE</td><td></td></tr>
+    <tr><td><code>sku</code></td><td>VARCHAR(20) NOT NULL UNIQUE</td><td>Group prefix plus a two-digit variant suffix (§12.1).</td></tr>
+    <tr><td><code>price_amount</code></td><td>BIGINT NOT NULL</td><td><code>CHECK (price_amount &gt; 0)</code> — this constraint alone makes defect R16 impossible.</td></tr>
+    <tr><td><code>compare_at_amount</code></td><td>BIGINT NULL</td><td>The "was" price, for showing a saving.</td></tr>
+    <tr><td><code>cost_amount</code></td><td>BIGINT NULL</td><td>Purchase cost. Never exposed to the storefront; drives margin reporting.</td></tr>
+    <tr><td><code>currency</code></td><td>CHAR(3) NOT NULL DEFAULT 'TZS'</td><td></td></tr>
+    <tr><td><code>stock_quantity</code></td><td>INT NOT NULL DEFAULT 0</td><td><code>CHECK (stock_quantity &gt;= 0)</code>.</td></tr>
+    <tr><td><code>reserved_quantity</code></td><td>INT NOT NULL DEFAULT 0</td><td>Held by unpaid orders. Available = stock − reserved (§12.4).</td></tr>
+    <tr><td><code>low_stock_threshold</code></td><td>INT NOT NULL DEFAULT 5</td><td>Drives the dashboard alert and the "Only n left" treatment.</td></tr>
+    <tr><td><code>weight_grams</code></td><td>INT NULL</td><td>For future weight-based shipping.</td></tr>
+    <tr><td><code>barcode</code></td><td>VARCHAR(64) NULL</td><td></td></tr>
+    <tr><td><code>position</code></td><td>INT NOT NULL DEFAULT 0</td><td>Display order in the selector.</td></tr>
+    <tr><td><code>is_active</code></td><td>TINYINT(1) NOT NULL DEFAULT 1</td><td></td></tr>
+    <tr><td><code>deleted_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+  </tbody>
+</table>
+<p class="kv"><strong>Indexes.</strong> <code>uq_product_variants_sku</code>, <code>idx_variants_product_active</code>, <code>idx_variants_stock</code>, <code>idx_variants_price</code>.</p>
+<div class="decision">
+  <span class="lbl">Every product has at least one variant</span>
+  A product with no options still gets a single variant row. Uniform structure removes every "does this product have variants?" branch from cart, order, stock and reporting code. The storefront simply hides the selector when the count is one. This is the structural fix for defect R2.
+</div>
+
+<h3>9.3.14 <code>variant_attribute_values</code></h3>
+<p><code>variant_id</code> FK CASCADE · <code>product_attribute_id</code> FK CASCADE · <code>value</code> VARCHAR(120) NOT NULL. Composite PK on <code>(variant_id, product_attribute_id)</code>; index on <code>(product_attribute_id, value)</code> for future attribute faceting.</p>
+
+<h3>9.3.15 <code>tags</code> and <code>product_tags</code></h3>
+<p><code>tags</code>: <code>id</code> · <code>name</code> VARCHAR(60) · <code>slug</code> VARCHAR(60) UNIQUE. <code>product_tags</code>: <code>product_id</code> · <code>tag_id</code>, composite PK, both CASCADE. Tags feed search boosting and curated collections. The reference platform has a <code>tags</code> array on every product and never populates it; here it is at least usable.</p>
+
+<h3>9.3.16 <code>discounts</code></h3>
+<p><code>id</code> · <code>scope</code> VARCHAR(20) CHECK IN ('product','variant','subcategory','category') · <code>scope_id</code> BIGINT UNSIGNED · <code>type</code> VARCHAR(16) CHECK IN ('percentage','fixed') · <code>value</code> INT NOT NULL (percent 1–90, or minor units) · <code>starts_at</code> DATETIME(3) NOT NULL · <code>ends_at</code> DATETIME(3) NOT NULL · <code>is_active</code> TINYINT(1) · <code>created_by</code> FK → users. Index on <code>(scope, scope_id, is_active, starts_at, ends_at)</code>. <code>CHECK (ends_at &gt; starts_at)</code>. Resolution order when several apply is defined in §12.3.</p>
+
+<h3>9.3.17 <code>media_files</code></h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Column</th><th style="width:38mm">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td></td></tr>
+    <tr><td><code>public_id</code></td><td>CHAR(26) UNIQUE</td><td>ULID; forms the served filename.</td></tr>
+    <tr><td><code>storage_driver</code></td><td>VARCHAR(20) NOT NULL</td><td>'local' | 's3' | 'cloudinary'.</td></tr>
+    <tr><td><code>storage_key</code></td><td>VARCHAR(512) NOT NULL</td><td>Path or key within the driver.</td></tr>
+    <tr><td><code>original_filename</code></td><td>VARCHAR(255)</td><td>Sanitised; never used as a path component.</td></tr>
+    <tr><td><code>mime_type</code></td><td>VARCHAR(80)</td><td>Determined by magic-byte sniffing, not by the client-supplied header (§11.7).</td></tr>
+    <tr><td><code>byte_size</code></td><td>INT UNSIGNED</td><td></td></tr>
+    <tr><td><code>width</code>, <code>height</code></td><td>INT UNSIGNED NULL</td><td>Used to reserve layout space and prevent shift.</td></tr>
+    <tr><td><code>checksum_sha256</code></td><td>CHAR(64)</td><td>Indexed — identical uploads are deduplicated to one stored file.</td></tr>
+    <tr><td><code>derivatives</code></td><td>JSON NOT NULL</td><td><code>{"sm":{...},"md":{...},"lg":{...}}</code> each with key, width, height and byte size.</td></tr>
+    <tr><td><code>uploaded_by</code></td><td>BIGINT UNSIGNED NULL FK SET NULL</td><td></td></tr>
+    <tr><td><code>reference_count</code></td><td>INT UNSIGNED NOT NULL DEFAULT 0</td><td>Maintained. Zero-reference files older than 24 hours are swept (§15.4).</td></tr>
+    <tr><td><code>deleted_at</code></td><td>DATETIME(3) NULL</td><td></td></tr>
+  </tbody>
+</table>

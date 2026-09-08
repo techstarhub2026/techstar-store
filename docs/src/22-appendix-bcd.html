@@ -1,0 +1,196 @@
+<h1 class="part"><span class="num">Appendix B</span>Validation Message Catalogue</h1>
+<p>Every validation message in the product, in one place, so that wording stays consistent and translation is a single pass. Messages marked <em>(source)</em> are carried over verbatim from the reference platform because they are already clear; the rest are new or rewritten. Keys are the i18n identifiers.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:44mm">Key</th><th style="width:52mm">Message</th><th>Applies to</th></tr></thead>
+  <tbody>
+    <tr><td><code>validation.required</code></td><td>{Field} is required</td><td>Generic fallback</td></tr>
+    <tr><td><code>auth.username.required</code></td><td>Username is required <em>(source)</em></td><td>Register, checkout, profile</td></tr>
+    <tr><td><code>auth.email.required</code></td><td>Email is required <em>(source)</em></td><td>Register, checkout, contact</td></tr>
+    <tr><td><code>auth.email.invalid</code></td><td>Enter a valid email <em>(source)</em></td><td>Everywhere an email is taken</td></tr>
+    <tr><td><code>auth.phone.required</code></td><td>Phone is required <em>(source)</em></td><td>Register, checkout, profile</td></tr>
+    <tr><td><code>auth.phone.numeric</code></td><td>Phone must be a number <em>(source)</em></td><td>Any phone field</td></tr>
+    <tr><td><code>auth.phone.length</code></td><td>Phone number must be 12 characters long <em>(source)</em></td><td>Any phone field</td></tr>
+    <tr><td><code>auth.phone.prefix</code></td><td>Enter your number in the form 255XXXXXXXXX</td><td>Any phone field</td></tr>
+    <tr><td><code>auth.password.required</code></td><td>Password is required</td><td>Register, login, reset</td></tr>
+    <tr><td><code>auth.password.short</code></td><td>Password must be at least 10 characters</td><td>Register, reset, change</td></tr>
+    <tr><td><code>auth.password.common</code></td><td>That password is too common. Choose something less predictable.</td><td>Register, reset, change</td></tr>
+    <tr><td><code>auth.password.mismatch</code></td><td>Passwords do not match</td><td>Register, reset, change</td></tr>
+    <tr><td><code>auth.terms.required</code></td><td>Please accept the Terms &amp; Conditions to continue</td><td>Register</td></tr>
+    <tr><td><code>auth.credentials.invalid</code></td><td>Email, phone or password is incorrect</td><td>Login — never says which</td></tr>
+    <tr><td><code>auth.locked</code></td><td>Too many attempts. Please try again in {minutes} minutes.</td><td>Login</td></tr>
+    <tr><td><code>auth.token.invalid</code></td><td>This link is no longer valid</td><td>Verify, reset, pay, invoice</td></tr>
+    <tr><td><code>checkout.shipping.required</code></td><td>Please select a shipping method</td><td>Checkout</td></tr>
+    <tr><td><code>checkout.receiver.required</code></td><td>Receiver's name is required <em>(source)</em></td><td>Shipping details</td></tr>
+    <tr><td><code>checkout.region.required</code></td><td>Region is required <em>(source)</em></td><td>Shipping details</td></tr>
+    <tr><td><code>checkout.district.required</code></td><td>District is required <em>(source)</em></td><td>Shipping details</td></tr>
+    <tr><td><code>checkout.street.required</code></td><td>Street address is required <em>(source)</em></td><td>Shipping details</td></tr>
+    <tr><td><code>checkout.payment.required</code></td><td>Please select a payment method <em>(source)</em></td><td>Checkout, delegated payment</td></tr>
+    <tr><td><code>checkout.paymentNumber.required</code></td><td>Enter a payment number <em>(source)</em></td><td>Lipa Namba</td></tr>
+    <tr><td><code>checkout.paymentNumber.length</code></td><td>Payment number must be 12 characters long <em>(source)</em></td><td>Lipa Namba</td></tr>
+    <tr><td><code>cart.stock.insufficient</code></td><td>Only {n} available — quantity adjusted</td><td>Cart, checkout</td></tr>
+    <tr><td><code>cart.price.changed</code></td><td>Price changed from {old} to {new}</td><td>Cart</td></tr>
+    <tr><td><code>cart.item.unavailable</code></td><td>This item is no longer available</td><td>Cart</td></tr>
+    <tr><td><code>cart.empty</code></td><td>Your cart is empty</td><td>Checkout guard</td></tr>
+    <tr><td><code>product.subcategory.required</code></td><td>Subcategory is required <em>(source)</em></td><td>Admin product form</td></tr>
+    <tr><td><code>product.name.required</code></td><td>Product name is required <em>(source)</em></td><td>Admin product form</td></tr>
+    <tr><td><code>product.description.required</code></td><td>Description is required <em>(source)</em></td><td>Admin product form</td></tr>
+    <tr><td><code>product.image.required</code></td><td>At least one image is required</td><td>Admin product form</td></tr>
+    <tr><td><code>product.price.positive</code></td><td>Price must be greater than zero</td><td>Admin product form</td></tr>
+    <tr><td><code>product.compareAt.higher</code></td><td>Compare-at price must be higher than the price</td><td>Admin product form</td></tr>
+    <tr><td><code>product.stock.negative</code></td><td>Stock cannot be negative</td><td>Admin product form</td></tr>
+    <tr><td><code>product.attribute.valueRequired</code></td><td>Every variant needs a value for each attribute</td><td>Variant matrix</td></tr>
+    <tr><td><code>product.attribute.duplicateSet</code></td><td>Two variants have the same combination of values</td><td>Variant matrix</td></tr>
+    <tr><td><code>product.attribute.duplicateName</code></td><td>Attribute names must be unique within a product</td><td>Variant matrix</td></tr>
+    <tr><td><code>category.name.required</code></td><td>Name is required <em>(source)</em></td><td>Category, subcategory</td></tr>
+    <tr><td><code>category.sku.required</code></td><td>SKU is required <em>(source)</em></td><td>Category, subcategory</td></tr>
+    <tr><td><code>category.sku.digits</code></td><td>SKU should only contain digits <em>(source)</em></td><td>Category, subcategory</td></tr>
+    <tr><td><code>category.sku.length2</code></td><td>SKU must be exactly 2 digits</td><td>Category</td></tr>
+    <tr><td><code>category.sku.length4</code></td><td>SKU must be exactly 4 digits</td><td>Subcategory</td></tr>
+    <tr><td><code>category.sku.taken</code></td><td>That SKU is already in use</td><td>Category, subcategory</td></tr>
+    <tr><td><code>category.parent.required</code></td><td>Category is required <em>(source)</em></td><td>Subcategory</td></tr>
+    <tr><td><code>shipping.name.required</code></td><td>Shipping method is required <em>(source)</em></td><td>Shipping form</td></tr>
+    <tr><td><code>shipping.cost.required</code></td><td>Shipping cost is required <em>(source)</em></td><td>Shipping form</td></tr>
+    <tr><td><code>shipping.cost.invalid</code></td><td>Please enter a valid shipping cost <em>(source)</em></td><td>Shipping form</td></tr>
+    <tr><td><code>shipping.description.required</code></td><td>Description is required <em>(source)</em></td><td>Shipping form</td></tr>
+    <tr><td><code>banner.title.required</code></td><td>Banner title is required <em>(source)</em></td><td>Banner builder</td></tr>
+    <tr><td><code>banner.image.required</code></td><td>An image is required <em>(source)</em></td><td>Banner builder</td></tr>
+    <tr><td><code>banner.contrast.low</code></td><td>This text colour may be hard to read on that background ({ratio}:1)</td><td>Banner builder, advisory</td></tr>
+    <tr><td><code>service.heading.required</code></td><td>Service heading is required <em>(source)</em></td><td>Service form</td></tr>
+    <tr><td><code>service.heading.tooLong</code></td><td>Heading should not exceed 15 words <em>(source)</em></td><td>Service, partner, article</td></tr>
+    <tr><td><code>service.content.required</code></td><td>Service content is required <em>(source)</em></td><td>Service form</td></tr>
+    <tr><td><code>partner.name.required</code></td><td>Partner name is required <em>(source)</em></td><td>Partner form</td></tr>
+    <tr><td><code>partner.link.required</code></td><td>Link to partner's website is required <em>(source)</em></td><td>Partner form</td></tr>
+    <tr><td><code>article.heading.required</code></td><td>Article heading is required <em>(source)</em></td><td>Article form</td></tr>
+    <tr><td><code>article.description.required</code></td><td>Article description is required <em>(source)</em></td><td>Article form</td></tr>
+    <tr><td><code>article.content.required</code></td><td>Article content is required <em>(source)</em></td><td>Article form</td></tr>
+    <tr><td><code>invoice.client.required</code></td><td>Client name is required <em>(source)</em></td><td>Invoice builder</td></tr>
+    <tr><td><code>invoice.lines.required</code></td><td>Add at least one line item</td><td>Invoice builder</td></tr>
+    <tr><td><code>campaign.name.required</code></td><td>Campaign name is required <em>(source)</em></td><td>SMS composer</td></tr>
+    <tr><td><code>campaign.subject.required</code></td><td>Subject is required <em>(source)</em></td><td>Email composer</td></tr>
+    <tr><td><code>campaign.audience.required</code></td><td>Send To is required <em>(source)</em></td><td>Both composers</td></tr>
+    <tr><td><code>campaign.message.required</code></td><td>Message is required <em>(source)</em></td><td>SMS composer</td></tr>
+    <tr><td><code>campaign.content.required</code></td><td>Content is required <em>(source)</em></td><td>Email composer</td></tr>
+    <tr><td><code>campaign.schedule.required</code></td><td>Date and time are required for sending the campaign later <em>(source)</em></td><td>Both composers</td></tr>
+    <tr><td><code>campaign.contacts.required</code></td><td>Contacts are required for a specific audience <em>(source)</em></td><td>Both composers</td></tr>
+    <tr><td><code>campaign.phone.invalid</code></td><td>Invalid phone number. Please enter a 12-digit number. <em>(source)</em></td><td>SMS composer</td></tr>
+    <tr><td><code>campaign.email.invalid</code></td><td>Invalid email. Please enter a valid email. <em>(source)</em></td><td>Email composer</td></tr>
+    <tr><td><code>review.rating.required</code></td><td>Please choose a rating</td><td>Review form</td></tr>
+    <tr><td><code>review.body.required</code></td><td>Please write a few words about this product</td><td>Review form</td></tr>
+    <tr><td><code>comment.body.required</code></td><td>Comment body is required <em>(source)</em></td><td>Comment form</td></tr>
+    <tr><td><code>contact.message.required</code></td><td>Message is required <em>(source)</em></td><td>Contact form</td></tr>
+    <tr><td><code>upload.type.invalid</code></td><td>Only JPEG, PNG, WebP and AVIF images are accepted</td><td>Any uploader</td></tr>
+    <tr><td><code>upload.size.tooLarge</code></td><td>Files must be 3 MB or smaller</td><td>Any uploader</td></tr>
+    <tr><td><code>upload.failed</code></td><td>Upload failed. Please try again.</td><td>Any uploader</td></tr>
+    <tr><td><code>filter.price.range</code></td><td>Minimum price must be less than maximum price</td><td>Catalogue filter</td></tr>
+  </tbody>
+</table>
+
+<h1 class="part"><span class="num">Appendix C</span>UI Copy Deck</h1>
+<p>Non-validation user-facing copy, grouped by where it appears. Three strings shipped by the reference platform contain errors and are corrected here: "No products to diplay" → "No products to display"; "Sarturday" → "Saturday"; "Opps!" → "Oops!".</p>
+
+<table class="compact">
+  <thead><tr><th style="width:38mm">Context</th><th>Copy</th></tr></thead>
+  <tbody>
+    <tr><td>Header search placeholder</td><td>"Search products, SKUs, part numbers…"</td></tr>
+    <tr><td>Header buttons</td><td>"Search" · "Login | Register"</td></tr>
+    <tr><td>Nav</td><td>"PRODUCTS" · "SHOP" · "SUPPORT" · "SERVICES"</td></tr>
+    <tr><td>Support dropdown</td><td>"CONTACT US" · "BLOG" · "FAQ"</td></tr>
+    <tr><td>Home sections</td><td>"OUR PRODUCTS" · "NEW ARRIVALS" · "HOT-SELLING PRODUCTS" · "OUR PARTNERS" · "VIEW MORE"</td></tr>
+    <tr><td>Product card</td><td>"ADD TO CART" · "CHOOSE OPTIONS" · "OUT OF STOCK" · "NOTIFY ME"</td></tr>
+    <tr><td>Catalogue controls</td><td>"Sort by:" · "Best Selling" · "New Arrivals" · "Price" · "Filters" · "Clear all" · "MIN PRICE" · "MAX PRICE" · "Apply" · "In stock only" · "On offer"</td></tr>
+    <tr><td>Catalogue empty</td><td>"No products found" · "No products match your filters" · "No products found in the selected category"</td></tr>
+    <tr><td>Product detail</td><td>"QUANTITY:" · "AVAILABLE STOCK:" · "ADD TO CART" · "ADD TO WISHLIST" · "BUY NOW" · "NOTIFY ME WHEN AVAILABLE" · "DESCRIPTION" · "SPECIFICATIONS" · "REVIEWS" · "RELATED PRODUCTS" · "Recently viewed"</td></tr>
+    <tr><td>Product detail lead</td><td>"Shop for products that have received wide attention of customers."</td></tr>
+    <tr><td>Reviews</td><td>"Verified purchase" · "Please sign in to write a review" · "Thank you — your review will appear once approved."</td></tr>
+    <tr><td>Cart panel</td><td>"SHOPPING CART" · "Your cart is empty" · "Browse products" · "CHECKOUT" · "View cart" · "Shipping calculated at checkout" · "Undo"</td></tr>
+    <tr><td>Wishlist panel</td><td>"WISHLIST" · "Your wishlist is empty" · "Move to cart"</td></tr>
+    <tr><td>Checkout</td><td>"Getting your order" · "Returning customer?" · "Click here to log in" · "Don't have a TechStar account?" · "Click here to create an account" · "CLIENT DETAILS" · "SHIPPING METHOD" · "ESTIMATED COST" · "SHIPPING DETAILS" · "PAYMENT METHOD" · "Someone else is paying for this order" · "Your Order" · "PLACE ORDER" · "Sub Total:" · "Shipping Cost:" · "TOTAL"</td></tr>
+    <tr><td>Payment</td><td>"Lipa Namba" · "Cash" · "Payment number" · "The mobile money number you will pay from." · "Pay exactly {amount}" · "MAKE PAYMENT"</td></tr>
+    <tr><td>Confirmation</td><td>"Order placed" · "What happens next" · "We have emailed a copy to {email}" · "View order" · "Print" · "Continue shopping" · "Payment confirmed"</td></tr>
+    <tr><td>Delegated payment</td><td>"Payment request" · "{name} has asked you to pay for this order." · "This order has already been paid." · "This payment link has expired."</td></tr>
+    <tr><td>Orders</td><td>"My orders" · "You have not placed any orders yet" · "Order again" · "Print invoice" · "Cancel order" · "Pay now" · "Are you sure you want to cancel this order?"</td></tr>
+    <tr><td>Order detail labels</td><td>"Client:" · "Email:" · "Phone:" · "Receiver's name:" · "Country:" · "City/Town:" · "Street Address:" · "Postal Code:" · "Quantity:" · "Anonymous" · "Not specified"</td></tr>
+    <tr><td>Account</td><td>"Account Settings" · "Account" · "Shipping Address" · "Change Password" · "Upload image" · "Details similar to my account" · "Update" · "Successfully updated user account" · "Successfully updated shipping details"</td></tr>
+    <tr><td>Auth modal</td><td>"LOGIN" · "REGISTER" · "EMAIL OR PHONE" · "PASSWORD" · "Forgot password?" · "Don't have an account?" · "Create your account here" · "Continue with Facebook" · "Continue with Google" · "SEND RESET LINK" · "If an account exists for that address, we have sent a reset link."</td></tr>
+    <tr><td>Verification</td><td>"Please verify your email address to receive order updates." · "Send verification link" · "Verification link sent" · "Email verification successful" · "Verification failed"</td></tr>
+    <tr><td>Contact</td><td>"GET IN TOUCH WITH US" · "CONTACT DETAILS" · "Your name" · "Send Message" · "Send me a copy of this message" · "Thank you for getting in touch with TechStar Store" · "Submit another message"</td></tr>
+    <tr><td>FAQ</td><td>"Frequently Asked Questions" · "Can't find your answer?" · "Contact us" · "Chat on WhatsApp"</td></tr>
+    <tr><td>About</td><td>"Our Story" · "Vision" · "Mission" · "Core values" · "Read More" · "Read Less"</td></tr>
+    <tr><td>Blog</td><td>"Blog" · "Read more" · "Latest Articles" · "Write something here" · "Post comment" · "Please create an account or log in to comment" · "Thank you for your comment — it will appear once approved." · "No articles yet"</td></tr>
+    <tr><td>Services</td><td>"Other Services" · "ASK FOR DESIGN SERVICE"</td></tr>
+    <tr><td>Errors</td><td>"Oops!" · "Page not found" · "The page you're looking for doesn't exist." · "Go home" · "Something went wrong at our end." · "Try again" · "You appear to be offline." · "This is taking longer than usual…"</td></tr>
+    <tr><td>Admin — generic</td><td>"New {entity}" · "Search" · "Delete" · "Edit" · "Confirm" · "Cancel" · "Close" · "Are you sure you want to proceed with this action?" · "Loading…" · "No {entity} found"</td></tr>
+    <tr><td>Admin — products</td><td>"PRODUCTS" · "CREATE YOUR PRODUCT" · "EDIT YOUR PRODUCT" · "Select one" · "Enter Product Name" · "Enter price" · "Enter Stock" · "Add specifications to your product here. Skip this step if the product does not have any special specifications." · "Add Attributes" · "Attribute Name" · "Add New Values" · "Delete Table" · "Product Added Successfully" · "Product Edited Successfully"</td></tr>
+    <tr><td>Admin — categories</td><td>"PRODUCT CATEGORIES" · "PRODUCT SUBCATEGORIES" · "CREATE CATEGORY" · "EDIT CATEGORY" · "SKU (2 digits)" · "SKU (4 digits)" · "Created New Category" · "Category edited" · "Category Deleted"</td></tr>
+    <tr><td>Admin — orders</td><td>"ORDERS MADE" · "All Orders" · "Awaiting verification" · "Verify payment" · "Record manual payment" · "Issue refund" · "Mark shipped" · "Mark delivered" · "Print packing slip" · "No orders"</td></tr>
+    <tr><td>Admin — invoices</td><td>"INVOICES" · "Create Invoice" · "No Invoices" · "Please search here …" · "Print Invoice" · "Share link" · "Mark paid" · "Void"</td></tr>
+    <tr><td>Admin — shipping</td><td>"SHIPPING METHODS" · "CREATE SHIPPING METHOD" · "EDIT SHIPPING METHOD" · "Check the box if this shipping method requires the client to provide shipping details." · "Check the box if this shipping method can receive mobile payments."</td></tr>
+    <tr><td>Admin — banners</td><td>"BANNERS" · "CREATE BANNER" · "EDIT BANNER" · "Enter Title" · "Enter Subtitle" · "Choose your background colour" · "Where does the banner redirect to" · "Enter Button text" · "Preview" · "PREVIEW MODAL"</td></tr>
+    <tr><td>Admin — campaigns</td><td>"CAMPAIGNS" · "CREATE A NEW SMS CAMPAIGN" · "CREATE A NEW EMAIL CAMPAIGN" · "Send To" · "Specific contacts" · "All contacts" · "Additional contacts" · "Include contacts" · "When to send:" · "Immediately" · "Later" · "Chars. Remaining ({n}) {used}/160" · "Campaign created successfully" · "No campaigns found."</td></tr>
+    <tr><td>Admin — searches</td><td>"SEARCHES" · "Search Query" · "Number Of Searches" · "No searches found" · "Zero-result searches"</td></tr>
+    <tr><td>Admin — settings</td><td>"GENERAL SITE SETTINGS" · "About Us Page Image" · "Privacy Policy Page Image" · "Terms and Conditions Page Image" · "PREVIEW" · "UPDATE" · "Image successfully updated"</td></tr>
+    <tr><td>Admin — currency</td><td>"CURRENCY FORMATTING" · "DISPLAY CURRENCY" · "FRACTION DIGITS" · "Update Currency Format" · "CURRENCY TYPE" · "MAXIMUM FRACTION DIGITS" · "Changing the display currency does not convert stored prices."</td></tr>
+    <tr><td>Admin — uploads</td><td>"Drag &amp; drop your files or Browse" · "Drag &amp; drop your image" · "Failed to delete image"</td></tr>
+    <tr><td>Admin — dashboard</td><td>"ANALYTICS" · "CUSTOMERS" · "BEST SELLING" · "Sales Analytics" · "Orders Analytics" · "Last 7 Days" · "Last 30 Days" · "Last 12 Months" · "No products to display"</td></tr>
+    <tr><td>Weekdays</td><td>"Sunday" · "Monday" · "Tuesday" · "Wednesday" · "Thursday" · "Friday" · "Saturday"</td></tr>
+  </tbody>
+</table>
+
+<h1 class="part"><span class="num">Appendix D</span>Environment Variables</h1>
+<p>Parsed once at boot through a Zod schema (§20.7). A missing or malformed value stops the process with a message naming the variable. <strong>R</strong> = required in production.</p>
+
+<table class="compact">
+  <thead><tr><th style="width:52mm">Variable</th><th class="c" style="width:8mm">R</th><th style="width:34mm">Example</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td colspan="4"><strong>Core</strong></td></tr>
+    <tr><td><code>NODE_ENV</code></td><td class="c">✓</td><td>production</td><td>Runtime mode</td></tr>
+    <tr><td><code>APP_NAME</code></td><td class="c">✓</td><td>TechStar Store</td><td>Used in emails and page titles</td></tr>
+    <tr><td><code>APP_URL</code></td><td class="c">✓</td><td>https://techstar.co.tz</td><td>Canonical origin; used to build absolute links</td></tr>
+    <tr><td><code>API_PORT</code></td><td class="c">✓</td><td>4000</td><td>HTTP listen port</td></tr>
+    <tr><td><code>TZ</code></td><td class="c">✓</td><td>UTC</td><td>Process timezone; display conversion is done in code</td></tr>
+    <tr><td><code>LOG_LEVEL</code></td><td class="c">—</td><td>info</td><td>pino level</td></tr>
+    <tr><td colspan="4"><strong>Database and cache</strong></td></tr>
+    <tr><td><code>DATABASE_URL</code></td><td class="c">✓</td><td>mysql://user:pass@host:3306/techstar</td><td>Prisma connection string</td></tr>
+    <tr><td><code>DATABASE_POOL_SIZE</code></td><td class="c">—</td><td>10</td><td>Connection pool</td></tr>
+    <tr><td><code>REDIS_URL</code></td><td class="c">✓</td><td>redis://127.0.0.1:6379</td><td>Cache, queues, rate limits, socket adapter</td></tr>
+    <tr><td colspan="4"><strong>Security</strong></td></tr>
+    <tr><td><code>JWT_ACCESS_SECRET</code></td><td class="c">✓</td><td>32+ random bytes, base64</td><td>Access token signing</td></tr>
+    <tr><td><code>JWT_ACCESS_TTL</code></td><td class="c">—</td><td>15m</td><td>Access token lifetime</td></tr>
+    <tr><td><code>REFRESH_TOKEN_TTL_DAYS</code></td><td class="c">—</td><td>30</td><td>Refresh cookie lifetime</td></tr>
+    <tr><td><code>COOKIE_DOMAIN</code></td><td class="c">✓</td><td>.techstar.co.tz</td><td>Refresh cookie scope</td></tr>
+    <tr><td><code>ENCRYPTION_KEY</code></td><td class="c">✓</td><td>32 random bytes, base64</td><td>Encrypts provider credentials stored in settings</td></tr>
+    <tr><td><code>CORS_ORIGINS</code></td><td class="c">—</td><td>https://techstar.co.tz</td><td>Only when a separate front-end origin exists</td></tr>
+    <tr><td colspan="4"><strong>OAuth</strong></td></tr>
+    <tr><td><code>GOOGLE_CLIENT_ID</code> / <code>_SECRET</code></td><td class="c">—</td><td></td><td>Google sign-in; feature disabled when absent</td></tr>
+    <tr><td><code>FACEBOOK_APP_ID</code> / <code>_SECRET</code></td><td class="c">—</td><td></td><td>Facebook sign-in; feature disabled when absent</td></tr>
+    <tr><td colspan="4"><strong>Storage</strong></td></tr>
+    <tr><td><code>STORAGE_DRIVER</code></td><td class="c">✓</td><td>local</td><td>local · s3 · cloudinary</td></tr>
+    <tr><td><code>MEDIA_ROOT</code></td><td class="c">—</td><td>/var/lib/techstar/media</td><td>local driver only</td></tr>
+    <tr><td><code>MEDIA_PUBLIC_URL</code></td><td class="c">✓</td><td>https://techstar.co.tz/media</td><td>Base URL for served derivatives</td></tr>
+    <tr><td><code>S3_*</code></td><td class="c">—</td><td>endpoint, region, bucket, key, secret</td><td>s3 driver only</td></tr>
+    <tr><td colspan="4"><strong>Email</strong></td></tr>
+    <tr><td><code>SMTP_HOST</code> <code>_PORT</code> <code>_USER</code> <code>_PASSWORD</code> <code>_SECURE</code></td><td class="c">✓</td><td></td><td>Nodemailer transport</td></tr>
+    <tr><td><code>MAIL_FROM_NAME</code> / <code>MAIL_FROM_ADDRESS</code></td><td class="c">✓</td><td>TechStar Store / orders@…</td><td>Envelope identity</td></tr>
+    <tr><td><code>MAIL_REPLY_TO</code></td><td class="c">—</td><td>support@…</td><td></td></tr>
+    <tr><td colspan="4"><strong>SMS</strong></td></tr>
+    <tr><td><code>SMS_PROVIDER</code></td><td class="c">✓</td><td>beem</td><td>beem · nextsms · console</td></tr>
+    <tr><td><code>SMS_API_KEY</code> / <code>SMS_API_SECRET</code></td><td class="c">✓</td><td></td><td>Provider credentials</td></tr>
+    <tr><td><code>SMS_SENDER_ID</code></td><td class="c">✓</td><td>TECHSTAR</td><td>Registered with operators in advance</td></tr>
+    <tr><td colspan="4"><strong>Payments</strong></td></tr>
+    <tr><td><code>PAYMENT_PROVIDER</code></td><td class="c">—</td><td>manual</td><td>manual · selcom · clickpesa · azampay</td></tr>
+    <tr><td><code>PAYMENT_API_KEY</code> / <code>_SECRET</code> / <code>_BASE_URL</code></td><td class="c">—</td><td></td><td>Aggregator credentials</td></tr>
+    <tr><td><code>PAYMENT_WEBHOOK_SECRET</code></td><td class="c">—</td><td></td><td>Signature verification</td></tr>
+    <tr><td><code>RESERVATION_HOURS</code></td><td class="c">—</td><td>48</td><td>Unpaid order reservation window</td></tr>
+    <tr><td colspan="4"><strong>Observability and limits</strong></td></tr>
+    <tr><td><code>SENTRY_DSN</code></td><td class="c">—</td><td></td><td>Error tracking; disabled when absent</td></tr>
+    <tr><td><code>OTEL_EXPORTER_OTLP_ENDPOINT</code></td><td class="c">—</td><td></td><td>Tracing</td></tr>
+    <tr><td><code>RATE_LIMIT_ENABLED</code></td><td class="c">—</td><td>true</td><td>Off only in test</td></tr>
+    <tr><td><code>MAX_UPLOAD_MB</code></td><td class="c">—</td><td>3</td><td>Per-file cap</td></tr>
+    <tr><td colspan="4"><strong>Front end (Vite, exposed to the browser — never put a secret here)</strong></td></tr>
+    <tr><td><code>VITE_API_URL</code></td><td class="c">✓</td><td>/api/v1</td><td>Same-origin by default</td></tr>
+    <tr><td><code>VITE_SOCKET_URL</code></td><td class="c">✓</td><td>/</td><td>Socket.IO endpoint</td></tr>
+    <tr><td><code>VITE_GA_MEASUREMENT_ID</code></td><td class="c">—</td><td>G-XXXXXXXXXX</td><td>Analytics; omitted disables the tag entirely</td></tr>
+    <tr><td><code>VITE_WHATSAPP_NUMBER</code></td><td class="c">✓</td><td>255XXXXXXXXX</td><td>Floating chat button</td></tr>
+  </tbody>
+</table>

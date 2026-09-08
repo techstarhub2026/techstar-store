@@ -1,0 +1,273 @@
+<h1 class="part"><span class="num">Part Twelve</span>Business Rules and Domain Logic</h1>
+
+<p>This part is the contract the server enforces. Every rule here is checked server-side regardless of what the client does. Where a rule exists to correct a defect in the reference platform, the defect number is given.</p>
+
+<h2>12.1 SKU scheme</h2>
+<p>Inherited from the reference platform because it is genuinely good: a positional code makes a physical component store tractable, since a technician can read a bin label and know exactly where it sits in the taxonomy.</p>
+<pre>Category      2 digits    00–99      assigned on category creation
+Subcategory   4 digits    CCSS       category code + 2-digit sequence within it
+Product       7 digits    CCSSPPP    subcategory code + 3-digit sequence within it
+Variant       9 digits    CCSSPPPVV  product code + 2-digit sequence within it
+
+  05        Sensors &amp; Conditioning Boards
+  0510      Sensors &gt; Voltage
+  0510003   Sensors &gt; Voltage &gt; PZEM-004T AC Energy Meter
+  051000301 …the 100 A variant</pre>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Assignment</td><td>Automatic. The sequence is the lowest unused number within the parent's scope, allocated inside the creating transaction with a row lock on the parent so two concurrent creations cannot collide.</td></tr>
+    <tr><td>Manual override</td><td>An administrator may type a specific code when creating a category or subcategory — this is how an existing physical numbering scheme is preserved. Uniqueness is still enforced.</td></tr>
+    <tr><td>Immutability</td><td>A SKU never changes. Moving a product to a different subcategory keeps its original SKU and records the move in the audit log. Renumbering would invalidate every printed bin label, every past invoice and every supplier order.</td></tr>
+    <tr><td>Reuse</td><td>Never. A deleted product's code is retired permanently, so a historical invoice can always be traced.</td></tr>
+    <tr><td>Capacity</td><td>100 categories, 100 subcategories each, 1,000 products each, 100 variants each — 10⁹ variants. Ample. If a subcategory ever exceeds 1,000 products, the correct response is to split it, which is also the correct merchandising response.</td></tr>
+    <tr><td>Search</td><td>The full SKU and any left-anchored prefix are searchable. Typing <code>0510</code> returns everything in Voltage.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.2 Product grouping and variants</h2>
+<div class="warn">
+  <span class="lbl">The defect being fixed (R2)</span>
+  The reference platform creates one document per attribute combination and reconstructs the product at read time by grouping on the <em>name string</em>. Consequences observed in live data: names carrying double spaces and trailing whitespace; grouping that silently splits on any typographical difference; a hard prohibition on two distinct products ever sharing a name; and a product URL that is a name, so a rename breaks every link. All of it follows from one modelling choice.
+</div>
+<table>
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Structure</td><td>A <code>product</code> row is the group. Each purchasable configuration is a <code>product_variant</code> row. Every product has at least one variant, even when it has no options.</td></tr>
+    <tr><td>Attributes</td><td>A product declares its attribute columns in <code>product_attributes</code> — ordered, optionally with a unit. Each variant supplies one value per attribute. A variant missing a value for a declared attribute is invalid and rejected on save.</td></tr>
+    <tr><td>Uniqueness</td><td>Within one product, no two variants may share the same complete set of attribute values. Enforced by an application check plus a generated hash column with a unique index.</td></tr>
+    <tr><td>Name hygiene</td><td>Names are trimmed and internal whitespace collapsed on write. Duplicate names across products are permitted, since identity is the slug, not the name.</td></tr>
+    <tr><td>Which variant is default</td><td>The lowest <code>position</code> among active, in-stock variants; if all are out of stock, the lowest <code>position</code> overall. The product page preselects it.</td></tr>
+    <tr><td>Aggregates</td><td><code>total_stock</code>, <code>min_price_amount</code> and <code>max_price_amount</code> are recomputed on the product row inside any transaction that changes a variant's price, stock or active flag. They are never computed on read — the catalogue grid must not join to variants.</td></tr>
+    <tr><td>Deleting a variant</td><td>Soft delete. Refused if it is the last active variant — delete the product instead. Refused with a warning if it appears in any open cart, listing how many.</td></tr>
+    <tr><td>Adding an attribute later</td><td>Adding a column to a product that already has variants requires a value for each existing variant. The admin console prompts for them in one screen rather than silently writing blanks.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.3 Pricing and discounts</h2>
+<table>
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Storage</td><td>Integer minor units on the variant. Never a float, never a string.</td></tr>
+    <tr><td>Floor</td><td><code>CHECK (price_amount &gt; 0)</code>. A zero-price product cannot exist — fixing defect R16, where a live product sells for TZS 0. Genuinely free items are modelled as a 100%-discounted line on an order, never as a zero price.</td></tr>
+    <tr><td>Compare-at</td><td>Optional <code>compare_at_amount</code>, which must exceed <code>price_amount</code> when set. Renders as a struck-through "was" price. This is a permanent list price, distinct from a time-boxed discount.</td></tr>
+    <tr><td>Discount scopes</td><td>A discount targets a variant, a product, a subcategory or a category. Type is percentage (1–90) or a fixed amount.</td></tr>
+    <tr><td>Resolution</td><td>When several discounts apply, the <strong>most specific scope wins</strong>: variant, then product, then subcategory, then category. Within one scope, the one that saves the customer more wins. Discounts never stack — stacking is the source of most pricing incidents in retail systems.</td></tr>
+    <tr><td>Window</td><td><code>starts_at</code> and <code>ends_at</code> are mandatory and compared in UTC. A discount with no end date is not permitted; a permanent price cut is a price change.</td></tr>
+    <tr><td>Floor after discount</td><td>The discounted price is floored at 1 minor unit. A fixed discount larger than the price is clamped, never negative.</td></tr>
+    <tr><td>Rounding</td><td>Percentage discounts round to the nearest whole shilling, half away from zero. Computed once, server-side, and returned formatted — the client never calculates a price.</td></tr>
+    <tr><td>Price at order time</td><td>The price is resolved and frozen into <code>order_items.unit_price_amount</code> when the order is created. A discount expiring one minute later does not change an existing order.</td></tr>
+    <tr><td>Currency</td><td>TZS with zero fraction digits, per the runtime currency setting. Formatting uses <code>Intl.NumberFormat</code> with that configuration, on the server.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.4 Stock and reservation</h2>
+<div class="warn">
+  <span class="lbl">The defect being fixed (R7)</span>
+  The reference platform displays stock on the product page and then never checks it again. Two customers can buy the last unit; nothing prevents it. For a store that holds one or two of many parts, this is a routine failure, not an edge case.
+</div>
+<table>
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Two counters</td><td>Each variant carries <code>stock_quantity</code> (physically on hand) and <code>reserved_quantity</code> (committed to unpaid orders). <strong>Available = stock − reserved.</strong> Availability is what the storefront shows and what every check uses.</td></tr>
+    <tr><td>Reservation</td><td>Created when an order is placed. Reserved stock is not deducted from <code>stock_quantity</code> — the goods are still on the shelf — but it is not sellable.</td></tr>
+    <tr><td>Expiry</td><td>Reservations for unpaid orders expire after <strong>48 hours</strong>. A scheduled job releases them, moves the order to <code>expired</code> and notifies the customer with a link to reorder. Cash-on-delivery orders are exempt, since payment happens at handover.</td></tr>
+    <tr><td>Deduction</td><td><code>stock_quantity</code> is decremented and the reservation released at the moment payment is confirmed — or, for cash on delivery, when the order is marked shipped. Deducting earlier makes the figure lie about what is on the shelf.</td></tr>
+    <tr><td>Restoration</td><td>Cancellation releases the reservation. A refund after fulfilment restores <code>stock_quantity</code> only when the goods physically return, which the administrator confirms explicitly.</td></tr>
+    <tr><td>Concurrency</td><td>Every stock mutation runs inside a transaction that takes <code>SELECT … FOR UPDATE</code> on the variant row, in ascending variant-id order across the whole order to prevent deadlock. The check and the write are never separated.</td></tr>
+    <tr><td>Ledger</td><td>Every change writes a <code>stock_movements</code> row in the same transaction, with reason, reference and actor. No exceptions — an adjustment with no ledger row is a bug.</td></tr>
+    <tr><td>Manual adjustment</td><td>Requires <code>stock.adjust</code>, a reason from the fixed list, and a note when the delta exceeds 10 units. Fully audited.</td></tr>
+    <tr><td>Backorder</td><td>Not supported at launch. An out-of-stock variant cannot be added to a cart. "Notify me when available" captures the demand instead.</td></tr>
+    <tr><td>Low stock</td><td>Crossing <code>low_stock_threshold</code> downward raises a dashboard alert and, once daily, a digest email to staff holding <code>stock.read</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.5 Cart rules</h2>
+
+<h3>12.5.1 Composition</h3>
+<ul>
+  <li>A cart line is <code>(variant, quantity)</code>. Adding an existing variant increments rather than duplicating, enforced by a unique index.</li>
+  <li>Quantity is at least 1 and at most the available stock. Requesting more clamps to available and reports it.</li>
+  <li>A cart holds at most 100 distinct lines and 999 units per line — bounds that prevent abuse without troubling a real bulk buyer.</li>
+</ul>
+
+<h3>12.5.2 Persistence</h3>
+<p>A guest cart is server-side, keyed by a <code>guest_token</code> cookie, and mirrored to <code>localStorage</code> for instant first paint. A signed-in cart is server-side against the user. The server is always authoritative; local storage is a cache, not a source of truth. This is what lets a customer add on a phone and check out on a laptop — a journey the reference platform cannot support, since its cart never leaves the browser until checkout.</p>
+
+<h3>12.5.3 Revalidation</h3>
+<p>Every cart read, and the checkout submit, revalidates each line against live data. This is the fix for defects R6 and R7.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Condition</th><th>Response</th></tr></thead>
+  <tbody>
+    <tr><td>Product or variant soft-deleted</td><td>Line removed; notice "This item is no longer available."</td></tr>
+    <tr><td>Variant deactivated</td><td>Same.</td></tr>
+    <tr><td>Price increased</td><td>Line updated to the new price; amber notice "Price changed from X to Y." Checkout requires an explicit re-confirmation.</td></tr>
+    <tr><td>Price decreased</td><td>Line updated silently, with a positive notice. Nobody objects to paying less, and no confirmation is required.</td></tr>
+    <tr><td>Available &lt; quantity</td><td>Quantity clamped to available; notice "Only n left — quantity reduced."</td></tr>
+    <tr><td>Available = 0</td><td>Line marked unavailable and excluded from the total, but kept visible so the customer knows why the total changed.</td></tr>
+  </tbody>
+</table>
+
+<h3>12.5.4 Merge on sign-in</h3>
+<pre>for each line in guestCart:
+    if accountCart has the same variant:
+        quantity = max(guest.quantity, account.quantity)   # never sum —
+        # summing silently doubles an order the customer did not intend
+    else:
+        add the line
+clamp every line to available stock
+delete the guest cart, clear the guest cookie
+report a summary: "3 items added to your cart"</pre>
+<p>The wishlist merges by union, with duplicates dropped.</p>
+
+<h2>12.6 Shipping</h2>
+<table>
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Model</td><td>Flat cost per method, as the reference platform does. Not weight- or distance-based. The columns for weight exist (§9.3.13) so a future change is additive.</td></tr>
+    <tr><td>Availability</td><td>A method may declare <code>available_regions</code>. Methods not available for the chosen region are hidden once a region is selected. Before a region is chosen, all are shown.</td></tr>
+    <tr><td>Address requirement</td><td><code>requires_shipping_address</code> drives whether the address block appears. Office pickup does not require one.</td></tr>
+    <tr><td>Payment coupling</td><td><code>accepts_mobile_payment</code> drives whether the payment block appears. A cash-on-delivery method sets it false and <code>is_cash_on_delivery</code> true.</td></tr>
+    <tr><td>Free threshold</td><td>When <code>free_over_amount</code> is set and the subtotal reaches it, the cost renders as "FREE" with the original struck through, and the order records zero shipping.</td></tr>
+    <tr><td>Cost freezing</td><td>The cost is copied into the order at placement. A later change to the method's price does not alter existing orders.</td></tr>
+    <tr><td>Default</td><td>No method is preselected. Preselecting the cheapest looks helpful and produces orders shipped by a method the customer never chose.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.7 Order state machine</h2>
+<p>Three independent axes. Lifecycle answers "where is this order"; payment answers "have we been paid"; fulfilment answers "have we shipped". Collapsing them into one field, as the reference platform does, makes the common case — paid but not yet shipped — inexpressible.</p>
+
+<h3>12.7.1 Lifecycle</h3>
+<pre>                    ┌──────────────────────────────────────┐
+                    │                                      ▼
+  [placed] ──▶ AWAITING_PAYMENT ──▶ CONFIRMED ──▶ PROCESSING ──▶ SHIPPED
+                    │  │                 │             │            │
+                    │  │                 │             │            ▼
+                    │  │                 │             │        DELIVERED
+                    │  │                 │             │            │
+                    │  ▼                 ▼             ▼            ▼
+                    │ EXPIRED         CANCELLED    CANCELLED     COMPLETED
+                    │ (48 h, no payment)                            │
+                    ▼                                               ▼
+                CANCELLED  ◀────── customer or staff            REFUNDED
+
+  Cash on delivery skips AWAITING_PAYMENT and is placed as CONFIRMED.</pre>
+<table class="compact">
+  <thead><tr><th style="width:34mm">State</th><th>Meaning and permitted transitions</th></tr></thead>
+  <tbody>
+    <tr><td><code>AWAITING_PAYMENT</code></td><td>Placed, stock reserved, money not yet received. → <code>CONFIRMED</code> (payment verified) · <code>CANCELLED</code> (customer or staff) · <code>EXPIRED</code> (48-hour job).</td></tr>
+    <tr><td><code>CONFIRMED</code></td><td>Paid, or cash on delivery accepted. Stock deducted for paid orders. → <code>PROCESSING</code> · <code>CANCELLED</code> (staff only, with reason; triggers a refund when money was taken).</td></tr>
+    <tr><td><code>PROCESSING</code></td><td>Being picked and packed. → <code>SHIPPED</code> · <code>CANCELLED</code> (staff only).</td></tr>
+    <tr><td><code>SHIPPED</code></td><td>Handed to the courier or ready for pickup. For cash on delivery, stock is deducted here. → <code>DELIVERED</code>. No cancellation.</td></tr>
+    <tr><td><code>DELIVERED</code></td><td>Received by the customer. → <code>COMPLETED</code> automatically after 7 days · <code>REFUNDED</code> (returns window).</td></tr>
+    <tr><td><code>COMPLETED</code></td><td>Terminal. Unlocks review eligibility.</td></tr>
+    <tr><td><code>CANCELLED</code></td><td>Terminal. Reservations released; refund raised if money was taken.</td></tr>
+    <tr><td><code>EXPIRED</code></td><td>Terminal. Reservations released. Distinguished from <code>CANCELLED</code> because it is a system action, and the analytics meaning is different.</td></tr>
+    <tr><td><code>REFUNDED</code></td><td>Terminal. Full or partial; stock restored only on confirmed physical return.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Enforcement</span>
+  Transitions are validated against an explicit table in the order service. Anything not listed returns <code>409 INVALID_STATE_TRANSITION</code>. Every accepted transition writes an <code>order_events</code> row with actor, timestamp, from and to. No code path anywhere may write <code>orders.status</code> directly — the state machine is the only door.
+</div>
+
+<h3>12.7.2 Payment and fulfilment axes</h3>
+<p><strong>Payment:</strong> <code>unpaid</code> → <code>pending_verification</code> → <code>paid</code>, with <code>failed</code>, <code>partially_refunded</code> and <code>refunded</code> as branches. <strong>Fulfilment:</strong> <code>unfulfilled</code> → <code>processing</code> → <code>shipped</code> → <code>delivered</code>, with <code>returned</code> as a branch. Each axis moves independently; the lifecycle state is derived from the pair and never contradicts it.</p>
+
+<h3>12.7.3 Notifications per transition</h3>
+<table class="compact">
+  <thead><tr><th style="width:38mm">Transition</th><th style="width:26mm">Customer</th><th>Staff</th></tr></thead>
+  <tbody>
+    <tr><td>Order placed</td><td>Email + SMS with the order number and payment instructions</td><td>Realtime toast and a bell notification in the admin console</td></tr>
+    <tr><td>Payment recorded</td><td>Email "We have received your payment details"</td><td>Realtime alert flagging an order awaiting verification</td></tr>
+    <tr><td>Payment verified</td><td>Email + SMS "Payment confirmed"</td><td>—</td></tr>
+    <tr><td>Shipped</td><td>Email + SMS with any tracking reference</td><td>—</td></tr>
+    <tr><td>Delivered</td><td>Email, plus a review invitation after 3 days</td><td>—</td></tr>
+    <tr><td>Cancelled</td><td>Email with the reason</td><td>Notification when the customer cancelled</td></tr>
+    <tr><td>Expiring soon</td><td>SMS at 36 hours: "Your order expires in 12 hours"</td><td>—</td></tr>
+    <tr><td>Expired</td><td>Email with a one-click reorder link</td><td>Daily digest</td></tr>
+  </tbody>
+</table>
+
+<h2>12.8 Payment reconciliation</h2>
+<p>With manual Lipa Namba, the money arrives at the till outside the system. Reconciliation is the process of tying an arrival to an order, and it is where a manual flow either works or quietly loses money.</p>
+<pre>Customer pays from 255712345678 to the till
+      │
+      ▼
+Mobile money sends the merchant an SMS or email confirmation
+      │
+      ▼
+Administrator opens Orders ▸ Awaiting verification
+      │  the queue is sorted by age, oldest first
+      ▼
+Matching, in priority order
+   1. exact match on payment_number ↔ payer's number       ← strongest
+   2. exact match on amount + a ±2 h window
+   3. manual search by customer name or phone
+      │
+      ▼
+Verify payment
+   ├─ enter the provider transaction reference (required, unique)
+   ├─ enter the amount received  (defaults to the order total)
+   ├─ system compares to the expected total
+   │     equal      → mark paid
+   │     less       → mark partially paid, order stays awaiting payment,
+   │                   customer notified of the shortfall
+   │     greater    → mark paid, flag an overpayment for refund
+   └─ writes payments row + order_events row + notifications
+      │
+      ▼
+Order → CONFIRMED, stock deducted, customer notified</pre>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Control</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Reference uniqueness</td><td>Unique on <code>(provider, provider_reference)</code>. The same mobile-money transaction can never be credited to two orders — the most likely and most costly manual error.</td></tr>
+    <tr><td>Separation of duties</td><td><code>payment.verify</code> is a distinct permission, not granted to the <code>support</code> role.</td></tr>
+    <tr><td>Audit</td><td>Every verification records who, when, from where, and the reference. Reversal is possible but never silent, and always leaves both records.</td></tr>
+    <tr><td>Ageing</td><td>Orders awaiting verification for more than 2 hours are highlighted amber on the dashboard; more than 24 hours, red.</td></tr>
+    <tr><td>Automation path</td><td>An aggregator (§13.3) replaces steps 1–3 with a signed webhook carrying the reference and amount. The verification record is written identically, with <code>actor_type = 'webhook'</code>, so the audit trail and the reports do not change shape when automation arrives.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.9 Delegated payment</h2>
+<p>The "friend payment" feature, redesigned around a token. Persona Grace — a teacher whose school pays — is the primary case, and it is common enough in this market to be a first-class flow rather than a workaround.</p>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Step</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>1. Nominate</td><td>At checkout the buyer expands "Someone else is paying" and supplies the payer's email. The order is created as <code>AWAITING_PAYMENT</code> with stock reserved as normal.</td></tr>
+    <tr><td>2. Token</td><td>A 32-byte token is generated, stored hashed on the order, valid <strong>14 days</strong>, single-use. It is the <em>only</em> credential for the payment page — no order id appears anywhere, which is what closes the reference platform's exposure of using a raw order identifier in the URL.</td></tr>
+    <tr><td>3. Notify</td><td>The payer receives an email naming the requester by first name and last initial, stating the amount and what it is for, with the link. The buyer receives a copy confirming it was sent.</td></tr>
+    <tr><td>4. Pay</td><td>The payer opens <code>/pay/:token</code>, sees only the line items and totals, picks a payment method, enters their payment number and submits. No account, no sign-in.</td></tr>
+    <tr><td>5. Confirm</td><td>Verification is identical to §12.8. Both payer and buyer are notified on success.</td></tr>
+    <tr><td>6. Expiry</td><td>An unpaid order expires at 48 hours like any other; the token is invalidated with it. The buyer may re-issue a new link from their order detail page, which resets both clocks.</td></tr>
+    <tr><td>Privacy</td><td>The payer never sees the delivery address, phone number or email of the buyer, nor their order history. The buyer never sees the payer's phone number beyond the last four digits.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.10 Invoicing</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Two origins</td><td>An invoice may be generated from an order, or created standalone by an administrator. The standalone case is the quotation a school or company needs before it will release funds, and is the reason the module exists.</td></tr>
+    <tr><td>Numbering</td><td><code>INV-{YYYY}-{000000}</code>, gapless within a year, allocated under a row lock. Gaps in an invoice sequence raise questions in an audit.</td></tr>
+    <tr><td>Immutability</td><td>A <code>draft</code> invoice is editable. Once <code>issued</code> it is frozen; corrections are made by voiding and re-issuing, never by editing. Voided invoices keep their number.</td></tr>
+    <tr><td>Line items</td><td>Catalogue lines carry a variant reference and snapshot fields; free-text lines are allowed for services and charges outside the catalogue.</td></tr>
+    <tr><td>Sharing</td><td>"Share" mints a token backing <code>/invoice/:token</code>. Revocable at any time. The page is <code>noindex</code> and never appears in the sitemap.</td></tr>
+    <tr><td>Printing</td><td>A print stylesheet renders A4 with the TechStar letterhead, registration details, client block, line table, totals, payment instructions and standard terms. No browser headers or footers.</td></tr>
+    <tr><td>Standard terms</td><td>Three lines carried on every invoice, as the reference platform does — goods shipped on confirmation of full payment; terms and conditions apply to handling, processing and shipping; payment only through TechStar's designated payment methods. Wording is administrator-editable in settings.</td></tr>
+    <tr><td>Stock</td><td>Issuing an invoice does <strong>not</strong> reserve or deduct stock. Only an order does. This must be explicit, because it is the assumption most often got wrong.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.11 Returns and refunds</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Window</td><td>7 days from delivery for a fault; 48 hours for an incorrect item shipped. Both are configurable in settings and must be reflected in the published Terms.</td></tr>
+    <tr><td>Eligibility</td><td>Components sold in opened anti-static packaging are non-returnable unless faulty — a necessary rule in this trade and one that must be stated plainly at the point of sale, not only in the Terms.</td></tr>
+    <tr><td>Process</td><td>The customer contacts support; staff raise a return against the order; goods are received and inspected; a refund is recorded; stock is restored only when the item is confirmed resaleable.</td></tr>
+    <tr><td>Refund method</td><td>Mobile money back to the paying number, which is why <code>payments.payer_phone</code> is captured. Cash refunds are recorded with the receiving staff member named.</td></tr>
+    <tr><td>Partial refunds</td><td>Supported per line. The order moves to <code>partially_refunded</code> and both amounts remain visible.</td></tr>
+    <tr><td>Audit</td><td>Every refund records actor, amount, reason and reference, and appears on the order timeline for the customer to see.</td></tr>
+  </tbody>
+</table>

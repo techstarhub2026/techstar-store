@@ -1,0 +1,137 @@
+<h1 class="part"><span class="num">Part Four</span>Technology Stack and Architecture</h1>
+
+<h2>4.1 Stack decision</h2>
+<table>
+  <thead><tr><th style="width:32mm">Concern</th><th style="width:52mm">Choice</th><th>Why this and not the obvious alternative</th></tr></thead>
+  <tbody>
+    <tr><td>UI framework</td><td>React 18.3 + TypeScript 5.4</td><td>Fixed by the brief. TypeScript is added because the domain has many similar-shaped objects (product / variant / cart item / order item) that are easy to confuse at runtime and trivial to distinguish at compile time.</td></tr>
+    <tr><td>Build</td><td>Vite 5</td><td>Sub-second cold start and instant HMR. Rollup production build with automatic route-level code splitting, matching the reference platform's 65-chunk strategy without hand configuration.</td></tr>
+    <tr><td>Routing</td><td>React Router 6.22 (data router)</td><td>Loaders and actions let route-level data requirements be declared next to the route, which keeps the 51-route map in Part 6 tractable.</td></tr>
+    <tr><td>Server state</td><td>TanStack Query 5</td><td>Directly fixes defects R4 and R5: request-keyed cache, automatic invalidation on mutation, stale-while-revalidate, retry and deduplication — all of which the reference platform hand-rolls incorrectly.</td></tr>
+    <tr><td>Client state</td><td>Zustand 4</td><td>Cart, wishlist, auth session, UI state. Small, unopinionated, and shaped almost identically to the Pinia stores being ported.</td></tr>
+    <tr><td>Styling</td><td>Bootstrap 5.3 + SCSS + React&nbsp;Bootstrap</td><td>Decision D4. Preserves the reference platform's layout vocabulary so Part 7 translates literally.</td></tr>
+    <tr><td>Forms</td><td>React Hook Form 7 + Zod 3</td><td>Zod schemas are shared with the server, so a field's rules are written once and enforced on both sides. This is the single highest-leverage choice in the stack.</td></tr>
+    <tr><td>Server runtime</td><td>Node.js 20 LTS + Express 4 + TypeScript</td><td>Decision D1.</td></tr>
+    <tr><td>Database</td><td>MySQL 8.0, InnoDB, <code>utf8mb4_0900_ai_ci</code></td><td>Fixed by the brief. MySQL 8 is required, not 5.7: the reporting queries in Part 18 use window functions and CTEs, and the search design uses <code>ngram</code>-capable full-text indexes.</td></tr>
+    <tr><td>Data access</td><td>Prisma 5</td><td>Decision D2.</td></tr>
+    <tr><td>Cache / queue</td><td>Redis 7 + BullMQ</td><td>Campaign sending, email and SMS dispatch, image derivative generation and scheduled jobs must not run inside a request. Redis also backs rate limiting and session revocation.</td></tr>
+    <tr><td>Realtime</td><td>Socket.IO 4</td><td>Admin order notifications and live order status for the customer.</td></tr>
+    <tr><td>Object storage</td><td>Local disk via adapter; S3 and Cloudinary adapters supplied</td><td>Decision D7.</td></tr>
+    <tr><td>Image processing</td><td>sharp</td><td>Generates the <code>sm</code>/<code>md</code>/<code>lg</code> WebP derivatives locally, removing the Cloudinary dependency and the transformation defects noted in §2.5.2.</td></tr>
+    <tr><td>Email</td><td>Nodemailer over SMTP, React&nbsp;Email templates</td><td>Provider-neutral. Works with Zoho, Google Workspace, SES or a local relay.</td></tr>
+    <tr><td>SMS</td><td>Adapter with Beem Africa and NextSMS implementations</td><td>Both are Tanzanian gateways with sender-ID registration; the adapter means neither is load-bearing.</td></tr>
+    <tr><td>Testing</td><td>Vitest, React Testing Library, Supertest, Playwright</td><td>Same runner for client and server unit tests; Playwright for the seven critical journeys in §21.1.</td></tr>
+    <tr><td>Process management</td><td>Docker Compose for development; PM2 or systemd behind Nginx in production</td><td>§22.1.</td></tr>
+  </tbody>
+</table>
+
+<h2>4.2 System topology</h2>
+<pre>                          ┌──────────────────────────────┐
+       Browser ──────────▶│  Nginx  (TLS, gzip/brotli)   │
+   (React SPA, PWA)       │  ─ static SPA bundle         │
+                          │  ─ /api      → app server    │
+                          │  ─ /uploads  → media volume  │
+                          │  ─ /socket.io→ app server    │
+                          └──────────────┬───────────────┘
+                                         │
+                          ┌──────────────▼───────────────┐
+                          │  Node.js / Express API       │
+                          │  ┌────────────────────────┐  │
+                          │  │ routes → controllers   │  │
+                          │  │ services (domain)      │  │
+                          │  │ repositories (Prisma)  │  │
+                          │  └────────────────────────┘  │
+                          │  Socket.IO gateway           │
+                          └───┬─────────┬────────┬───────┘
+                              │         │        │
+                  ┌───────────▼──┐ ┌────▼────┐ ┌─▼──────────────┐
+                  │  MySQL 8     │ │ Redis 7 │ │ Media storage  │
+                  │  InnoDB      │ │ cache   │ │ local | S3     │
+                  │              │ │ queues  │ │                │
+                  └──────────────┘ └────┬────┘ └────────────────┘
+                                        │
+                              ┌─────────▼──────────┐
+                              │ BullMQ workers     │
+                              │ ─ email dispatch   │
+                              │ ─ SMS dispatch     │
+                              │ ─ campaign sender  │
+                              │ ─ image derivatives│
+                              │ ─ scheduled jobs   │
+                              └─────────┬──────────┘
+                                        │
+                 ┌──────────────────────┼───────────────────────┐
+          ┌──────▼──────┐      ┌────────▼────────┐     ┌────────▼────────┐
+          │ SMTP relay  │      │ SMS gateway     │     │ Payment         │
+          │             │      │ Beem / NextSMS  │     │ aggregator      │
+          └─────────────┘      └─────────────────┘     └─────────────────┘</pre>
+
+<h3>4.2.1 Why the API is same-origin</h3>
+<p>The API is mounted at <code>/api</code> on the same origin as the SPA, exactly as the reference platform does. This is not cosmetic: it lets the refresh token live in a <code>SameSite=Strict</code> httpOnly cookie without a cross-site cookie exemption, removes CORS preflight latency from every mutation, and keeps one TLS certificate. Development uses a Vite proxy so the same-origin assumption holds locally.</p>
+
+<h2>4.3 Request lifecycle</h2>
+<p>Every API request passes through the same ordered pipeline. The order matters and is normative.</p>
+<table class="compact">
+  <thead><tr><th style="width:8mm">#</th><th style="width:38mm">Stage</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>requestId</code></td><td>Assign a ULID, attach to the async-local context, echo as <code>X-Request-Id</code>. Every log line and error response carries it.</td></tr>
+    <tr><td>2</td><td><code>helmet</code></td><td>Security headers including a strict Content-Security-Policy (§11.8).</td></tr>
+    <tr><td>3</td><td><code>cors</code></td><td>Same-origin by default; an explicit allowlist only when an alternate front end is deployed.</td></tr>
+    <tr><td>4</td><td>Body parsing</td><td>JSON limited to 256&nbsp;KB; multipart handled by <code>multer</code> only on upload routes, with per-file and per-request caps (§11.7).</td></tr>
+    <tr><td>5</td><td>Rate limiting</td><td>Redis-backed sliding window. Tiers in §10.9.</td></tr>
+    <tr><td>6</td><td>Authentication</td><td>Verify the access token if present; populate <code>req.auth = {userId, role, permissions}</code>. Never rejects here — absence of a token is a valid state for public routes.</td></tr>
+    <tr><td>7</td><td>Route match</td><td>Express router.</td></tr>
+    <tr><td>8</td><td>Authorisation</td><td>Route-declared guard: <code>requireAuth()</code>, <code>requireRole()</code>, <code>requirePermission()</code>. Rejects with 401 or 403.</td></tr>
+    <tr><td>9</td><td>Validation</td><td>Zod parse of <code>params</code>, <code>query</code> and <code>body</code>. On failure emits the 422 shape in §10.2. The parsed, typed value replaces the raw input — controllers never see unvalidated data.</td></tr>
+    <tr><td>10</td><td>Controller</td><td>Translates HTTP to a service call and back. Contains no business logic.</td></tr>
+    <tr><td>11</td><td>Service</td><td>Domain logic, invariants, transaction boundaries. The only layer allowed to enforce a business rule.</td></tr>
+    <tr><td>12</td><td>Repository</td><td>Prisma access. No domain logic, no HTTP concepts.</td></tr>
+    <tr><td>13</td><td>Serialisation</td><td>Explicit response DTO. Never returns an ORM entity directly — this is what stops password hashes and internal flags leaking.</td></tr>
+    <tr><td>14</td><td>Audit</td><td>Successful mutations by staff append an audit record (§14.18) on the same transaction.</td></tr>
+    <tr><td>15</td><td>Error handler</td><td>Maps typed domain errors to status codes (§20.4); logs with request id; never leaks stack traces in production.</td></tr>
+  </tbody>
+</table>
+
+<h2>4.4 Environments</h2>
+<table class="compact">
+  <thead><tr><th style="width:24mm">Environment</th><th style="width:34mm">Purpose</th><th>Configuration</th></tr></thead>
+  <tbody>
+    <tr><td><code>local</code></td><td>Developer workstation</td><td>Docker Compose brings up MySQL, Redis and MailHog. Media on local disk. SMS adapter is a console stub. Payments in sandbox. Seed data from Appendix F.</td></tr>
+    <tr><td><code>test</code></td><td>Automated suites</td><td>Ephemeral MySQL schema per run, migrated then truncated between tests. All outbound adapters are fakes. No network egress permitted.</td></tr>
+    <tr><td><code>staging</code></td><td>Pre-production verification</td><td>Production topology at smaller size. Anonymised copy of production data. Real SMS and email to an allowlist only. Payment aggregator in sandbox. <code>noindex</code> enforced at Nginx.</td></tr>
+    <tr><td><code>production</code></td><td>Live</td><td>Full topology per §22.1. Debug endpoints absent from the build, not merely disabled.</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <span class="lbl">Configuration rule</span>
+  Configuration is read from the environment exactly once, at boot, through a Zod schema that fails fast on a missing or malformed variable (§20.8). No <code>process.env</code> access anywhere else in the codebase. This is what prevents the reference platform's failure mode of shipping a development hostname to production (R10).
+</div>
+
+<h2>4.5 Repository layout</h2>
+<p>A single repository with npm workspaces. One <code>git clone</code>, one <code>npm install</code>, one command to run everything.</p>
+<div class="tree">techstar-store/
+├── apps/
+│   ├── web/                      React SPA — storefront and admin console
+│   │   ├── public/
+│   │   ├── src/
+│   │   └── vite.config.ts
+│   └── api/                      Express API + Socket.IO gateway + workers
+│       ├── prisma/
+│       │   ├── schema.prisma
+│       │   ├── migrations/
+│       │   └── seed.ts
+│       └── src/
+├── packages/
+│   ├── contracts/                Zod schemas + inferred TS types shared by web and api
+│   ├── ui/                       Design-system components and SCSS tokens
+│   └── config/                   Shared eslint, tsconfig, prettier
+├── docker/
+│   ├── docker-compose.yml
+│   └── nginx/
+├── docs/                         This specification and derived artefacts
+├── scripts/                      Migration, backup, seed and ops helpers
+└── package.json                  Workspace root</div>
+
+<div class="decision">
+  <span class="lbl">Why <code>packages/contracts</code> is the keystone</span>
+  Every request and response shape in Part 10 is defined once as a Zod schema in this package. The API validates against it; the React forms validate against it; TypeScript types are inferred from it on both sides. A field added to a form without a corresponding schema change fails to compile. This single package is what makes a specification this large stay true to the code six months after it is written.
+</div>

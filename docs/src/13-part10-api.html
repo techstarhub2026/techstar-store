@@ -1,0 +1,300 @@
+<h1 class="part"><span class="num">Part Ten</span>REST API Specification</h1>
+
+<h2>10.1 Conventions</h2>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Rule</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Base path</td><td><code>/api/v1</code>. Versioned from day one — the reference platform's unversioned <code>/api</code> leaves no way to change a response shape without breaking every cached client.</td></tr>
+    <tr><td>Content type</td><td><code>application/json; charset=utf-8</code>, except upload endpoints which accept <code>multipart/form-data</code>.</td></tr>
+    <tr><td>Casing</td><td><code>camelCase</code> in JSON; <code>snake_case</code> in the database. The mapping happens once, in the serialisation layer.</td></tr>
+    <tr><td>Identifiers</td><td>Public identifiers only — slugs, order numbers, ULIDs. Numeric primary keys are never returned.</td></tr>
+    <tr><td>Money</td><td>Returned as an object: <code>{"amount": 35000, "currency": "TZS", "formatted": "TZS 35,000"}</code>. The server formats, so a price never renders differently in two places.</td></tr>
+    <tr><td>Timestamps</td><td>ISO 8601 with an explicit offset: <code>2026-08-19T14:32:05.123Z</code>. Always UTC.</td></tr>
+    <tr><td>Status codes</td><td><code>200</code> read or update · <code>201</code> create, with a <code>Location</code> header · <code>204</code> delete · <code>400</code> malformed · <code>401</code> unauthenticated · <code>403</code> unauthorised · <code>404</code> absent · <code>409</code> conflict · <code>410</code> gone · <code>422</code> validation · <code>429</code> rate limited · <code>500</code> server.</td></tr>
+    <tr><td>Success assertion</td><td>Clients must test <code>response.ok</code> — the 2xx class — never a specific code. Fixes defect R8.</td></tr>
+    <tr><td>Collections</td><td>Always an envelope, never a bare array:<br><code>{"data":[…],"meta":{"page":1,"pageSize":24,"total":617,"pageCount":26},"links":{"next":"…","prev":null}}</code>. The reference platform returns bare arrays, which means a paginated response can never be introduced without a breaking change.</td></tr>
+    <tr><td>Single resources</td><td><code>{"data":{…}}</code>. Same reason.</td></tr>
+    <tr><td>Sparse fields</td><td><code>?fields=id,name,price</code> on read endpoints for expensive lists.</td></tr>
+    <tr><td>Expansion</td><td><code>?include=variants,images,reviews</code>. Each endpoint documents which expansions it accepts; unknown values are a 422, never silently ignored.</td></tr>
+    <tr><td>Sorting</td><td><code>?sort=-createdAt,name</code>. A leading minus is descending. Only whitelisted fields.</td></tr>
+    <tr><td>Pagination</td><td><code>?page=</code> and <code>?pageSize=</code>, default 24, maximum 100. Cursor pagination (<code>?cursor=</code>) additionally on <code>audit_logs</code>, <code>order_events</code> and <code>search_logs</code>, where offsets get expensive.</td></tr>
+    <tr><td>Idempotency</td><td><code>Idempotency-Key</code> header honoured on <code>POST /orders</code> and <code>POST /payments</code>. Replays within 24 hours return the original response.</td></tr>
+    <tr><td>Correlation</td><td>Every response carries <code>X-Request-Id</code>, echoed into logs and shown on error screens.</td></tr>
+    <tr><td>Deprecation</td><td>Retiring an endpoint sends <code>Deprecation</code> and <code>Sunset</code> headers for at least 90 days before removal.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.2 Error format</h2>
+<p>One shape for every error, at every status code.</p>
+<pre>{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Some fields need attention.",
+    "requestId": "01JBQ7X2K9P3M4N5Q6R7S8T9V0",
+    "details": [
+      { "field": "phone",    "code": "invalid_length",
+        "message": "Phone number must be 12 characters long" },
+      { "field": "items[2].quantity", "code": "insufficient_stock",
+        "message": "Only 2 available", "meta": { "available": 2 } }
+    ]
+  }
+}</pre>
+<table class="compact">
+  <thead><tr><th style="width:40mm">Code</th><th style="width:14mm">Status</th><th>Raised when</th></tr></thead>
+  <tbody>
+    <tr><td><code>VALIDATION_FAILED</code></td><td>422</td><td>Zod parse failed. <code>details</code> lists every failing field, not just the first.</td></tr>
+    <tr><td><code>UNAUTHENTICATED</code></td><td>401</td><td>Missing, malformed or expired access token.</td></tr>
+    <tr><td><code>FORBIDDEN</code></td><td>403</td><td>Authenticated but lacking the required permission.</td></tr>
+    <tr><td><code>NOT_FOUND</code></td><td>404</td><td>No such resource, or one the caller may not see. Never distinguishes the two.</td></tr>
+    <tr><td><code>GONE</code></td><td>410</td><td>Soft-deleted resource that used to be public.</td></tr>
+    <tr><td><code>CONFLICT</code></td><td>409</td><td>Unique constraint or a state-machine violation.</td></tr>
+    <tr><td><code>PRICE_CHANGED</code></td><td>409</td><td>Checkout revalidation found a different price. <code>details</code> carries old and new per line.</td></tr>
+    <tr><td><code>INSUFFICIENT_STOCK</code></td><td>409</td><td>Checkout revalidation found too little stock. <code>details</code> carries the available quantity per line.</td></tr>
+    <tr><td><code>INVALID_STATE_TRANSITION</code></td><td>409</td><td>Order status change not permitted by §12.7.</td></tr>
+    <tr><td><code>TOKEN_INVALID</code></td><td>400</td><td>Verification, reset, payment or invoice token bad, used or expired — one code for all four cases, deliberately.</td></tr>
+    <tr><td><code>RATE_LIMITED</code></td><td>429</td><td>With a <code>Retry-After</code> header.</td></tr>
+    <tr><td><code>PAYLOAD_TOO_LARGE</code></td><td>413</td><td>Body or upload over the cap.</td></tr>
+    <tr><td><code>UNSUPPORTED_MEDIA_TYPE</code></td><td>415</td><td>Upload MIME type not on the allowlist.</td></tr>
+    <tr><td><code>INTERNAL_ERROR</code></td><td>500</td><td>Message is always generic. Details go to logs, never to the client.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.3 Authentication endpoints</h2>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Verb</th><th style="width:44mm">Path</th><th style="width:16mm">Access</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/register</code></td><td><span class="pill pub">public</span></td><td>Body <code>{username, email?, phone?, password, acceptedTerms}</code>. At least one of email or phone required. Creates the user, issues tokens, queues a verification email. 201.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/login</code></td><td><span class="pill pub">public</span></td><td>Body <code>{identifier, password}</code> where identifier is an email or a phone. Sets the refresh cookie, returns the access token and profile. Rate limited per §10.9.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/refresh</code></td><td>cookie</td><td>Rotates the refresh token, returns a new access token. Reuse of a rotated token revokes the whole family (§11.2).</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/logout</code></td><td><span class="pill auth">token</span></td><td>Revokes the current session and clears the cookie. 204.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/logout-all</code></td><td><span class="pill auth">token</span></td><td>Revokes every session for the user.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/auth/oauth/:provider</code></td><td><span class="pill pub">public</span></td><td>302 to the provider with PKCE and a state parameter.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/auth/oauth/:provider/callback</code></td><td><span class="pill pub">public</span></td><td>Validates state, exchanges the code, links or creates the user, then 302 to the SPA with a one-time exchange code — never with a token in the URL, which would leak through referrers and history.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/oauth/exchange</code></td><td><span class="pill pub">public</span></td><td>Swaps the one-time code for a session.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/email/verify/request</code></td><td><span class="pill auth">token</span></td><td>Re-sends verification. Limited to 3 per hour.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/email/verify</code></td><td><span class="pill pub">public</span></td><td>Body <code>{token}</code>. Marks verified.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/password/forgot</code></td><td><span class="pill pub">public</span></td><td>Always 200 with the same body, whether or not the address exists.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/auth/password/reset</code></td><td><span class="pill pub">public</span></td><td>Body <code>{token, password}</code>. Revokes all sessions.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/auth/password</code></td><td><span class="pill auth">token</span></td><td>Body <code>{currentPassword, newPassword}</code>. Revokes other sessions.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/me</code></td><td><span class="pill auth">token</span></td><td>Current profile, roles and permission keys.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/me</code></td><td><span class="pill auth">token</span></td><td>Body <code>{username?, email?, phone?, marketingOptIn?}</code>. Changing email clears verification and re-sends.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/me/avatar</code></td><td><span class="pill auth">token</span></td><td>Multipart, field <code>file</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/me/addresses</code></td><td><span class="pill auth">token</span></td><td>List and create.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/me/addresses/:id</code></td><td><span class="pill auth">token</span></td><td>Update and soft-delete.</td></tr>
+  </tbody>
+</table>
+
+<h3>10.3.1 Login response</h3>
+<pre>200 OK
+Set-Cookie: ts_rt=&lt;opaque&gt;; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth; Max-Age=2592000
+{
+  "data": {
+    "accessToken": "eyJhbGciOi…",
+    "expiresIn": 900,
+    "user": {
+      "id": "01JBQ7X2K9P3M4N5Q6R7S8T9V0",
+      "username": "Amina Mushi",
+      "email": "amina@example.com",
+      "emailVerified": false,
+      "phone": "255712345678",
+      "accountType": "customer",
+      "profileImage": { "sm": "…", "md": "…", "lg": "…" },
+      "roles": [],
+      "permissions": []
+    }
+  }
+}</pre>
+
+<h2>10.4 Catalogue endpoints</h2>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Verb</th><th style="width:48mm">Path</th><th style="width:16mm">Access</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span></td><td><code>/categories</code></td><td><span class="pill pub">public</span></td><td><code>?include=subcategories</code>, <code>?activeOnly=true</code>. Cached 5 minutes at the edge and invalidated on write.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/categories/:slug</code></td><td><span class="pill pub">public</span></td><td>With its subcategories and counts.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/subcategories</code></td><td><span class="pill pub">public</span></td><td><code>?categorySlug=</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products</code></td><td><span class="pill pub">public</span></td><td>The catalogue feed. Query: <code>page</code>, <code>pageSize</code>, <code>sort</code> (<code>bestSelling</code>|<code>newest</code>|<code>priceAsc</code>|<code>priceDesc</code>|<code>random</code>), <code>categorySlug</code>, <code>subcategorySlug</code>, <code>minPrice</code>, <code>maxPrice</code>, <code>inStock</code>, <code>onOffer</code>, <code>tag</code>, <code>ids</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products/:slug</code></td><td><span class="pill pub">public</span></td><td>Full detail with variants, attributes, images and review summary. 410 when soft-deleted; 301 hint when the slug is retired.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products/:slug/related</code></td><td><span class="pill pub">public</span></td><td>Up to 12 from the same subcategory, by sales.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/products/:slug/reviews</code></td><td><span class="pill pub">public</span></td><td>Approved only, paginated, with the rating histogram.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/products/:slug/reviews</code></td><td><span class="pill auth">token</span></td><td>Body <code>{rating, title?, body}</code>. Created as <code>pending</code>. 409 if the user has already reviewed.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span> <span class="pill del">DELETE</span></td><td><code>/reviews/:id</code></td><td><span class="pill auth">token</span></td><td>Own review only, or with <code>review.moderate</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/search</code></td><td><span class="pill pub">public</span></td><td><code>?q=</code> plus every catalogue filter. Logs the term with its result count. <code>?suggest=true</code> returns the lightweight 8-item shape for the header dropdown and does not log.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/locations/regions</code></td><td><span class="pill pub">public</span></td><td>Cached 24 hours.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/locations/regions/:region/districts</code></td><td><span class="pill pub">public</span></td><td>Cached 24 hours.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/shipping-methods</code></td><td><span class="pill pub">public</span></td><td><code>?region=</code> filters to methods available there.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/settings/public</code></td><td><span class="pill pub">public</span></td><td>Store name, contact details, social links, currency configuration, payment instruction blocks, feature flags. One request instead of the reference platform's several.</td></tr>
+  </tbody>
+</table>
+
+<h3>10.4.1 Product detail response</h3>
+<pre>{
+  "data": {
+    "slug": "pzem-004t-ac-energy-meter-module",
+    "name": "PZEM-004T AC Energy Meter Voltage Current Power Monitoring Module",
+    "skuPrefix": "0510003",
+    "brand": "Peacefair",
+    "manufacturerPartNumber": "PZEM-004T-100A",
+    "shortDescription": "Real-time voltage, current, power and energy monitoring over UART.",
+    "descriptionHtml": "&lt;p&gt;…&lt;/p&gt;",
+    "subcategory": { "slug": "voltage", "name": "Voltage",
+                     "category": { "slug": "sensors-conditioning-boards",
+                                   "name": "Sensors &amp; Conditioning Boards" } },
+    "images": [ { "id":"01J…","alt":"…",
+                  "sm":"/media/01J…-sm.webp",
+                  "md":"/media/01J…-md.webp",
+                  "lg":"/media/01J…-lg.webp",
+                  "width":1200,"height":1200 } ],
+    "attributes": [ { "name": "Current range", "unit": "A", "position": 0 } ],
+    "variants": [
+      { "sku": "051000301", "attributes": [ { "name":"Current range","value":"100" } ],
+        "price": { "amount":35000, "currency":"TZS", "formatted":"TZS 35,000" },
+        "compareAt": null, "discount": null,
+        "stock": { "available": 10, "status": "in_stock", "lowThreshold": 5 },
+        "imageId": null, "isActive": true }
+    ],
+    "priceRange": { "min": {"amount":35000,…}, "max": {"amount":35000,…} },
+    "totalStock": 10,
+    "reviewSummary": { "count": 0, "average": 0,
+                       "histogram": {"5":0,"4":0,"3":0,"2":0,"1":0} },
+    "publishedAt": "2026-03-31T06:59:16.951Z"
+  }
+}</pre>
+
+<h2>10.5 Cart, wishlist and orders</h2>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Verb</th><th style="width:44mm">Path</th><th style="width:16mm">Access</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span></td><td><code>/cart</code></td><td>token or guest cookie</td><td>Returns the cart with every line revalidated: current price, current availability, and a <code>changes[]</code> array describing anything that moved since the item was added.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/cart/items</code></td><td>same</td><td>Body <code>{variantSku, quantity}</code>. Adding an existing line increments. 409 <code>INSUFFICIENT_STOCK</code> when the total would exceed availability.</td></tr>
+    <tr><td><span class="pill patch">PATCH</span></td><td><code>/cart/items/:variantSku</code></td><td>same</td><td>Body <code>{quantity}</code>. Zero removes.</td></tr>
+    <tr><td><span class="pill del">DELETE</span></td><td><code>/cart/items/:variantSku</code></td><td>same</td><td>204.</td></tr>
+    <tr><td><span class="pill del">DELETE</span></td><td><code>/cart</code></td><td>same</td><td>Empties the cart.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/cart/merge</code></td><td><span class="pill auth">token</span></td><td>Called immediately after sign-in. Merges the guest cart into the account cart per §12.5.4.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span> <span class="pill del">DELETE</span></td><td><code>/wishlist</code>, <code>/wishlist/items</code>, <code>/wishlist/items/:id</code></td><td>same</td><td>Same shape as the cart, without quantity.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/orders</code></td><td>token or guest</td><td>Creates an order. Full contract below.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/orders</code></td><td><span class="pill auth">token</span></td><td>The caller's orders, paginated, filterable by status.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/orders/:orderNumber</code></td><td>owner or confirmation token</td><td>Full detail with items, address, totals and the event timeline.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/orders/:orderNumber/cancel</code></td><td>owner</td><td>Body <code>{reason?}</code>. Permitted only from <code>pending</code> or <code>awaiting_payment</code>. Writes a transition, releases reservations. 409 otherwise.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/orders/:orderNumber/reorder</code></td><td>owner</td><td>Adds available lines to the cart; returns <code>{added[], unavailable[]}</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/invoices/shared/:token</code></td><td>token</td><td>Public printable invoice.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/notify-requests</code></td><td><span class="pill pub">public</span></td><td>Body <code>{variantSku, email}</code>. Back-in-stock registration.</td></tr>
+  </tbody>
+</table>
+
+<h3>10.5.1 Create order</h3>
+<pre>POST /api/v1/orders
+Idempotency-Key: 5f8c1e2a-…
+
+{
+  "customer":       { "name": "Amina Mushi", "phone": "255712345678",
+                      "email": "amina@example.com" },
+  "items":          [ { "variantSku": "051000301", "quantity": 2 } ],
+  "shippingMethodSlug": "savings",
+  "shippingAddress": { "receiverName":"Amina Mushi","phone":"255712345678",
+                       "email":"amina@example.com","country":"Tanzania",
+                       "region":"DAR-ES-SALAAM","district":"KINONDONI",
+                       "streetAddress":"Plot 44, Mikocheni B","postalCode":"14110" },
+  "paymentMethod":  "lipa_namba",
+  "paymentNumber":  "255712345678",
+  "delegatedPayerEmail": null,
+  "customerNote":   null
+}
+
+201 Created
+Location: /api/v1/orders/TS-2026-000148
+{
+  "data": {
+    "orderNumber": "TS-2026-000148",
+    "status": "awaiting_payment",
+    "paymentStatus": "unpaid",
+    "fulfilmentStatus": "unfulfilled",
+    "items": [ … ],
+    "subtotal": {"amount":70000,"currency":"TZS","formatted":"TZS 70,000"},
+    "shipping": {"amount":15000,…},
+    "total":    {"amount":85000,…},
+    "paymentInstructions": {
+      "method": "lipa_namba",
+      "amount": {"amount":85000,…},
+      "reference": "TS-2026-000148",
+      "networks": [ { "name":"M-Pesa","tillNumber":"…","steps":[ "…" ] }, … ]
+    },
+    "confirmationToken": "…",       // lets a guest view their own confirmation
+    "redirectUrl": null,            // set when an aggregator hosts the payment
+    "placedAt": "2026-08-19T14:32:05.123Z"
+  }
+}</pre>
+<p>Failure modes are <code>409 PRICE_CHANGED</code> and <code>409 INSUFFICIENT_STOCK</code>, each returning per-line detail so the client can update the summary in place rather than sending the customer back to the cart.</p>
+
+<h2>10.6 Payments</h2>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Verb</th><th style="width:44mm">Path</th><th style="width:16mm">Access</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span></td><td><code>/pay/:token</code></td><td>token</td><td>Order summary for the delegated payer. Deliberately omits the buyer's address, phone and email.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/pay/:token</code></td><td>token</td><td>Body <code>{paymentMethod, paymentNumber}</code>. Records a payment as <code>pending</code>. Single-use: the token is consumed.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/orders/:orderNumber/payments</code></td><td>owner</td><td>Records a payment attempt against the caller's own order — the "Pay now" path from order detail.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/webhooks/payments/:provider</code></td><td>signature</td><td>Aggregator callback. Verifies the signature, writes a <code>payment_events</code> row, then processes idempotently by <code>external_event_id</code>. Always returns 200 once persisted, even if processing is deferred — a provider that receives a non-200 will retry forever.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/admin/orders/:orderNumber/payments/:id/verify</code></td><td><span class="pill adm">admin</span></td><td>Marks a manual payment settled. Body <code>{providerReference, amount, note?}</code>. Transitions the order and fires notifications.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/admin/orders/:orderNumber/refunds</code></td><td><span class="pill adm">admin</span></td><td>Body <code>{amount, reason}</code>. Records a refund and restores stock when the order was already fulfilled.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.7 Content endpoints</h2>
+<table class="compact">
+  <thead><tr><th style="width:12mm">Verb</th><th style="width:44mm">Path</th><th style="width:16mm">Access</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill get">GET</span></td><td><code>/banners</code></td><td><span class="pill pub">public</span></td><td><code>?placement=home</code>. Only active banners inside their schedule window.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/partners</code></td><td><span class="pill pub">public</span></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/services</code>, <code>/services/:slug</code></td><td><span class="pill pub">public</span></td><td></td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/articles</code>, <code>/articles/:slug</code></td><td><span class="pill pub">public</span></td><td>Published only.</td></tr>
+    <tr><td><span class="pill get">GET</span> <span class="pill post">POST</span></td><td><code>/articles/:slug/comments</code></td><td>public / token</td><td>Approved only on read. Writes enter moderation.</td></tr>
+    <tr><td><span class="pill del">DELETE</span></td><td><code>/comments/:id</code></td><td><span class="pill auth">token</span></td><td>Own comment, or with <code>comment.moderate</code>.</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/faqs</code></td><td><span class="pill pub">public</span></td><td>Grouped and ordered.</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/contact-messages</code></td><td><span class="pill pub">public</span></td><td>Body <code>{name, email, subject?, message, sendCopy}</code>. Honeypot and timing checks; rate limited.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.8 Admin endpoints</h2>
+<p>Every admin route is under <code>/api/v1/admin</code> and requires a staff account plus the named permission. All follow the same CRUD shape, so only the resource names and their special operations are listed.</p>
+<table class="compact">
+  <thead><tr><th style="width:44mm">Resource</th><th style="width:26mm">Permission prefix</th><th>Beyond standard CRUD</th></tr></thead>
+  <tbody>
+    <tr><td><code>/admin/products</code></td><td><code>product.*</code></td><td><code>POST /:id/variants</code>, <code>PATCH /:id/variants/:sku</code>, <code>DELETE /:id/variants/:sku</code>, <code>POST /:id/images</code>, <code>PATCH /:id/images/order</code>, <code>POST /bulk-delete</code>, <code>PATCH /bulk-status</code>, <code>POST /:id/duplicate</code>, <code>GET /export</code>, <code>POST /import</code></td></tr>
+    <tr><td><code>/admin/categories</code>, <code>/admin/subcategories</code></td><td><code>category.*</code></td><td><code>PATCH /order</code> for drag-reordering, <code>POST /:id/move-products</code></td></tr>
+    <tr><td><code>/admin/orders</code></td><td><code>order.*</code></td><td><code>PATCH /:n/status</code>, <code>PATCH /:n/fulfilment</code>, <code>POST /:n/notes</code>, <code>POST /:n/resend-confirmation</code>, <code>GET /:n/events</code>, <code>GET /export</code></td></tr>
+    <tr><td><code>/admin/invoices</code></td><td><code>invoice.*</code></td><td><code>POST /:id/share</code> issues a token, <code>DELETE /:id/share</code> revokes it, <code>POST /:id/send</code> emails it</td></tr>
+    <tr><td><code>/admin/customers</code></td><td><code>customer.*</code></td><td><code>GET /:id/orders</code>, <code>POST /:id/suspend</code>, <code>POST /:id/unsuspend</code>, <code>POST /:id/password-reset</code>, <code>GET /export</code></td></tr>
+    <tr><td><code>/admin/shipping-methods</code></td><td><code>shipping.*</code></td><td><code>PATCH /order</code></td></tr>
+    <tr><td><code>/admin/banners</code></td><td><code>banner.*</code></td><td><code>PATCH /:id/image</code>, <code>PATCH /order</code></td></tr>
+    <tr><td><code>/admin/services</code>, <code>/admin/partners</code>, <code>/admin/articles</code>, <code>/admin/faqs</code></td><td><code>service.* partner.* article.* faq.*</code></td><td><code>PATCH /order</code>; articles add <code>POST /:id/publish</code> and <code>POST /:id/unpublish</code></td></tr>
+    <tr><td><code>/admin/comments</code>, <code>/admin/reviews</code></td><td><code>*.moderate</code></td><td><code>POST /:id/approve</code>, <code>POST /:id/reject</code>, <code>POST /bulk-moderate</code></td></tr>
+    <tr><td><code>/admin/campaigns</code></td><td><code>campaign.*</code></td><td><code>POST /:id/send</code>, <code>POST /:id/schedule</code>, <code>POST /:id/cancel</code>, <code>POST /:id/test</code>, <code>GET /:id/recipients</code>, <code>GET /estimate</code> returns recipient count and SMS cost before sending</td></tr>
+    <tr><td><code>/admin/contacts</code></td><td><code>campaign.read</code></td><td><code>POST /import</code>, <code>GET /export</code>, <code>POST /:id/unsubscribe</code></td></tr>
+    <tr><td><code>/admin/stock</code></td><td><code>stock.*</code></td><td><code>POST /adjust</code> with reason and note, <code>GET /movements</code>, <code>GET /low-stock</code></td></tr>
+    <tr><td><code>/admin/discounts</code></td><td><code>discount.*</code></td><td>Standard CRUD plus <code>POST /bulk</code></td></tr>
+    <tr><td><code>/admin/media</code></td><td><code>media.*</code></td><td><code>POST /</code> upload, <code>DELETE /:id</code>, <code>GET /orphans</code></td></tr>
+    <tr><td><code>/admin/settings</code></td><td><code>settings.*</code></td><td><code>GET /</code>, <code>PATCH /</code> accepting a partial map of keys</td></tr>
+    <tr><td><code>/admin/staff</code>, <code>/admin/roles</code></td><td><code>staff.manage</code></td><td><code>POST /:id/roles</code>, <code>DELETE /:id/roles/:roleId</code>, <code>POST /invite</code></td></tr>
+    <tr><td><code>/admin/analytics</code></td><td><code>analytics.view</code></td><td><code>GET /summary</code>, <code>GET /sales?period=</code>, <code>GET /orders?period=</code>, <code>GET /best-sellers?region=</code>, <code>GET /customers</code>, <code>GET /searches</code>, <code>GET /zero-result-searches</code></td></tr>
+    <tr><td><code>/admin/audit-logs</code></td><td><code>audit.view</code></td><td>Read only. No create, update or delete route exists at all.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.9 Rate limits</h2>
+<table class="compact">
+  <thead><tr><th style="width:48mm">Scope</th><th style="width:26mm">Limit</th><th>Keyed by</th></tr></thead>
+  <tbody>
+    <tr><td>Global, unauthenticated</td><td>300 / 5 min</td><td>IP</td></tr>
+    <tr><td>Global, authenticated</td><td>1,200 / 5 min</td><td>user</td></tr>
+    <tr><td><code>POST /auth/login</code></td><td>5 / 15 min, then exponential lockout</td><td>IP + identifier</td></tr>
+    <tr><td><code>POST /auth/register</code></td><td>3 / hour</td><td>IP</td></tr>
+    <tr><td><code>POST /auth/password/forgot</code></td><td>3 / hour</td><td>IP + email</td></tr>
+    <tr><td><code>POST /auth/email/verify/request</code></td><td>3 / hour</td><td>user</td></tr>
+    <tr><td><code>POST /orders</code></td><td>10 / hour</td><td>user or IP</td></tr>
+    <tr><td><code>POST /pay/:token</code></td><td>5 / hour</td><td>token</td></tr>
+    <tr><td><code>POST /contact-messages</code></td><td>3 / hour</td><td>IP</td></tr>
+    <tr><td><code>GET /search</code></td><td>60 / min</td><td>IP</td></tr>
+    <tr><td>Upload endpoints</td><td>30 / hour</td><td>user</td></tr>
+    <tr><td>Webhooks</td><td>not limited</td><td>signature-verified; unsigned requests are dropped before the limiter</td></tr>
+  </tbody>
+</table>
+<p class="kv">Every limited response carries <code>Retry-After</code>, <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code> and <code>X-RateLimit-Reset</code>. Counters live in Redis so limits hold across application instances.</p>

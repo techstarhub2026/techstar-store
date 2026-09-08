@@ -1,0 +1,221 @@
+<h1 class="part"><span class="num">Part Seven</span>Storefront UI/UX Specification</h1>
+
+<p>Each screen below is specified as: <em>purpose</em>, <em>layout</em> (region by region, desktop then mobile), <em>elements</em> (every control, its copy, its behaviour), <em>states</em> (loading, empty, error, partial), and <em>interactions</em> (what happens on each action). Copy shown in quotation marks is the exact string to implement; the consolidated copy deck is Appendix C.</p>
+
+<h2>7.1 Global chrome</h2>
+
+<h3>7.1.1 Page shell</h3>
+<p>Every storefront route renders inside <code>StorefrontLayout</code>:</p>
+<pre>&lt;SkipLink&gt;                    "Skip to main content" — visible on focus only
+&lt;UtilityBar /&gt;                ≥ md only
+&lt;StickyHeader&gt;
+  &lt;PrimaryBar /&gt;
+  &lt;CategoryBar /&gt;             ≥ md only
+&lt;/StickyHeader&gt;
+&lt;Breadcrumb /&gt;                every route except Home
+&lt;main id="main"&gt;{route}&lt;/main&gt;
+&lt;Footer /&gt;
+&lt;CartOffcanvas /&gt; &lt;WishlistOffcanvas /&gt; &lt;MobileNavOffcanvas /&gt;
+&lt;AuthModal /&gt; &lt;QuickViewModal /&gt; &lt;SearchModal /&gt;
+&lt;ToastRegion aria-live="polite" /&gt;
+&lt;WhatsAppButton /&gt;
+&lt;EmailVerificationBanner /&gt;   only when signed in and email unverified</pre>
+
+<h3>7.1.2 Search field</h3>
+<table class="compact">
+  <thead><tr><th style="width:32mm">Aspect</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Placeholder</td><td>"Search products, SKUs, part numbers…"</td></tr>
+    <tr><td>Suggestions</td><td>Fires after 2 characters, debounced 250&nbsp;ms. A dropdown of up to 8 results, each a 40&nbsp;px thumbnail, product name, subcategory eyebrow and price. Below them, "See all n results for '<em>term</em>'".</td></tr>
+    <tr><td>Keyboard</td><td><kbd>↓</kbd>/<kbd>↑</kbd> move through suggestions, <kbd>Enter</kbd> opens the highlighted one or submits the raw term if none is highlighted, <kbd>Esc</kbd> closes the dropdown and keeps the text.</td></tr>
+    <tr><td>Submit</td><td>Navigates to <code>/search?q=…</code>. The term is logged for analytics once per distinct term per session — not on every keystroke, which is what would make the reference platform's search table useless.</td></tr>
+    <tr><td>No matches</td><td>Dropdown shows "No products match '<em>term</em>'" plus "Browse all products" and "Ask us on WhatsApp".</td></tr>
+    <tr><td>Accessibility</td><td><code>role="combobox"</code> with <code>aria-expanded</code>, <code>aria-controls</code>, <code>aria-activedescendant</code>; the listbox has <code>role="listbox"</code> and each option <code>role="option"</code>. Result count announced in a live region.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.1.3 Cart and wishlist indicators</h3>
+<ul>
+  <li><strong>Cart.</strong> Icon plus a pill badge (distinct item count, not total quantity) and the running total formatted per the currency setting — <code>TZS 45,000</code>. Clicking opens the cart off-canvas. Badge animates a single 200&nbsp;ms scale pulse on change, suppressed under reduced motion.</li>
+  <li><strong>Wishlist.</strong> Icon plus count badge. Clicking opens the wishlist off-canvas.</li>
+  <li><strong>Zero state.</strong> The badge renders "0" and the total "TZS 0" — matching the reference platform, which always shows the badge. This is preferred to hiding it, because a persistent target is easier to hit and to learn.</li>
+</ul>
+
+<h3>7.1.4 Breadcrumb</h3>
+<p>A home icon linking to <code>/</code>, then <code>&gt;</code>-separated ancestors, the last being plain text in <code>--ts-text-muted</code>. Marked up as <code>&lt;nav aria-label="Breadcrumb"&gt;</code> with an ordered list and <code>aria-current="page"</code> on the last item, plus <code>BreadcrumbList</code> JSON-LD. Trails: catalogue → <code>Home &gt; Products</code>; subcategory → <code>Home &gt; {Category} &gt; {Subcategory}</code>; product → <code>Home &gt; {Category} &gt; {Subcategory} &gt; {Product}</code>; content pages → <code>Home &gt; {Page}</code>.</p>
+
+<h3>7.1.5 Email verification banner</h3>
+<p>When a signed-in user's email is unverified, a dismissible bar sits directly beneath the header: "Please verify your email address to receive order updates." with a "Send verification link" button. On send, the button becomes a disabled "Verification link sent" for 60 seconds. Dismissal is remembered for the session only. Never shown to guests.</p>
+
+<h2>7.2 Home</h2>
+<p><strong>Purpose.</strong> Give a browsing visitor three different ways into the catalogue — promotion, novelty, popularity — and establish that the store is real, stocked and staffed.</p>
+
+<h3>7.2.1 Layout, top to bottom</h3>
+<table>
+  <thead><tr><th style="width:34mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>1. Banner carousel</td><td>Full-bleed. Each slide is a two-column split: text on the left (7 of 12), artwork on the right (5 of 12, <code>object-fit: contain</code>, full height). The slide background colour, title text and colour, subtitle text and colour, button label, button background and button text colour all come from the banner record — every banner is independently art-directed by an administrator with no code change. Title at display size, subtitle at h1 size and hidden below <code>lg</code>, then the call-to-action button. Autoplay 6&nbsp;s, loop, pause on hover and on focus-within. Previous/next chevrons, vertically centred, 40&nbsp;px circular white with shadow 2, hidden below <code>md</code> where swipe takes over. Dots below on mobile. Height 380&nbsp;px at <code>lg</code>, 260&nbsp;px at <code>md</code>, 220&nbsp;px below.</td></tr>
+    <tr><td>2. "OUR PRODUCTS"</td><td>Section heading, then one sentence of positioning copy (hidden below <code>md</code>), then a horizontal carousel of product cards drawn from a randomised selection. 6 cards visible at <code>xl</code>, 4 at <code>lg</code>, 3 at <code>md</code>, 2 below. Chevron controls sit outside the track on desktop, overlapping its vertical centre.</td></tr>
+    <tr><td>3. "NEW ARRIVALS"</td><td>Identical structure; source is products ordered by creation date descending.</td></tr>
+    <tr><td>4. "HOT-SELLING PRODUCTS"</td><td>Identical structure; source is products ordered by lifetime order count descending. Followed by a centred "VIEW MORE" primary button linking to <code>/products?sort=best-selling</code>.</td></tr>
+    <tr><td>5. "OUR PARTNERS"</td><td>Centred heading, then a horizontally scrolling strip of partner logos — 96&nbsp;px square, <code>object-fit: contain</code>, greyscale at rest, full colour on hover, with the partner name beneath, truncated. Each links to the partner's site with <code>rel="noopener noreferrer"</code>. Section hidden entirely when there are no partners.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.2.2 States</h3>
+<table class="compact">
+  <thead><tr><th style="width:26mm">State</th><th>Rendering</th></tr></thead>
+  <tbody>
+    <tr><td>Loading</td><td>Banner shows a shimmer block at its final height. Each carousel shows six skeleton cards at final dimensions. No layout shift when real content arrives — this is the single most important performance requirement on the page.</td></tr>
+    <tr><td>No banners</td><td>Carousel region omitted. The page begins with "OUR PRODUCTS". No placeholder, no empty coloured band.</td></tr>
+    <tr><td>Empty rail</td><td>That section is omitted. A section heading with nothing under it is never rendered.</td></tr>
+    <tr><td>Partial failure</td><td>Each rail loads independently. One failing request degrades one rail to an inline "Could not load this section. Retry" — it never blanks the page.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.2.3 Product card, definitive specification</h3>
+<p>This component appears in every grid and carousel in the storefront. Specified once, here.</p>
+<table>
+  <thead><tr><th style="width:30mm">Element</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Container</td><td>White, 1&nbsp;px <code>--ts-border</code>, radius <code>md</code>, shadow 1 → 2 on hover. The whole card is a link to the product page; nested action buttons stop propagation.</td></tr>
+    <tr><td>Image well</td><td>1:1 aspect ratio, <code>--ts-surface-sunken</code>, <code>object-fit: contain</code> with 8&nbsp;px inset. Uses the <code>md</code> derivative with an <code>srcset</code> offering <code>sm</code> for narrow viewports. <code>loading="lazy"</code> and explicit <code>width</code>/<code>height</code> to reserve space. <code>alt</code> is the product name.</td></tr>
+    <tr><td>Badges</td><td>Discount badge top-left, accent amber, "−15%". "NEW" badge top-right, primary green, for products created within 30 days. "OUT OF STOCK" ribbon across the lower third of the image well, red at 90% opacity, when total stock is zero.</td></tr>
+    <tr><td>Eyebrow</td><td>Subcategory name, 11&nbsp;px uppercase, muted, centred, truncated to one line.</td></tr>
+    <tr><td>Title</td><td>Product name, 13&nbsp;px semibold uppercase, centred, truncated to one line with ellipsis. Full name available as the link's accessible label — never rely on <code>title</code> alone.</td></tr>
+    <tr><td>Price</td><td>Centred, primary green, 15&nbsp;px semibold. Multi-variant products show "From TZS 200". Discounted products show the original struck through in muted grey before the new price. Zero-price products cannot exist (§12.3), so no zero case is designed.</td></tr>
+    <tr><td>Action row</td><td>Two 32&nbsp;px icon buttons, centred: wishlist (<code>heart</code>, filled and green when present in the wishlist) and quick view (<code>eye</code>, opens the preview modal). Visible at all breakpoints; the reference platform hides these below <code>md</code>, which removes the only way to reach quick view on a phone.</td></tr>
+    <tr><td>Add to cart</td><td>A pill button that slides up from the card's lower edge on hover, on desktop only. Label "ADD TO CART". Below <code>md</code>, and on any coarse pointer, it is a permanently visible full-width button in the card footer — hover-only affordances do not exist on touch.</td></tr>
+    <tr><td>Out of stock</td><td>Add to cart replaced by a disabled "OUT OF STOCK" and a secondary "Notify me" that captures an email against the variant.</td></tr>
+    <tr><td>Multi-variant</td><td>Add to cart reads "CHOOSE OPTIONS" and navigates to the product page rather than adding, because there is nothing unambiguous to add.</td></tr>
+    <tr><td>Keyboard</td><td>Card is one tab stop; the two icon buttons and add-to-cart are separate stops in reading order. Focus ring is the 2&nbsp;px primary-green outline. Hover-revealed controls become visible on focus-within.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.2.4 Quick-view modal</h3>
+<p>Max width 900&nbsp;px. Left (5 of 12): the <code>lg</code> image with a thumbnail strip. Right (7 of 12): name, price, stock, a two-line clamped description, variant selector if applicable, quantity stepper, "ADD TO CART", and "View full details" linking to the product page. Close by button, scrim click or <kbd>Esc</kbd>. Focus trapped inside while open; returned to the triggering card on close. Adding to cart from the modal closes it and opens the cart off-canvas.</p>
+
+<h2>7.3 Catalogue</h2>
+<p><strong>Purpose.</strong> Let a visitor traverse 600+ products, narrowed by category, price and availability, and ordered how they choose. One component serves all three catalogue routes; only the scope differs.</p>
+
+<h3>7.3.1 Layout</h3>
+<table>
+  <thead><tr><th style="width:30mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Breadcrumb</td><td>Per §7.1.4.</td></tr>
+    <tr><td>Heading</td><td>The subcategory name, or category name, or "All Products". Beside it, the result count: "617 products".</td></tr>
+    <tr><td>Control bar</td><td>One row, wrapping. Left: "Sort by:" then three inline text controls — <strong>Best Selling</strong>, <strong>New Arrivals</strong>, <strong>Price</strong>. Price toggles ascending/descending and shows an arrow indicating direction. The active control is primary green with a 2&nbsp;px underline. Right: a "Filters" button showing the count of active filters, which opens the filter panel; and a view-density toggle (comfortable / compact grid) persisted to <code>localStorage</code>.</td></tr>
+    <tr><td>Active filter chips</td><td>Beneath the control bar when any filter is set: one chip per filter with an <code>×</code>, plus "Clear all". Each chip states its value — "TZS 1,000 – 50,000", "In stock only".</td></tr>
+    <tr><td>Grid</td><td>Product cards. 6 columns at <code>xl</code>, 4 at <code>lg</code>, 3 at <code>md</code>, 2 below. 16&nbsp;px gutters. Row heights equalised so cards align regardless of name length.</td></tr>
+    <tr><td>Pagination</td><td>Bottom-centred. Previous chevron, page numbers with ellipsis for long ranges, next chevron; plus a "per page" select offering 24 / 48 / 96, default 24. This replaces the reference platform's <code>limit=10000</code> single-shot load (defect R17).</td></tr>
+    <tr><td>Filter panel</td><td>Desktop: a 260&nbsp;px left column that appears when Filters is toggled, pushing the grid to 9 of 12 columns. Mobile: a full-height off-canvas from the left with a sticky "Apply" footer showing the matching count.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.3.2 Filters</h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">Filter</th><th>Control</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Category</td><td>Collapsible tree of categories with subcategory children and counts</td><td>Selecting a node navigates to its route rather than adding a query parameter, so the URL stays meaningful and the breadcrumb stays correct.</td></tr>
+    <tr><td>Price</td><td>Two numeric inputs, "MIN PRICE" and "MAX PRICE", plus an "Apply" button</td><td>Matches the reference platform's modal. Inputs are seeded with the actual minimum and maximum in the current scope. Validation: numeric, non-negative, min ≤ max; on violation the message "Minimum price must be less than maximum price" appears and Apply stays disabled.</td></tr>
+    <tr><td>Availability</td><td>Checkbox, "In stock only"</td><td>Excludes products whose total stock across variants is zero.</td></tr>
+    <tr><td>Discounted</td><td>Checkbox, "On offer"</td><td>Products with an active discount window.</td></tr>
+  </tbody>
+</table>
+<p>All filter state lives in the query string (§6.6) so a filtered view can be shared, bookmarked and returned to with the browser's back button.</p>
+
+<h3>7.3.3 States</h3>
+<table class="compact">
+  <thead><tr><th style="width:30mm">State</th><th>Rendering</th></tr></thead>
+  <tbody>
+    <tr><td>Loading, first page</td><td>Twenty-four skeleton cards. Control bar renders immediately.</td></tr>
+    <tr><td>Loading, page change</td><td>The existing grid dims to 50% opacity with a spinner overlay; it is not replaced by skeletons. Scroll position returns to the top of the grid, not the top of the page.</td></tr>
+    <tr><td>Empty, no filters</td><td>"No products found" with a <code>package-x</code> icon and a "Browse all categories" action.</td></tr>
+    <tr><td>Empty, with filters</td><td>"No products match your filters" plus a "Clear all filters" primary action and a summary of what was applied. Distinguishing these two is what stops a filtered empty state from reading like an empty catalogue.</td></tr>
+    <tr><td>Empty subcategory</td><td>"No products found in the selected category" plus links to sibling subcategories that do have products.</td></tr>
+    <tr><td>Error</td><td>Inline panel, "We could not load products just now.", with "Try again". Filters and breadcrumb remain usable.</td></tr>
+  </tbody>
+</table>
+
+<h2>7.4 Product detail</h2>
+<p><strong>Purpose.</strong> Answer "is this the right part, is it in stock, what does it cost" in the first screenful, and support the decision below the fold.</p>
+
+<h3>7.4.1 Layout — above the fold</h3>
+<table>
+  <thead><tr><th style="width:30mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Gallery (left, 6 of 12)</td><td>Main image in a 1:1 well on <code>--ts-surface-sunken</code>, <code>object-fit: contain</code>, using the <code>lg</code> derivative. Click opens a lightbox with pan and zoom; on touch, pinch to zoom. Beneath it a thumbnail strip of <code>sm</code> derivatives, 4 visible with chevron paging, the active one outlined in primary green. Keyboard: <kbd>←</kbd>/<kbd>→</kbd> change image; thumbnails are a tab-navigable radio group.</td></tr>
+    <tr><td>Buy box (right, 6 of 12)</td><td>An elevated white card, 1&nbsp;px border, radius <code>md</code>, shadow 1. Contents in order: product name as h1 (uppercase, 22&nbsp;px, allowed to wrap to three lines); SKU in monospace muted with a click-to-copy control; average rating stars plus "(n reviews)" linking to the reviews tab, omitted when there are none; price block; variant selector; quantity stepper and stock display side by side; then three full-width stacked buttons.</td></tr>
+    <tr><td>Price block</td><td>Current price at 24&nbsp;px semibold primary green. When discounted: original struck through in muted grey above, then the discounted price, then an amber "SAVE 15%" badge and, if the discount window ends within 7 days, "Offer ends 3 March".</td></tr>
+    <tr><td>Variant selector</td><td>Omitted for single-variant products. One control per attribute, labelled with the attribute name in uppercase. ≤ 6 options render as a pill group; more render as a select. Options that are out of stock are shown struck through and disabled — never hidden, because their absence is information the buyer needs. Choosing a variant updates price, SKU, stock and the gallery if that variant has its own image, and writes the selection to the URL as <code>?v=SKU</code> so a specific variant is shareable.</td></tr>
+    <tr><td>Quantity</td><td>Label "QUANTITY:". A stepper: <code>−</code> button, numeric input, <code>+</code> button, matching the reference platform's arrangement. Minimum 1; maximum is available stock; the input accepts typing and clamps on blur. <code>−</code> is disabled at 1; <code>+</code> disabled at stock, with a tooltip "Only n available".</td></tr>
+    <tr><td>Stock</td><td>Label "AVAILABLE STOCK:" and a read-only field showing the number, as the reference platform does. Above 5: green dot and the count. 1–5: amber dot and "Only n left". 0: red dot and "Out of stock".</td></tr>
+    <tr><td>Actions</td><td><strong>ADD TO CART</strong> (primary, full width) · <strong>ADD TO WISHLIST</strong> (secondary) · <strong>BUY NOW</strong> (primary, adds to cart and navigates straight to checkout). Out of stock: the first and third are replaced by a disabled "OUT OF STOCK" plus "NOTIFY ME WHEN AVAILABLE".</td></tr>
+  </tbody>
+</table>
+
+<h3>7.4.2 Layout — below the fold</h3>
+<ul>
+  <li><strong>Tabs.</strong> "DESCRIPTION" and "REVIEWS (n)", as on the reference platform, plus "SPECIFICATIONS" when the product has attributes. Implemented as real ARIA tabs with arrow-key navigation. The panel is not lazily unmounted, so browser find-in-page works across it.</li>
+  <li><strong>Description panel.</strong> Sanitised rich text from the admin editor. Permitted elements: <code>p, strong, em, u, ul, ol, li, h3, h4, a, br, table, thead, tbody, tr, th, td, img, code, pre, blockquote</code>. Everything else is stripped server-side on save <em>and</em> client-side on render — sanitising in one place only is how stored XSS happens.</li>
+  <li><strong>Specifications panel.</strong> A two-column table of attribute names and values for the selected variant.</li>
+  <li><strong>Reviews panel.</strong> Summary at the top: average out of 5, total count, and a five-row histogram with proportional bars. Then a list of reviews, each with rating stars, author display name, relative date, body, and a "Verified purchase" badge where the reviewer has a delivered order containing the product. Sort by most recent or highest rating; paginated at 10. A signed-in user who has not yet reviewed sees the review form; a guest sees "Please sign in to write a review" with a button that opens the auth modal. Own reviews can be edited or deleted.</li>
+  <li><strong>Review form.</strong> Required 1–5 star radio group, optional 80-character title, required body of 10–2,000 characters with a live counter. Submits as <code>pending</code> for moderation with the message "Thank you — your review will appear once approved."</li>
+  <li><strong>"RELATED PRODUCTS".</strong> Heading, one line of copy, then up to 12 cards in a carousel drawn from the same subcategory, excluding the current product, ordered by sales. Section omitted when empty rather than rendered with a stray heading.</li>
+  <li><strong>Recently viewed.</strong> Up to 8 cards from a client-side ring buffer, deduplicated by product id. Omitted when fewer than two entries exist.</li>
+</ul>
+
+<h3>7.4.3 States and edge cases</h3>
+<table class="compact">
+  <thead><tr><th style="width:34mm">Case</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Loading</td><td>Gallery and buy box render as skeletons at final dimensions. Tabs render with their labels and a skeleton body.</td></tr>
+    <tr><td>Slug not found</td><td>Check <code>product_slug_history</code>; if the slug was retired, 301 to the current one. Otherwise render the 404 page with a search field and "Browse all products".</td></tr>
+    <tr><td>Product soft-deleted</td><td>410 Gone semantics: "This product is no longer available" plus related products from the same subcategory. Not a bare 404 — the page existed and may be linked from elsewhere.</td></tr>
+    <tr><td>No images</td><td>Placeholder graphic bearing the TechStar mark. Never a broken image icon.</td></tr>
+    <tr><td>Every variant out of stock</td><td>Buy box shows the out-of-stock treatment; the variant selector remains interactive so the buyer can still read prices and register interest.</td></tr>
+    <tr><td>Price changed since a cached view</td><td>The buy box is authoritative. If the cart holds this item at a different price, the cart shows a change notice on its next revalidation (§12.5).</td></tr>
+    <tr><td>Quantity exceeds stock at submit</td><td>Server rejects; the field is clamped to available stock and a toast explains "Only n available — quantity adjusted."</td></tr>
+  </tbody>
+</table>
+
+<h3>7.4.4 Structured data</h3>
+<pre>Product           name, description (plain text), sku, image[], brand,
+                  category, aggregateRating (when reviews exist)
+Offer             price, priceCurrency "TZS", availability
+                  (InStock | OutOfStock), url, priceValidUntil when discounted
+BreadcrumbList    Home &gt; Category &gt; Subcategory &gt; Product
+Review[]          author, reviewRating, datePublished, reviewBody</pre>
+<p>Emitted as a single <code>application/ld+json</code> block. Every value must match what is rendered — divergence between structured data and visible content is a manual-action risk with search engines, not a clever optimisation.</p>
+
+<h2>7.5 Search results</h2>
+<p><strong>Purpose.</strong> Serve the electronics buyer who arrived with a part number. Speed and precision matter more than presentation.</p>
+<ul>
+  <li>Heading: "Search results for '<em>term</em>'" with the count beneath: "28 products found".</li>
+  <li>The same control bar, filter panel, grid and pagination as the catalogue — one component, one behaviour to learn.</li>
+  <li>The searched term is highlighted within result names using a <code>&lt;mark&gt;</code> styled with an amber tint.</li>
+  <li>Matching is specified in §16.2: SKU exact match ranks first, then name prefix, then name contains, then description full-text. A search for "74HC14" must surface that exact part before anything merely mentioning it.</li>
+  <li><strong>Empty state.</strong> "No products match '<em>term</em>'", then in order: spelling suggestion ("Did you mean <em>arduino</em>?") when one is available within an edit distance of 2 of an indexed term; up to 6 popular products; "Browse all categories"; and "Ask us on WhatsApp — we may be able to source it", which turns a dead end into a lead.</li>
+  <li>Every search with zero results is recorded with its term and result count, and surfaced in the admin console (§16.4) as the catalogue's own to-do list.</li>
+</ul>
+
+<h2>7.6 Cart and wishlist</h2>
+
+<h3>7.6.1 Cart off-canvas</h3>
+<table>
+  <thead><tr><th style="width:26mm">Region</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>Header</td><td>Primary green, white uppercase title "SHOPPING CART", item count, white close button.</td></tr>
+    <tr><td>Line item</td><td>A 64&nbsp;px <code>sm</code> thumbnail; name (two-line clamp, links to the product); selected variant attributes in muted 12&nbsp;px; unit price; a compact quantity stepper; line total in semibold; and a <code>trash-2</code> remove button. Rows separated by a 1&nbsp;px border.</td></tr>
+    <tr><td>Change notices</td><td>When revalidation finds a difference, an amber inline strip on the affected row: "Price changed from TZS 5,000 to TZS 5,500" or "Only 2 left — quantity reduced". This is the visible half of the fix for defect R6.</td></tr>
+    <tr><td>Footer</td><td>Pinned to the bottom, on <code>--ts-surface-alt</code>. Subtotal, a note that shipping is calculated at checkout, then "CHECKOUT" (primary, full width) and "View cart" (text link).</td></tr>
+    <tr><td>Empty</td><td>Centred <code>shopping-cart</code> icon at 48&nbsp;px muted, "Your cart is empty", one line of guidance, and a "Browse products" primary button. The reference platform renders a bare <code>&lt;h1&gt;Cart is Empty&lt;/h1&gt;</code>; this replaces it.</td></tr>
+    <tr><td>Behaviour</td><td>Opens automatically on add-to-cart, with the newly added row briefly highlighted in <code>--ts-primary-tint</code>. Quantity changes are optimistic and reconciled with the server; a rejected change reverts with a toast. Removal offers a 5-second "Undo" in the toast before it is committed.</td></tr>
+  </tbody>
+</table>
+
+<h3>7.6.2 Cart page</h3>
+<p>Same data, laid out as a two-column page: a line-item table on the left (8 of 12) with columns Product, Unit price, Quantity, Total, Remove; and an order summary card on the right (4 of 12), sticky on scroll, holding subtotal, estimated shipping once a method is chosen, total, and "PROCEED TO CHECKOUT". Below the table: "Continue shopping" and "Clear cart" (with confirmation). Stacks to one column below <code>lg</code>.</p>
+
+<h3>7.6.3 Wishlist off-canvas</h3>
+<p>Header "WISHLIST". Rows carry thumbnail, name, price, current stock status, "Move to cart" and remove. No quantity — a wishlist entry is an intent, not a line item, which is why the reference platform's unused quantity field is dropped. Empty state: heart icon, "Your wishlist is empty", "Browse products". Signed-in wishlists persist server-side and merge on sign-in per §12.5.4.</p>
