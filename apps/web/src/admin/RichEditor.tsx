@@ -1,12 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import {
-  Bold, Code, Heading2, Heading3, Italic, Link2, Link2Off, List, ListOrdered,
-  Quote, Redo2, RemoveFormatting, Strikethrough, Undo2,
+  Bold, Code, Heading2, Heading3, ImagePlus, Italic, Link2, Link2Off, List,
+  ListOrdered, Loader2, Quote, Redo2, RemoveFormatting, Strikethrough, Undo2,
 } from 'lucide-react';
+import { api } from '../lib/api';
+import { useUi } from '../stores';
+import type { MediaDto } from '../lib/types';
+
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
+const IMAGE_MAX_MB = 5;
 
 /**
  * A visual editor for the admin's long-form fields.
@@ -24,7 +31,11 @@ interface ToolButton {
   run: () => void;
 }
 
-function Toolbar({ editor }: { editor: Editor }) {
+function Toolbar({ editor, onInsertImage, imageUploading }: {
+  editor: Editor;
+  onInsertImage: () => void;
+  imageUploading: boolean;
+}) {
   const promptLink = () => {
     const previous = editor.getAttributes('link').href ?? '';
     const url = window.prompt('Link address (leave empty to remove)', previous);
@@ -54,6 +65,12 @@ function Toolbar({ editor }: { editor: Editor }) {
       { icon: <List size={15} />, title: 'Bulleted list', isActive: () => editor.isActive('bulletList'), run: () => editor.chain().focus().toggleBulletList().run() },
       { icon: <ListOrdered size={15} />, title: 'Numbered list', isActive: () => editor.isActive('orderedList'), run: () => editor.chain().focus().toggleOrderedList().run() },
       { icon: <Quote size={15} />, title: 'Quote', isActive: () => editor.isActive('blockquote'), run: () => editor.chain().focus().toggleBlockquote().run() },
+    ],
+    [
+      {
+        icon: imageUploading ? <Loader2 size={15} className="spin" /> : <ImagePlus size={15} />,
+        title: 'Insert image', run: onInsertImage,
+      },
     ],
     [
       { icon: <Link2 size={15} />, title: 'Add link', isActive: () => editor.isActive('link'), run: promptLink },
@@ -109,10 +126,17 @@ export function RichEditor({
   placeholder?: string;
   minHeight?: number;
 }) {
+  const toast = useUi((s) => s.toast);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
       Link.configure({ openOnClick: false, autolink: true }),
+      // `inline: false` keeps every inserted photo on its own line — this is
+      // article/news body copy, not a chat bubble with an avatar beside it.
+      Image.configure({ inline: false, allowBase64: false }),
       Placeholder.configure({ placeholder }),
     ],
     content: value || '',
@@ -123,6 +147,38 @@ export function RichEditor({
       onChange(html === '<p></p>' ? '' : html);
     },
   });
+
+  /**
+   * Uploads straight to the same media store `ImageUploader` uses — a photo
+   * dropped into an article body is a real asset (immutable-cached, in the
+   * media library) rather than a base64 blob bloating the HTML column, which
+   * `allowBase64: false` above also forecloses.
+   */
+  const handleFiles = async (files: FileList | null) => {
+    const file = files?.[0];
+    if (!file || !editor) return;
+    if (file.size > IMAGE_MAX_MB * 1024 * 1024) {
+      toast({ tone: 'danger', title: 'File too large', text: `Images must be ${IMAGE_MAX_MB} MB or smaller.` });
+      return;
+    }
+    if (!IMAGE_ACCEPT.split(',').includes(file.type)) {
+      toast({ tone: 'danger', title: 'Unsupported file type', text: 'Only JPEG, PNG, WebP and AVIF are accepted.' });
+      return;
+    }
+    setImageUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('files', file);
+      const [stored] = await api.post<MediaDto[]>('/admin/media', fd);
+      if (stored) {
+        editor.chain().focus().setImage({ src: stored.lg, alt: '' }).run();
+      }
+    } catch {
+      toast({ tone: 'danger', title: 'Upload failed', text: 'The image could not be uploaded. Please try again.' });
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   // Re-sync when the form loads its record after the editor has mounted.
   useEffect(() => {
@@ -144,8 +200,21 @@ export function RichEditor({
       ) : null}
 
       <div className={`ts-rte ${error ? 'ts-rte--error' : ''}`}>
-        {editor ? <Toolbar editor={editor} /> : null}
+        {editor ? (
+          <Toolbar
+            editor={editor}
+            imageUploading={imageUploading}
+            onInsertImage={() => { if (!imageUploading) fileInputRef.current?.click(); }}
+          />
+        ) : null}
         <EditorContent editor={editor} className="ts-rte__body" style={{ minHeight }} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={IMAGE_ACCEPT}
+          hidden
+          onChange={(e) => { void handleFiles(e.target.files); e.target.value = ''; }}
+        />
       </div>
 
       {error ? <div className="ts-error">{error}</div> : hint ? <div className="ts-hint">{hint}</div> : null}

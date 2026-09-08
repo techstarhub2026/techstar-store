@@ -85,19 +85,36 @@ export const stripHtml = (html: string) =>
 const ALLOWED_TAGS = new Set([
   'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li',
   'h2', 'h3', 'h4', 'a', 'blockquote', 'code', 'pre', 'span', 'div',
-  'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr',
+  'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'img',
 ]);
 const ALLOWED_ATTRS: Record<string, Set<string>> = {
   a: new Set(['href', 'title', 'target', 'rel']),
+  // No `onerror`/event-handler attributes reach here regardless (stripped
+  // above before tags are parsed at all); `src` is still checked against the
+  // same javascript:/data:/vbscript: denylist as `href` so this cannot be
+  // used to smuggle a script URI either.
+  img: new Set(['src', 'alt', 'width', 'height']),
 };
 
 export function sanitizeHtml(input: string): string {
   if (!input) return '';
+  // A blanket `.replace(/javascript:/gi, '')` used to run here as a second
+  // net under the per-attribute check below. It did the opposite of what it
+  // looked like: for `href="javascript:alert(1)"` it deleted only the
+  // scheme, in place, before the attribute-level check ever ran — so what
+  // reached that check was already the harmless-looking `href="alert(1)"`,
+  // which the javascript:/data:/vbscript: test downstream no longer matched
+  // and therefore kept. `href`/`src="alert(1)"` cannot execute (no browser
+  // resolves that as anything but a broken relative URL), so this was never
+  // an active hole, but the value that survived was neither the author's
+  // original nor a value the check believed it had rejected — dropping the
+  // pass here means the one check downstream, which sees the real
+  // pre-mangled value and drops the whole attribute on a match, is the only
+  // one doing this job.
   let out = input
     .replace(/<\s*(script|style|iframe|object|embed|form|input|link|meta)[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
     .replace(/<\s*(script|style|iframe|object|embed|form|input|link|meta)[^>]*\/?>/gi, '')
-    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    .replace(/javascript:/gi, '');
+    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
 
   out = out.replace(/<\s*(\/?)\s*([a-zA-Z][a-zA-Z0-9]*)([^>]*)>/g, (_m, close, tag, attrs) => {
     const name = String(tag).toLowerCase();
@@ -112,10 +129,12 @@ export function sanitizeHtml(input: string): string {
       const attr = m[1].toLowerCase();
       const value = m[3] ?? m[4] ?? '';
       if (!allowed.has(attr)) continue;
-      if (attr === 'href' && /^(javascript|data|vbscript):/i.test(value.trim())) continue;
+      if ((attr === 'href' || attr === 'src') && /^(javascript|data|vbscript):/i.test(value.trim())) continue;
+      if ((attr === 'width' || attr === 'height') && !/^\d+(%|px)?$/.test(value.trim())) continue;
       kept.push(`${attr}="${value.replace(/"/g, '&quot;')}"`);
     }
     if (name === 'a') kept.push('rel="noopener noreferrer"');
+    if (name === 'img' && !kept.some((k) => k.startsWith('src='))) return '';
     return `<${name}${kept.length ? ' ' + kept.join(' ') : ''}>`;
   });
 

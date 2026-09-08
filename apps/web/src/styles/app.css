@@ -789,6 +789,12 @@ h1, h2, h3, h4 { font-weight: 700; line-height: 1.25; }
   font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 0.9em;
 }
 .ts-rte__body .ProseMirror a { color: var(--ts-primary-dark); text-decoration: underline; }
+.ts-rte__body .ProseMirror img {
+  max-width: 100%; height: auto; border-radius: 8px; display: block;
+}
+.ts-rte__body .ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid var(--ts-primary); outline-offset: 2px;
+}
 .ts-rte__body .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder); float: left; height: 0;
   color: var(--ts-text-muted); pointer-events: none;
