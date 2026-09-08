@@ -1,0 +1,7 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "deploy": {
+    "startCommand": "sh -c 'if [ -d apps/api/media-seed ]; then mkdir -p \"${MEDIA_ROOT:-./uploads}\"; cp -rn apps/api/media-seed/. \"${MEDIA_ROOT:-./uploads}/\"; fi; node apps/api/dist/index.js'"
+  }
+}
