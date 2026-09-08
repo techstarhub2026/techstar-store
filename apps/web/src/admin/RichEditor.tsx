@@ -132,7 +132,12 @@ export function RichEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      // StarterKit bundles its own Link extension as of Tiptap v3; disabled
+      // here so the explicit Link.configure() below — carrying this editor's
+      // actual settings (no click-through, autolink) — is the only one
+      // registered. Both being active at once produced a harmless but real
+      // "Duplicate extension names found: ['link']" console warning.
+      StarterKit.configure({ heading: { levels: [2, 3] }, link: false }),
       Link.configure({ openOnClick: false, autolink: true }),
       // `inline: false` keeps every inserted photo on its own line — this is
       // article/news body copy, not a chat bubble with an avatar beside it.
