@@ -146,6 +146,20 @@ export function createApp() {
 
     app.get(/^(?!\/api\/|\/media\/).*/, (req, res, next) => {
       if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+      // Every deep client-side route (/admin, /admin/site/hero, ...) falls
+      // through express.static above — nothing on disk matches that path —
+      // and lands here. This `res.sendFile` is a separate call from the one
+      // express.static makes internally, so it does NOT go through that
+      // middleware's `setHeaders` callback above; without an explicit
+      // header here it fell back to sendFile's own default of a bare
+      // `max-age=0`, weaker than the `no-cache` set for a direct
+      // `/index.html` request. The two are meant to behave identically —
+      // both are the same file — but only one of them actually was,
+      // so reloading while deep in the admin (which is every reload, since
+      // the SPA never sits at the bare /index.html URL) could serve a
+      // stale cached shell depending on how strictly the browser or an
+      // intermediate proxy treated that weaker header.
+      res.setHeader('Cache-Control', 'no-cache');
       res.sendFile(path.join(spaRoot, 'index.html'), (err) => {
         if (err) next();
       });
