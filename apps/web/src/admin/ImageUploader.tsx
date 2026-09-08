@@ -4,8 +4,13 @@ import { api } from '../lib/api';
 import { useUi } from '../stores';
 import { Button, IconButton, Modal } from '../components/ui';
 import type { MediaDto } from '../lib/types';
+import { convertHeicFiles, isHeic } from '../lib/heic';
 
-const ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
+// `image/heic`/`image/heif` are listed here even though the server rejects
+// them, so a phone's file picker still shows and allows selecting the
+// photo — convertHeicFiles() below turns it into a JPEG before it ever
+// reaches the size/type checks or the network request.
+const ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif';
 const MAX_MB = 5;
 
 /**
@@ -18,7 +23,7 @@ export function ImageUploader({
   onChange,
   max = 20,
   label = 'Photos',
-  hint = 'Drag & drop images here, or browse your device. JPEG, PNG or WebP, up to 5 MB each.',
+  hint = 'Drag & drop images here, or browse your device — iPhone photos included. Up to 5 MB each.',
   single = false,
 }: {
   value: MediaDto[];
@@ -30,15 +35,44 @@ export function ImageUploader({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  // Separate from `busy`: converting a large iPhone photo can take a couple
+  // of seconds of real CPU work in the browser, before the network request
+  // that `busy` otherwise represents has even started — a photo picked and
+  // then nothing visibly happening for a moment is exactly what "upload
+  // isn't working" looks like from the other side of the screen.
+  const [converting, setConverting] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const toast = useUi((s) => s.toast);
 
   const upload = useCallback(
     async (files: FileList | File[]) => {
-      const list = Array.from(files);
+      let list = Array.from(files);
       if (!list.length) return;
 
+      const heicCount = list.filter(isHeic).length;
+      if (heicCount) {
+        setConverting(true);
+        try {
+          const failed: string[] = [];
+          list = await convertHeicFiles(list, (f) => failed.push(f.name));
+          if (failed.length) {
+            toast({
+              tone: 'danger',
+              title: `Could not convert ${failed.length} photo${failed.length === 1 ? '' : 's'}`,
+              text: failed.join(', '),
+            });
+          }
+          if (!list.length) return;
+        } finally {
+          setConverting(false);
+        }
+      }
+
+      // Checked after HEIC conversion, not before: HEIC compresses noticeably
+      // better than JPEG, so a photo that was under the limit as HEIC can
+      // land over it once re-encoded — the limit has to apply to what's
+      // actually about to be uploaded.
       const tooBig = list.filter((f) => f.size > MAX_MB * 1024 * 1024);
       if (tooBig.length) {
         toast({ tone: 'danger', title: 'File too large', text: `Images must be ${MAX_MB} MB or smaller.` });
@@ -99,7 +133,11 @@ export function ImageUploader({
           textAlign: 'center',
         }}
       >
-        {busy ? (
+        {converting ? (
+          <div className="d-flex align-items-center justify-content-center gap-2">
+            <Loader2 size={18} className="spin" /> Converting photo…
+          </div>
+        ) : busy ? (
           <div className="d-flex align-items-center justify-content-center gap-2">
             <Loader2 size={18} className="spin" /> Uploading…
           </div>

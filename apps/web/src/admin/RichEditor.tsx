@@ -11,8 +11,12 @@ import {
 import { api } from '../lib/api';
 import { useUi } from '../stores';
 import type { MediaDto } from '../lib/types';
+import { convertHeicToJpeg, isHeic } from '../lib/heic';
 
-const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
+// `image/heic`/`image/heif` listed so a phone's file picker offers the
+// photo at all — see lib/heic.ts for why HEIC is converted rather than
+// accepted by the server directly.
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif';
 const IMAGE_MAX_MB = 5;
 
 /**
@@ -160,13 +164,31 @@ export function RichEditor({
    * `allowBase64: false` above also forecloses.
    */
   const handleFiles = async (files: FileList | null) => {
-    const file = files?.[0];
+    let file = files?.[0];
     if (!file || !editor) return;
+
+    // Converted up front, same reasoning as ImageUploader's own copy of
+    // this: the size limit below has to see the JPEG's real size, and a
+    // phone's file picker won't reliably offer a HEIC photo as selectable
+    // unless the accept list actually names it.
+    if (isHeic(file)) {
+      setImageUploading(true);
+      try {
+        file = await convertHeicToJpeg(file);
+      } catch {
+        setImageUploading(false);
+        toast({ tone: 'danger', title: 'Could not convert photo', text: `${file.name} may be corrupted or an unsupported HEIC variant.` });
+        return;
+      }
+    }
+
     if (file.size > IMAGE_MAX_MB * 1024 * 1024) {
+      setImageUploading(false);
       toast({ tone: 'danger', title: 'File too large', text: `Images must be ${IMAGE_MAX_MB} MB or smaller.` });
       return;
     }
     if (!IMAGE_ACCEPT.split(',').includes(file.type)) {
+      setImageUploading(false);
       toast({ tone: 'danger', title: 'Unsupported file type', text: 'Only JPEG, PNG, WebP and AVIF are accepted.' });
       return;
     }
