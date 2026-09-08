@@ -1022,6 +1022,22 @@ model Project {
   contentHtml String    @db.MediumText
   contentText String    @db.MediumText
   imageId     Int?
+  /// "program" | "project" — this table serves two different menus on the
+  /// website. "program" rows are the five bootcamp offerings linked from the
+  /// Programs dropdown; they existed here first and default to that value on
+  /// upgrade so nothing already published silently changes what it is.
+  /// "project" rows are genuine ongoing/completed work and are the only ones
+  /// the public Projects page (status below) returns.
+  kind        String    @default("program") @db.VarChar(16)
+  /// "ongoing" | "completed" — which list a "project" row shows in on the
+  /// public Projects page. Meaningless for "program" rows. Plain string, not
+  /// a DB enum, matching every other status column in this schema (see
+  /// Order.status etc.) so it can gain a third value later without a
+  /// destructive column migration.
+  status      String    @default("ongoing") @db.VarChar(16)
+  /// Optional external link — a case study, GitHub repo, live demo, press
+  /// coverage. Shown as a "Learn more" / "Visit" action when set.
+  linkUrl     String?   @db.VarChar(512)
   position    Int       @default(0)
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
@@ -1031,6 +1047,7 @@ model Project {
   image MediaFile? @relation(fields: [imageId], references: [id], onDelete: SetNull)
 
   @@index([position, id])
+  @@index([kind, status, position])
   @@map("projects")
 }
 

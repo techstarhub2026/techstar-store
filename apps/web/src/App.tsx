@@ -30,7 +30,7 @@ import {
 } from './admin/Content';
 import { AdminCourses, AdminEvents, AdminTeam } from './admin/WebsiteContent';
 import {
-  AdminHeroSlides, AdminHighlights, AdminHomeOffer, AdminProjects, AdminSiteStats,
+  AdminHeroSlides, AdminHighlights, AdminHomeOffer, AdminPrograms, AdminProjects, AdminSiteStats,
 } from './admin/SiteHome';
 import {
   AdminPurchaseOrderDetail, AdminPurchaseOrderForm, AdminPurchaseOrders,
@@ -135,6 +135,7 @@ export default function App() {
         <Route path="site/highlights" element={<AdminHighlights />} />
         <Route path="site/stats" element={<AdminSiteStats />} />
         <Route path="site/offer" element={<AdminHomeOffer />} />
+        <Route path="site/programs" element={<AdminPrograms />} />
         <Route path="site/projects" element={<AdminProjects />} />
 
         <Route path="campaigns" element={<AdminCampaigns />} />

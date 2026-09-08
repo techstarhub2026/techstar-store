@@ -269,6 +269,9 @@ const projectBody = z.object({
   excerpt: z.string().max(500).optional().or(z.literal('')),
   contentHtml: z.string().min(1, 'Content is required'),
   imageId: z.number().int().nullable().optional(),
+  kind: z.enum(['program', 'project']).default('project'),
+  status: z.enum(['ongoing', 'completed']).default('ongoing'),
+  linkUrl: z.string().trim().url('Enter a full URL, e.g. https://…').max(512).optional().or(z.literal('')),
   position: z.number().int().default(0),
   isActive: z.boolean().default(true),
 });
@@ -276,9 +279,14 @@ const projectBody = z.object({
 adminSiteRouter.get(
   '/projects',
   requirePermission('service.read'),
-  handler(async (_req, res) => {
+  handler(async (req, res) => {
+    // `?kind=program` / `?kind=project` scopes the admin's Programs and
+    // Projects screens to their own rows — both edit this same table, but an
+    // admin managing bootcamp pages should never see (or accidentally
+    // reorder into) genuine project entries and vice versa.
+    const kind = req.query.kind === 'program' || req.query.kind === 'project' ? req.query.kind : undefined;
     const rows = await prisma.project.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, ...(kind ? { kind } : {}) },
       orderBy: [{ position: 'asc' }, { id: 'asc' }],
       include: { image: true },
     });
@@ -302,6 +310,9 @@ adminSiteRouter.post(
           contentHtml: html,
           contentText: stripHtml(html),
           imageId: b.imageId ?? null,
+          kind: b.kind,
+          status: b.status,
+          linkUrl: b.linkUrl || null,
           position: b.position,
           isActive: b.isActive,
         },
@@ -329,6 +340,9 @@ adminSiteRouter.patch(
         ...(b.excerpt !== undefined ? { excerpt: b.excerpt || null } : {}),
         ...(html !== undefined ? { contentHtml: html, contentText: stripHtml(html) } : {}),
         ...(b.imageId !== undefined ? { imageId: b.imageId } : {}),
+        ...(b.kind !== undefined ? { kind: b.kind } : {}),
+        ...(b.status !== undefined ? { status: b.status } : {}),
+        ...(b.linkUrl !== undefined ? { linkUrl: b.linkUrl || null } : {}),
         ...(b.position !== undefined ? { position: b.position } : {}),
         ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
       },

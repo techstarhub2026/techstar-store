@@ -24,14 +24,20 @@ import { useUi } from '../stores';
  * insertion order.
  */
 
-/** Shared plumbing: fetch a list, save one, delete one, reorder two. */
-function useCrud(resource: string, queryKey: string) {
+/**
+ * Shared plumbing: fetch a list, save one, delete one, reorder two.
+ *
+ * `listQuery` is an optional query string (e.g. `?kind=project`) appended
+ * only to the list fetch — save/remove/swap always address `/admin/${resource}/${id}`,
+ * which a suffix on `resource` itself would have broken.
+ */
+function useCrud(resource: string, queryKey: string, listQuery = '') {
   const qc = useQueryClient();
   const toast = useUi((s) => s.toast);
 
   const list = useQuery({
     queryKey: ['admin', queryKey],
-    queryFn: () => api.get<any[]>(`/admin/${resource}`),
+    queryFn: () => api.get<any[]>(`/admin/${resource}${listQuery}`),
   });
 
   const refresh = () => qc.invalidateQueries({ queryKey: ['admin', queryKey] });
@@ -438,8 +444,17 @@ export function AdminSiteStats() {
 
 // ═══════════════════════════════════════════════ programmes / projects ══
 
-export function AdminProjects() {
-  const { list, save, remove, swap, toast } = useCrud('projects', 'projects');
+/**
+ * The five bootcamp offerings linked from the website's Programs menu.
+ *
+ * Shares the `projects` table with AdminProjects below — both are website
+ * pages backed by the same content shape (title, cover image, rich body) —
+ * but scoped to `kind=program` so an admin editing a bootcamp page never
+ * sees, and can never accidentally reorder into, the genuine project entries
+ * below, or vice versa.
+ */
+export function AdminPrograms() {
+  const { list, save, remove, swap, toast } = useCrud('projects', 'programs', '?kind=program');
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [confirm, setConfirm] = useState<any | null>(null);
@@ -466,9 +481,9 @@ export function AdminProjects() {
     setBusy(true);
     try {
       await save(editing?.id ?? null, {
-        ...form, imageId: image[0]?.id ?? null, position: editing?.position ?? rows.length,
+        ...form, kind: 'program', imageId: image[0]?.id ?? null, position: editing?.position ?? rows.length,
       });
-      toast({ tone: 'success', title: editing ? 'Programme updated' : 'Programme published' });
+      toast({ tone: 'success', title: editing ? 'Program updated' : 'Program published' });
       setOpen(false);
     } catch (e) {
       if (e instanceof ApiError) {
@@ -482,7 +497,7 @@ export function AdminProjects() {
     <>
       <PageHeader
         title="Programs"
-        description="The programme pages linked from the website’s Programs menu."
+        description="The programme pages linked from the website's Programs menu."
         actions={<Button onClick={() => openForm()}><Plus size={15} /> New program</Button>}
       />
 
@@ -534,6 +549,133 @@ export function AdminProjects() {
         onConfirm={async () => {
           setBusy(true);
           try { await remove(confirm.id); toast({ tone: 'success', title: 'Program deleted' }); }
+          finally { setBusy(false); setConfirm(null); }
+        }}
+        onCancel={() => setConfirm(null)} busy={busy} />
+    </>
+  );
+}
+
+/**
+ * Ongoing and completed work shown on the website's Projects page.
+ *
+ * Shares the `projects` table with AdminPrograms above, scoped to
+ * `kind=project` — see that component's doc comment for why the two are
+ * kept as separate screens rather than one list mixing both.
+ */
+export function AdminProjects() {
+  const { list, save, remove, swap, toast } = useCrud('projects', 'site-projects', '?kind=project');
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [confirm, setConfirm] = useState<any | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [image, setImage] = useState<MediaDto[]>([]);
+  const [form, setForm] = useState({
+    title: '', excerpt: '', contentHtml: '', status: 'ongoing', linkUrl: '', isActive: true,
+  });
+
+  const rows = list.data ?? [];
+
+  const openForm = (row?: any) => {
+    setEditing(row ?? null);
+    setErrors({});
+    setImage(row?.image ? [row.image] : []);
+    setForm({
+      title: row?.title ?? '', excerpt: row?.excerpt ?? '',
+      contentHtml: row?.contentHtml ?? '', status: row?.status ?? 'ongoing',
+      linkUrl: row?.linkUrl ?? '', isActive: row?.isActive ?? true,
+    });
+    setOpen(true);
+  };
+
+  const submit = async () => {
+    setErrors({});
+    setBusy(true);
+    try {
+      await save(editing?.id ?? null, {
+        ...form, kind: 'project', imageId: image[0]?.id ?? null, position: editing?.position ?? rows.length,
+      });
+      toast({ tone: 'success', title: editing ? 'Project updated' : 'Project published' });
+      setOpen(false);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrors(e.fieldErrors());
+        if (!e.details?.length) toast({ tone: 'danger', title: e.message });
+      }
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <>
+      <PageHeader
+        title="Projects"
+        description="Ongoing and completed work shown on the website's Projects page."
+        actions={<Button onClick={() => openForm()}><Plus size={15} /> New project</Button>}
+      />
+
+      {list.isLoading ? <Skeleton h={220} /> : !rows.length ? (
+        <EmptyState icon={<FolderKanban size={44} />} title="No projects yet"
+          action={<Button onClick={() => openForm()}>Add the first project</Button>} />
+      ) : (
+        <div className="row g-3">
+          {rows.map((p, i) => (
+            <div className="col-12 col-md-6 col-lg-4" key={p.id}>
+              <div className="ts-card h-100" style={{ overflow: 'hidden', opacity: p.isActive ? 1 : 0.55 }}>
+                {p.image ? <img src={p.image.md} alt=""
+                  style={{ width: '100%', height: 130, objectFit: 'cover', background: 'var(--ts-surface-sunken)' }} /> : null}
+                <div className="p-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <strong style={{ fontSize: 14.5 }}>{p.title}</strong>
+                    <span className={`ts-badge ${p.status === 'completed' ? '' : 'ts-badge--warning'}`}>
+                      {p.status === 'completed' ? 'Completed' : 'Ongoing'}
+                    </span>
+                  </div>
+                  <p className="ts-muted ts-clamp-2 mt-1 mb-2" style={{ fontSize: 12.5 }}>{p.excerpt}</p>
+                  <div className="d-flex gap-1">
+                    <OrderButtons rows={rows} index={i} onSwap={(a, b) => void swap(a, b)} />
+                    <button className="ts-iconbtn" aria-label="Edit" onClick={() => openForm(p)}><SquarePen size={15} /></button>
+                    <button className="ts-iconbtn" aria-label="Delete" onClick={() => setConfirm(p)}><Trash2 size={15} /></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Modal open={open} onClose={() => setOpen(false)} size="lg"
+        title={editing ? 'Edit project' : 'New project'}
+        footer={<>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => void submit()} loading={busy}>Save</Button>
+        </>}>
+        <TextInput label="Title" value={form.title} error={errors.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+        <Select label="Status" value={form.status}
+          onChange={(e) => setForm({ ...form, status: e.target.value })}>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+        </Select>
+        <TextArea label="Short summary" value={form.excerpt} rows={2}
+          onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+          hint="Shown on the card that links to this project." />
+        <RichEditor label="Full page content" value={form.contentHtml} error={errors.contentHtml}
+          onChange={(html) => setForm({ ...form, contentHtml: html })}
+          placeholder="Describe the project…" required />
+        <TextInput label="Link (optional)" value={form.linkUrl} error={errors.linkUrl}
+          onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
+          placeholder="https://…"
+          hint="A case study, repo, live demo or press coverage. Shown as a button on the card." />
+        <ImageUploader value={image} onChange={setImage} single max={1} label="Cover image" />
+        <ActiveToggle checked={form.isActive} onChange={(v) => setForm({ ...form, isActive: v })} />
+      </Modal>
+
+      <ConfirmDialog open={Boolean(confirm)} title="Delete this project?"
+        message={<>Delete <strong>{confirm?.title}</strong>?</>}
+        onConfirm={async () => {
+          setBusy(true);
+          try { await remove(confirm.id); toast({ tone: 'success', title: 'Project deleted' }); }
           finally { setBusy(false); setConfirm(null); }
         }}
         onCancel={() => setConfirm(null)} busy={busy} />

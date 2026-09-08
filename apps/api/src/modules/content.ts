@@ -307,8 +307,11 @@ contentRouter.get(
 contentRouter.get(
   '/site/projects',
   handler(async (_req, res) => {
+    // `kind: 'project'` excludes the five bootcamp pages that live in this
+    // same table for the Programs menu — this feed is genuine ongoing/
+    // completed work only, never programme offerings.
     const rows = await prisma.project.findMany({
-      where: { deletedAt: null, isActive: true },
+      where: { deletedAt: null, isActive: true, kind: 'project' },
       orderBy: [{ position: 'asc' }, { id: 'asc' }],
       include: { image: true },
     });
@@ -320,6 +323,8 @@ contentRouter.get(
         excerpt: p.excerpt,
         contentHtml: p.contentHtml,
         image: p.image ? toMediaDto(p.image) : null,
+        status: p.status,
+        linkUrl: p.linkUrl,
       })),
     );
   }),
