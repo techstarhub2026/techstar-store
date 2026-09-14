@@ -28,7 +28,9 @@ import {
 import {
   AdminArticles, AdminFaqs, AdminInvoices, AdminPartners, AdminServices,
 } from './admin/Content';
-import { AdminCourses, AdminEvents, AdminTeam } from './admin/WebsiteContent';
+import {
+  AdminCourses, AdminEvents, AdminWebsiteBoard, AdminWebsiteStaff,
+} from './admin/WebsiteContent';
 import {
   AdminHeroSlides, AdminHighlights, AdminHomeOffer, AdminPrograms, AdminProjects, AdminSiteStats,
 } from './admin/SiteHome';
@@ -127,7 +129,8 @@ export default function App() {
         <Route path="comments" element={<AdminModeration kind="comments" />} />
         <Route path="reviews" element={<AdminModeration kind="reviews" />} />
         <Route path="faqs" element={<AdminFaqs />} />
-        <Route path="team" element={<AdminTeam />} />
+        <Route path="team/staff" element={<AdminWebsiteStaff />} />
+        <Route path="team/board" element={<AdminWebsiteBoard />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="courses" element={<AdminCourses />} />
 

@@ -334,9 +334,12 @@ contentRouter.get(
 
 contentRouter.get(
   '/team',
-  handler(async (_req, res) => {
+  handler(async (req, res) => {
+    // ?group=staff or ?group=board scopes the response to one of
+    // techstarhub.or.tz's two team pages; omitted, it returns everyone.
+    const group = req.query.group === 'staff' || req.query.group === 'board' ? req.query.group : undefined;
     const rows = await prisma.teamMember.findMany({
-      where: { deletedAt: null, isActive: true },
+      where: { deletedAt: null, isActive: true, ...(group ? { group } : {}) },
       orderBy: [{ position: 'asc' }, { id: 'asc' }],
       include: { image: true },
     });
@@ -346,6 +349,7 @@ contentRouter.get(
         name: m.name,
         role: m.role,
         bio: m.bio,
+        group: m.group,
         image: m.image ? toMediaDto(m.image) : null,
         socials: {
           facebook: m.facebookUrl,

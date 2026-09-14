@@ -17,7 +17,8 @@
     "prestart": "node scripts/free-port.mjs",
     "db:seed:site": "dotenv -e ../../.env -- tsx prisma/seed-site-content.mts",
     "db:seed:services": "dotenv -e ../../.env -- tsx prisma/seed-services.mts",
-    "db:seed:offer": "dotenv -e ../../.env -- tsx prisma/seed-home-offer.mts"
+    "db:seed:offer": "dotenv -e ../../.env -- tsx prisma/seed-home-offer.mts",
+    "db:seed:team": "dotenv -e ../../.env -- tsx prisma/seed-team.mts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

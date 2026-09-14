@@ -643,6 +643,7 @@ const teamMemberBody = z.object({
   xUrl: z.string().max(512).optional().or(z.literal('')),
   instagramUrl: z.string().max(512).optional().or(z.literal('')),
   linkedinUrl: z.string().max(512).optional().or(z.literal('')),
+  group: z.enum(['staff', 'board']).default('staff'),
   position: z.number().int().default(0),
   isActive: z.boolean().default(true),
 });
@@ -650,9 +651,10 @@ const teamMemberBody = z.object({
 adminContentRouter.get(
   '/team-members',
   requirePermission('service.read'),
-  handler(async (_req, res) => {
+  handler(async (req, res) => {
+    const group = req.query.group === 'staff' || req.query.group === 'board' ? req.query.group : undefined;
     const rows = await prisma.teamMember.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, ...(group ? { group } : {}) },
       orderBy: [{ position: 'asc' }, { id: 'asc' }],
       include: { image: true },
     });
@@ -702,6 +704,7 @@ adminContentRouter.patch(
         ...(b.xUrl !== undefined ? { xUrl: b.xUrl || null } : {}),
         ...(b.instagramUrl !== undefined ? { instagramUrl: b.instagramUrl || null } : {}),
         ...(b.linkedinUrl !== undefined ? { linkedinUrl: b.linkedinUrl || null } : {}),
+        ...(b.group ? { group: b.group } : {}),
         ...(b.position !== undefined ? { position: b.position } : {}),
         ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
       },

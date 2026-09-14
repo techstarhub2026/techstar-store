@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, Plus, SquarePen, Trash2, Users } from 'lucide-react';
+import {
+  ArrowDown, ArrowUp, CalendarDays, Plus, SquarePen, Trash2, Users,
+} from 'lucide-react';
 import { ApiError, api } from '../lib/api';
 import type { MediaDto } from '../lib/types';
 import { PageHeader } from './AdminLayout';
@@ -20,9 +22,34 @@ import { useUi } from '../stores';
 
 // ══════════════════════════════════════════════════════════ team ══
 
-export function AdminTeam() {
+function OrderButtons({ rows, index, onSwap }: { rows: any[]; index: number; onSwap: (a: any, b: any) => void }) {
+  return (
+    <>
+      <button className="ts-iconbtn" aria-label="Move up" disabled={index === 0}
+        onClick={() => onSwap(rows[index], rows[index - 1])}>
+        <ArrowUp size={14} />
+      </button>
+      <button className="ts-iconbtn" aria-label="Move down" disabled={index === rows.length - 1}
+        onClick={() => onSwap(rows[index], rows[index + 1])}>
+        <ArrowDown size={14} />
+      </button>
+    </>
+  );
+}
+
+/**
+ * Shared implementation behind AdminStaff and AdminBoard below — both edit
+ * the same `team_members` table, scoped by the `group` column, so someone
+ * managing the Board page never sees (or reorders into) the Staff page's
+ * people and vice versa. Mirrors the AdminPrograms/AdminProjects split for
+ * the `projects` table.
+ */
+function TeamGroupAdmin({ group, title, description, addLabel }: {
+  group: 'staff' | 'board'; title: string; description: string; addLabel: string;
+}) {
   const qc = useQueryClient();
   const toast = useUi((s) => s.toast);
+  const queryKey = ['admin', 'team-members', group];
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [confirm, setConfirm] = useState<any | null>(null);
@@ -34,9 +61,11 @@ export function AdminTeam() {
   });
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['admin', 'team-members'],
-    queryFn: () => api.get<any[]>('/admin/team-members'),
+    queryKey,
+    queryFn: () => api.get<any[]>(`/admin/team-members?group=${group}`),
   });
+
+  const refresh = () => qc.invalidateQueries({ queryKey });
 
   const openForm = (row?: any) => {
     setEditing(row ?? null);
@@ -55,10 +84,10 @@ export function AdminTeam() {
     setErrors({});
     setBusy(true);
     try {
-      const payload = { ...form, imageId: image[0]?.id ?? null };
+      const payload = { ...form, group, imageId: image[0]?.id ?? null, position: editing?.position ?? data.length };
       if (editing) await api.patch(`/admin/team-members/${editing.id}`, payload);
       else await api.post('/admin/team-members', payload);
-      await qc.invalidateQueries({ queryKey: ['admin', 'team-members'] });
+      await refresh();
       toast({ tone: 'success', title: editing ? 'Team member updated' : 'Team member added' });
       setOpen(false);
     } catch (e) {
@@ -69,20 +98,28 @@ export function AdminTeam() {
     } finally { setBusy(false); }
   };
 
+  const swap = async (a: any, b: any) => {
+    await Promise.all([
+      api.patch(`/admin/team-members/${a.id}`, { position: b.position ?? 0 }),
+      api.patch(`/admin/team-members/${b.id}`, { position: a.position ?? 0 }),
+    ]);
+    await refresh();
+  };
+
   return (
     <>
       <PageHeader
-        title="Team"
-        description="The people shown on techstarhub.or.tz’s team page."
-        actions={<Button onClick={() => openForm()}><Plus size={15} /> Add team member</Button>}
+        title={title}
+        description={description}
+        actions={<Button onClick={() => openForm()}><Plus size={15} /> {addLabel}</Button>}
       />
       {isLoading ? <Skeleton h={220} /> : !data.length ? (
-        <EmptyState icon={<Users size={44} />} title="No team members yet" action={<Button onClick={() => openForm()}>Add your first team member</Button>} />
+        <EmptyState icon={<Users size={44} />} title="No one here yet" action={<Button onClick={() => openForm()}>Add your first person</Button>} />
       ) : (
         <div className="row g-3">
-          {data.map((m) => (
+          {data.map((m, i) => (
             <div className="col-12 col-md-6 col-lg-4" key={m.id}>
-              <div className="ts-card h-100 p-3 d-flex gap-3 align-items-start">
+              <div className="ts-card h-100 p-3 d-flex gap-3 align-items-start" style={{ opacity: m.isActive ? 1 : 0.55 }}>
                 <img
                   src={m.image?.sm ?? ''}
                   alt=""
@@ -92,6 +129,7 @@ export function AdminTeam() {
                   <strong style={{ fontSize: 14.5 }}>{m.name}</strong>
                   <div className="ts-muted ts-clamp-2" style={{ fontSize: 12.5 }}>{m.role}</div>
                   <div className="d-flex gap-1 mt-2">
+                    <OrderButtons rows={data} index={i} onSwap={(a, b) => void swap(a, b)} />
                     <button className="ts-iconbtn" aria-label="Edit" onClick={() => openForm(m)}><SquarePen size={15} /></button>
                     <button className="ts-iconbtn" aria-label="Delete" onClick={() => setConfirm(m)}><Trash2 size={15} /></button>
                   </div>
@@ -153,12 +191,28 @@ export function AdminTeam() {
           setBusy(true);
           try {
             await api.del(`/admin/team-members/${confirm.id}`);
-            await qc.invalidateQueries({ queryKey: ['admin', 'team-members'] });
+            await refresh();
             toast({ tone: 'success', title: 'Team member removed' });
           } finally { setBusy(false); setConfirm(null); }
         }}
         onCancel={() => setConfirm(null)} busy={busy} />
     </>
+  );
+}
+
+export function AdminWebsiteStaff() {
+  return (
+    <TeamGroupAdmin group="staff" title="Staff"
+      description="The day-to-day team shown on techstarhub.or.tz's Staff page."
+      addLabel="Add staff member" />
+  );
+}
+
+export function AdminWebsiteBoard() {
+  return (
+    <TeamGroupAdmin group="board" title="Board"
+      description="The advisory and consulting board shown on techstarhub.or.tz's Board page."
+      addLabel="Add board member" />
   );
 }
 

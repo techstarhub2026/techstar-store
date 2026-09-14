@@ -1061,6 +1061,12 @@ model TeamMember {
   xUrl         String?   @db.VarChar(512)
   instagramUrl String?   @db.VarChar(512)
   linkedinUrl  String?   @db.VarChar(512)
+  /// "staff" | "board" — which of techstarhub.or.tz's two team pages (Our
+  /// Staff / Our Board) this person is shown on. Plain string, matching
+  /// Project.kind, rather than a DB enum, so a third page never needs a
+  /// destructive column migration. Defaults to "staff" on upgrade since
+  /// every row that existed before this column did was a staff member.
+  group        String    @default("staff") @db.VarChar(16)
   position     Int       @default(0)
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
@@ -1069,7 +1075,7 @@ model TeamMember {
 
   image MediaFile? @relation(fields: [imageId], references: [id], onDelete: SetNull)
 
-  @@index([position, id])
+  @@index([group, position, id])
   @@map("team_members")
 }
 
