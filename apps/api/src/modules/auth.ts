@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { config } from '../config/index.js';
 import { prisma } from '../lib/prisma.js';
 import { handler, ok, created, noContent } from '../lib/http.js';
 import { validate, requireAuth } from '../middleware/index.js';
@@ -400,5 +401,161 @@ authRouter.patch(
       data: { revokedAt: new Date() },
     });
     return ok(res, { changed: true });
+  }),
+);
+
+// ───────────────────────────────────────────────────────── google sign-in ──
+
+/**
+ * Google sign-in, as a plain redirect flow rather than a library.
+ *
+ * The browser is sent to Google, comes back to /auth/google/callback with a
+ * one-time code, and the API trades that code for the user's verified email
+ * itself. The account is matched on that email, so someone who registered
+ * with a password keeps the same account — and their orders with it — when
+ * they later use the Google button.
+ */
+
+const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
+/** Guards the round trip to Google against CSRF; see the state cookie below. */
+const OAUTH_STATE_COOKIE = 'ts_oauth_state';
+
+function googleRedirectUri() {
+  return `${config.API_PUBLIC_URL}/api/v1/auth/google/callback`;
+}
+
+function googleConfigured() {
+  return Boolean(config.GOOGLE_CLIENT_ID && config.GOOGLE_CLIENT_SECRET);
+}
+
+authRouter.get(
+  '/google',
+  handler(async (req, res) => {
+    if (!googleConfigured()) {
+      throw new ValidationError([
+        { field: 'google', code: 'unavailable', message: 'Google sign-in is not configured.' },
+      ]);
+    }
+
+    // Round-trip the caller's landing page through the state cookie, so the
+    // callback can return them where they started without trusting a URL
+    // that came back from Google.
+    const next = typeof req.query.next === 'string' ? req.query.next : '';
+    const state = randomToken(16);
+
+    res.cookie(OAUTH_STATE_COOKIE, `${state}:${next}`, {
+      httpOnly: true,
+      secure: config.isProd,
+      sameSite: 'lax', // must survive Google's cross-site redirect back here
+      path: '/api/v1/auth',
+      maxAge: 10 * 60_000,
+    });
+
+    const params = new URLSearchParams({
+      client_id: config.GOOGLE_CLIENT_ID!,
+      redirect_uri: googleRedirectUri(),
+      response_type: 'code',
+      scope: 'openid email profile',
+      state,
+      prompt: 'select_account',
+    });
+    return res.redirect(`${GOOGLE_AUTH_URL}?${params.toString()}`);
+  }),
+);
+
+authRouter.get(
+  '/google/callback',
+  handler(async (req, res) => {
+    const fail = (reason: string) =>
+      res.redirect(`${config.APP_URL}/?auth_error=${encodeURIComponent(reason)}`);
+
+    if (!googleConfigured()) return fail('google_unavailable');
+
+    const cookie = req.cookies?.[OAUTH_STATE_COOKIE] as string | undefined;
+    res.clearCookie(OAUTH_STATE_COOKIE, { path: '/api/v1/auth' });
+
+    const code = typeof req.query.code === 'string' ? req.query.code : '';
+    const state = typeof req.query.state === 'string' ? req.query.state : '';
+    if (!code || !cookie) return fail('google_cancelled');
+
+    const [expectedState, next = ''] = cookie.split(':');
+    if (!state || state !== expectedState) return fail('google_state_mismatch');
+
+    const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: config.GOOGLE_CLIENT_ID!,
+        client_secret: config.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: googleRedirectUri(),
+        grant_type: 'authorization_code',
+      }),
+    });
+    if (!tokenRes.ok) return fail('google_token_failed');
+
+    const { access_token: accessToken } = await tokenRes.json() as { access_token?: string };
+    if (!accessToken) return fail('google_token_failed');
+
+    const infoRes = await fetch(GOOGLE_USERINFO_URL, {
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+    if (!infoRes.ok) return fail('google_profile_failed');
+
+    const profile = await infoRes.json() as {
+      email?: string; email_verified?: boolean; name?: string; picture?: string;
+    };
+    const email = profile.email?.toLowerCase().trim();
+    // Google is what vouches for this address. An unverified one must not be
+    // able to claim an existing account that uses it.
+    if (!email || profile.email_verified === false) return fail('google_email_unverified');
+
+    let user = await prisma.user.findFirst({ where: { email, deletedAt: null } });
+
+    if (user) {
+      if (user.status !== 'active') return fail('account_suspended');
+      // Signing in through Google proves the address, so an account that
+      // never confirmed it by email is confirmed now.
+      if (!user.emailVerifiedAt) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerifiedAt: new Date() },
+        });
+      }
+    } else {
+      user = await prisma.user.create({
+        data: {
+          publicId: newUlid(),
+          username: cleanName(profile.name || email.split('@')[0]).slice(0, 80),
+          email,
+          // No password: this account signs in through Google until its owner
+          // sets one. The column is nullable for exactly this case.
+          passwordHash: null,
+          accountType: 'customer',
+          emailVerifiedAt: new Date(),
+        },
+      });
+
+      await prisma.contact.create({
+        data: {
+          userId: user.id,
+          name: user.username,
+          email: user.email,
+          source: 'google',
+          emailOptIn: false,
+          smsOptIn: false,
+        },
+      }).catch(() => undefined);
+    }
+
+    await establishSession(user.id, req, res);
+
+    // The session cookie is set; the SPA picks the session up on load. Only
+    // a same-site path is honoured, so an open redirect cannot be smuggled
+    // through the state cookie.
+    const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/';
+    return res.redirect(`${config.APP_URL}${safeNext}`);
   }),
 );

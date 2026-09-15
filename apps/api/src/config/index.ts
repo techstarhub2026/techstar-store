@@ -30,6 +30,18 @@ const schema = z.object({
   API_PORT: z.coerce.number().int().positive().default(4000),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 
+  // Where this API is reachable from a browser. Google redirects the visitor
+  // back to it by absolute URL, and it must match the redirect URI registered
+  // in the Google console exactly. In production the SPA is served from this
+  // same origin, so APP_URL is the sensible default.
+  API_PUBLIC_URL: z.string().optional(),
+
+  // Google sign-in. Optional: left unset, the /auth/google routes report that
+  // the option is unavailable rather than the whole API refusing to boot, so
+  // a deployment without these keys still runs on email and password.
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
   JWT_ACCESS_SECRET: z.string().min(16, 'JWT_ACCESS_SECRET must be at least 16 characters'),
@@ -72,6 +84,10 @@ export const config = Object.freeze({
   ...env,
   isProd: env.NODE_ENV === 'production',
   isDev: env.NODE_ENV === 'development',
+  // In production the SPA and this API share one origin, so APP_URL is
+  // already the API's public address; only a split deployment needs to set
+  // API_PUBLIC_URL explicitly.
+  API_PUBLIC_URL: env.API_PUBLIC_URL || env.APP_URL,
   mediaRoot: path.isAbsolute(env.MEDIA_ROOT)
     ? env.MEDIA_ROOT
     : path.resolve(API_ROOT, env.MEDIA_ROOT),
