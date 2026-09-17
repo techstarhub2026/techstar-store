@@ -29,7 +29,7 @@ import {
   AdminArticles, AdminFaqs, AdminInvoices, AdminPartners, AdminServices,
 } from './admin/Content';
 import {
-  AdminCourses, AdminEvents, AdminWebsiteBoard, AdminWebsiteStaff,
+  AdminCourses, AdminEvents, AdminGallery, AdminWebsiteBoard, AdminWebsiteStaff,
 } from './admin/WebsiteContent';
 import {
   AdminHeroSlides, AdminHighlights, AdminHomeOffer, AdminPrograms, AdminProjects, AdminSiteStats,
@@ -132,6 +132,7 @@ export default function App() {
         <Route path="team/staff" element={<AdminWebsiteStaff />} />
         <Route path="team/board" element={<AdminWebsiteBoard />} />
         <Route path="events" element={<AdminEvents />} />
+        <Route path="gallery" element={<AdminGallery />} />
         <Route path="courses" element={<AdminCourses />} />
 
         <Route path="site/hero" element={<AdminHeroSlides />} />

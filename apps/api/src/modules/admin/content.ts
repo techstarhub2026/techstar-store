@@ -736,6 +736,9 @@ const eventBody = z.object({
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   registerUrl: z.string().max(512).optional().or(z.literal('')),
+  // Pills on the website's event card, and the bulleted key facts beside it.
+  tags: z.array(z.string().max(60)).max(8).optional(),
+  facts: z.array(z.string().max(200)).max(10).optional(),
   position: z.number().int().default(0),
   isActive: z.boolean().default(true),
 });
@@ -773,6 +776,8 @@ adminContentRouter.post(
           startsAt: b.startsAt ?? null,
           endsAt: b.endsAt ?? null,
           registerUrl: b.registerUrl || null,
+          tags: b.tags ?? [],
+          facts: b.facts ?? [],
           position: b.position,
           isActive: b.isActive,
         },
@@ -804,6 +809,8 @@ adminContentRouter.patch(
         ...(b.startsAt !== undefined ? { startsAt: b.startsAt } : {}),
         ...(b.endsAt !== undefined ? { endsAt: b.endsAt } : {}),
         ...(b.registerUrl !== undefined ? { registerUrl: b.registerUrl || null } : {}),
+        ...(b.tags !== undefined ? { tags: b.tags } : {}),
+        ...(b.facts !== undefined ? { facts: b.facts } : {}),
         ...(b.position !== undefined ? { position: b.position } : {}),
         ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
       },
@@ -913,6 +920,79 @@ adminContentRouter.delete(
     const id = Number(req.params.id);
     await prisma.course.update({ where: { id }, data: { deletedAt: new Date(), isActive: false } });
     await audit(req, { action: 'course.delete', entityType: 'course', entityId: id });
+    return ok(res, { deleted: true });
+  }),
+);
+
+// ═════════════════════════════════════════════════ WEBSITE — GALLERY ══
+// The gallery page carried a fixed grid of twelve photographs in its own
+// markup, so adding or removing one meant editing HTML. These make it a
+// record staff manage from the console, like every other site section.
+
+const galleryPhotoBody = z.object({
+  imageId: z.number().int({ message: 'Choose a photo' }),
+  caption: z.string().max(255).optional().or(z.literal('')),
+  position: z.number().int().default(0),
+  isActive: z.boolean().default(true),
+});
+
+adminContentRouter.get(
+  '/gallery-photos',
+  requirePermission('service.read'),
+  handler(async (_req, res) => {
+    const rows = await prisma.galleryPhoto.findMany({
+      where: { deletedAt: null },
+      orderBy: [{ position: 'asc' }, { id: 'asc' }],
+      include: { image: true },
+    });
+    return ok(res, rows.map((p) => ({ ...p, image: p.image ? toMediaDto(p.image) : null })));
+  }),
+);
+
+adminContentRouter.post(
+  '/gallery-photos',
+  requirePermission('service.create'),
+  validate({ body: galleryPhotoBody }),
+  handler(async (req, res) => {
+    const b = req.body as z.infer<typeof galleryPhotoBody>;
+    const row = await prisma.galleryPhoto.create({
+      data: { imageId: b.imageId, caption: b.caption || null, position: b.position, isActive: b.isActive },
+    });
+    await audit(req, { action: 'gallery_photo.create', entityType: 'gallery_photo', entityId: row.id, entityLabel: row.caption ?? `Photo ${row.id}` });
+    return created(res, row);
+  }),
+);
+
+adminContentRouter.patch(
+  '/gallery-photos/:id',
+  requirePermission('service.update'),
+  validate({ body: galleryPhotoBody.partial() }),
+  handler(async (req, res) => {
+    const id = Number(req.params.id);
+    const before = await prisma.galleryPhoto.findFirst({ where: { id, deletedAt: null } });
+    if (!before) throw new NotFoundError('Photo');
+    const b = req.body as Partial<z.infer<typeof galleryPhotoBody>>;
+    const row = await prisma.galleryPhoto.update({
+      where: { id },
+      data: {
+        ...(b.imageId !== undefined ? { imageId: b.imageId } : {}),
+        ...(b.caption !== undefined ? { caption: b.caption || null } : {}),
+        ...(b.position !== undefined ? { position: b.position } : {}),
+        ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
+      },
+    });
+    await audit(req, { action: 'gallery_photo.update', entityType: 'gallery_photo', entityId: id, entityLabel: row.caption ?? `Photo ${row.id}` });
+    return ok(res, row);
+  }),
+);
+
+adminContentRouter.delete(
+  '/gallery-photos/:id',
+  requirePermission('service.delete'),
+  handler(async (req, res) => {
+    const id = Number(req.params.id);
+    await prisma.galleryPhoto.update({ where: { id }, data: { deletedAt: new Date(), isActive: false } });
+    await audit(req, { action: 'gallery_photo.delete', entityType: 'gallery_photo', entityId: id });
     return ok(res, { deleted: true });
   }),
 );

@@ -591,3 +591,77 @@ contentRouter.post(
     });
   }),
 );
+
+// ─────────────────────────────────────────── website events & gallery ──
+
+/**
+ * The events and gallery feeds for techstarhub.or.tz.
+ *
+ * Both pages were already written to call these — see the contracts at the
+ * top of the site's events-integration.js and gallery-integration.js — but
+ * the endpoints did not exist, so each fell back to the fixed markup in its
+ * own HTML and nothing an administrator entered ever appeared.
+ *
+ * The shapes below are those contracts: `{ data: { events: [...] } }` and
+ * `{ data: { gallery: [...] } }`, with dates as plain yyyy-mm-dd.
+ */
+
+function isoDate(value: Date | null) {
+  return value ? value.toISOString().slice(0, 10) : undefined;
+}
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : [];
+}
+
+contentRouter.get(
+  '/site/events',
+  handler(async (_req, res) => {
+    const rows = await prisma.event.findMany({
+      where: { deletedAt: null, isActive: true },
+      orderBy: [{ startsAt: 'desc' }, { id: 'desc' }],
+      include: { image: true },
+    });
+
+    return ok(res, {
+      events: rows.map((e) => {
+        const media = e.image ? toMediaDto(e.image) : null;
+        return {
+          title: e.title,
+          // The site derives past/upcoming/running from these on every page
+          // load, so an event never needs re-flagging once its date passes.
+          startDate: isoDate(e.startsAt),
+          endDate: isoDate(e.endsAt),
+          location: e.location ?? undefined,
+          image: media?.lg ?? media?.md ?? undefined,
+          summary: e.excerpt ?? undefined,
+          tags: stringList(e.tags),
+          facts: stringList(e.facts),
+          registerUrl: e.registerUrl ?? undefined,
+        };
+      }),
+    });
+  }),
+);
+
+contentRouter.get(
+  '/site/gallery',
+  handler(async (_req, res) => {
+    const rows = await prisma.galleryPhoto.findMany({
+      where: { deletedAt: null, isActive: true },
+      orderBy: [{ position: 'asc' }, { id: 'asc' }],
+      include: { image: true },
+    });
+
+    return ok(res, {
+      gallery: rows
+        .map((p) => {
+          const media = p.image ? toMediaDto(p.image) : null;
+          return media
+            ? { image: media.lg ?? media.md, caption: p.caption ?? '' }
+            : null;
+        })
+        .filter((p): p is { image: string; caption: string } => p !== null),
+    });
+  }),
+);

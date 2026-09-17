@@ -143,6 +143,7 @@ export function AdminLayout() {
             { to: '/admin/site/programs', label: 'Programs', icon: <FolderKanban size={16} />, permission: 'service.read' },
             { to: '/admin/site/projects', label: 'Projects', icon: <FolderKanban size={16} />, permission: 'service.read' },
             { to: '/admin/events', label: 'Events', icon: <CalendarDays size={16} />, permission: 'service.read' },
+            { to: '/admin/gallery', label: 'Gallery', icon: <ImageIcon size={16} />, permission: 'service.read' },
             { to: '/admin/team/staff', label: 'Staff', icon: <Users size={16} />, permission: 'service.read' },
             { to: '/admin/team/board', label: 'Board', icon: <Users size={16} />, permission: 'service.read' },
             { to: '/admin/services', label: 'Services', icon: <Building2 size={16} />, permission: 'service.read' },

@@ -58,6 +58,7 @@ model MediaFile {
   heroArtworks  HeroSlide[]     @relation("HeroSlideArtwork")
   highlights    HighlightCard[]
   projects      Project[]
+  galleryPhotos GalleryPhoto[]
 
   @@index([checksumSha256])
   @@map("media_files")
@@ -1091,6 +1092,12 @@ model Event {
   startsAt    DateTime?
   endsAt      DateTime?
   registerUrl String?   @db.VarChar(512)
+  /// Short labels shown as pills on the website's event card, and the
+  /// bulleted "key facts" beside it. Both are lists the marketing site
+  /// already renders, so they belong to the record rather than to markup
+  /// someone edits by hand.
+  tags        Json?
+  facts       Json?
   position    Int       @default(0)
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
@@ -1101,6 +1108,25 @@ model Event {
 
   @@index([startsAt])
   @@map("events")
+}
+
+/// A photograph in techstarhub.or.tz's gallery. The page used to carry a
+/// fixed grid of twelve images in its own markup, so adding or removing one
+/// meant editing HTML; this makes the grid a record staff can manage.
+model GalleryPhoto {
+  id        Int       @id @default(autoincrement())
+  imageId   Int?
+  caption   String?   @db.VarChar(255)
+  position  Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  image MediaFile? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@index([position, id])
+  @@map("gallery_photos")
 }
 
 model Course {

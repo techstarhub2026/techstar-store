@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  ArrowDown, ArrowUp, CalendarDays, Plus, SquarePen, Trash2, Users,
+  ArrowDown, ArrowUp, CalendarDays, Image as ImageIcon, Plus, SquarePen, Trash2, Users,
 } from 'lucide-react';
 import { ApiError, api } from '../lib/api';
 import type { MediaDto } from '../lib/types';
@@ -228,7 +228,8 @@ export function AdminEvents() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [image, setImage] = useState<MediaDto[]>([]);
   const [form, setForm] = useState({
-    title: '', excerpt: '', contentHtml: '', location: '', startsAt: '', endsAt: '', registerUrl: '', isActive: true,
+    title: '', excerpt: '', contentHtml: '', location: '', startsAt: '', endsAt: '', registerUrl: '',
+    tags: '', facts: '', isActive: true,
   });
 
   const { data = [], isLoading } = useQuery({
@@ -245,7 +246,12 @@ export function AdminEvents() {
     setForm({
       title: row?.title ?? '', excerpt: row?.excerpt ?? '', contentHtml: row?.contentHtml ?? '',
       location: row?.location ?? '', startsAt: toLocal(row?.startsAt), endsAt: toLocal(row?.endsAt),
-      registerUrl: row?.registerUrl ?? '', isActive: row?.isActive ?? true,
+      registerUrl: row?.registerUrl ?? '',
+      // Stored as lists; edited as one per line, which is how the website
+      // renders them anyway.
+      tags: (Array.isArray(row?.tags) ? row.tags : []).join('\n'),
+      facts: (Array.isArray(row?.facts) ? row.facts : []).join('\n'),
+      isActive: row?.isActive ?? true,
     });
     setOpen(true);
   };
@@ -254,11 +260,14 @@ export function AdminEvents() {
     setErrors({});
     setBusy(true);
     try {
+      const toList = (v: string) => v.split('\n').map((t) => t.trim()).filter(Boolean);
       const payload = {
         ...form,
         imageId: image[0]?.id ?? null,
         startsAt: form.startsAt || null,
         endsAt: form.endsAt || null,
+        tags: toList(form.tags),
+        facts: toList(form.facts),
       };
       if (editing) await api.patch(`/admin/events/${editing.id}`, payload);
       else await api.post('/admin/events', payload);
@@ -336,6 +345,18 @@ export function AdminEvents() {
           <div className="col-12 col-md-6">
             <TextInput label="Registration link" value={form.registerUrl}
               onChange={(e) => setForm({ ...form, registerUrl: e.target.value })} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-12 col-md-6">
+            <TextArea label="Tags" value={form.tags} rows={3}
+              onChange={(e) => setForm({ ...form, tags: e.target.value })}
+              hint="One per line — shown as pills on the event card." />
+          </div>
+          <div className="col-12 col-md-6">
+            <TextArea label="Key facts" value={form.facts} rows={3}
+              onChange={(e) => setForm({ ...form, facts: e.target.value })}
+              hint="One per line — the bulleted list beside the event." />
           </div>
         </div>
         <ImageUploader value={image} onChange={setImage} single max={1} label="Event image" />
@@ -491,6 +512,144 @@ export function AdminCourses() {
             await api.del(`/admin/courses/${confirm.id}`);
             await qc.invalidateQueries({ queryKey: ['admin', 'courses'] });
             toast({ tone: 'success', title: 'Course deleted' });
+          } finally { setBusy(false); setConfirm(null); }
+        }}
+        onCancel={() => setConfirm(null)} busy={busy} />
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════ gallery ══
+
+/**
+ * The website's photo gallery.
+ *
+ * gallery.html used to carry a fixed grid of twelve photographs in its own
+ * markup, so adding or removing one meant editing HTML. The page already had
+ * the code to fetch this list — it just had nothing to fetch.
+ */
+export function AdminGallery() {
+  const qc = useQueryClient();
+  const toast = useUi((s) => s.toast);
+  const queryKey = ['admin', 'gallery-photos'];
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [confirm, setConfirm] = useState<any | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [image, setImage] = useState<MediaDto[]>([]);
+  const [caption, setCaption] = useState('');
+  const [isActive, setIsActive] = useState(true);
+
+  const { data = [], isLoading } = useQuery({
+    queryKey,
+    queryFn: () => api.get<any[]>('/admin/gallery-photos'),
+  });
+
+  const refresh = () => qc.invalidateQueries({ queryKey });
+
+  const openForm = (row?: any) => {
+    setEditing(row ?? null);
+    setErrors({});
+    setImage(row?.image ? [row.image] : []);
+    setCaption(row?.caption ?? '');
+    setIsActive(row?.isActive ?? true);
+    setOpen(true);
+  };
+
+  const save = async () => {
+    setErrors({});
+    if (!image[0]?.id) {
+      setErrors({ imageId: 'Choose a photo' });
+      return;
+    }
+    setBusy(true);
+    try {
+      const payload = {
+        imageId: image[0].id,
+        caption,
+        isActive,
+        position: editing?.position ?? data.length,
+      };
+      if (editing) await api.patch(`/admin/gallery-photos/${editing.id}`, payload);
+      else await api.post('/admin/gallery-photos', payload);
+      await refresh();
+      toast({ tone: 'success', title: editing ? 'Photo updated' : 'Photo added' });
+      setOpen(false);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrors(e.fieldErrors());
+        if (!e.details?.length) toast({ tone: 'danger', title: e.message });
+      }
+    } finally { setBusy(false); }
+  };
+
+  const swap = async (a: any, b: any) => {
+    await Promise.all([
+      api.patch(`/admin/gallery-photos/${a.id}`, { position: b.position ?? 0 }),
+      api.patch(`/admin/gallery-photos/${b.id}`, { position: a.position ?? 0 }),
+    ]);
+    await refresh();
+  };
+
+  return (
+    <>
+      <PageHeader
+        title="Gallery"
+        description="Photographs shown on techstarhub.or.tz's gallery page."
+        actions={<Button onClick={() => openForm()}><Plus size={15} /> Add photo</Button>}
+      />
+      {isLoading ? <Skeleton h={220} /> : !data.length ? (
+        <EmptyState icon={<ImageIcon size={44} />} title="No photos yet"
+          action={<Button onClick={() => openForm()}>Add your first photo</Button>} />
+      ) : (
+        <div className="row g-3">
+          {data.map((p, i) => (
+            <div className="col-12 col-md-6 col-lg-4" key={p.id}>
+              <div className="ts-card h-100" style={{ overflow: 'hidden', opacity: p.isActive ? 1 : 0.55 }}>
+                <img src={p.image?.md ?? ''} alt=""
+                  style={{ width: '100%', height: 150, objectFit: 'cover', background: 'var(--ts-surface-sunken)' }} />
+                <div className="p-3">
+                  <div className="ts-clamp-2" style={{ fontSize: 13.5, minHeight: 20 }}>
+                    {p.caption || <span className="ts-muted">No caption</span>}
+                  </div>
+                  <div className="d-flex gap-1 mt-2">
+                    <OrderButtons rows={data} index={i} onSwap={(a, b) => void swap(a, b)} />
+                    <button className="ts-iconbtn" aria-label="Edit" onClick={() => openForm(p)}><SquarePen size={15} /></button>
+                    <button className="ts-iconbtn" aria-label="Delete" onClick={() => setConfirm(p)}><Trash2 size={15} /></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Modal open={open} onClose={() => setOpen(false)} size="lg"
+        title={editing ? 'Edit photo' : 'Add photo'}
+        footer={<>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => void save()} loading={busy}>Save</Button>
+        </>}>
+        <ImageUploader value={image} onChange={setImage} single max={1} label="Photo" />
+        {errors.imageId && <p style={{ color: 'var(--ts-danger)', fontSize: 13 }}>{errors.imageId}</p>}
+        <TextInput label="Caption" value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          hint="Optional — shown when a visitor hovers the photo." />
+        <label className="d-flex gap-2 align-items-center" style={{ fontSize: 14 }}>
+          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+          Shown on the site
+        </label>
+      </Modal>
+
+      <ConfirmDialog open={Boolean(confirm)} title="Remove this photo?"
+        message={<>Remove this photo from the gallery?</>}
+        onConfirm={async () => {
+          setBusy(true);
+          try {
+            await api.del(`/admin/gallery-photos/${confirm.id}`);
+            await refresh();
+            toast({ tone: 'success', title: 'Photo removed' });
           } finally { setBusy(false); setConfirm(null); }
         }}
         onCancel={() => setConfirm(null)} busy={busy} />
