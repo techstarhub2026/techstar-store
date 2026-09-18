@@ -665,3 +665,32 @@ contentRouter.get(
     });
   }),
 );
+
+/**
+ * Page headers for techstarhub.or.tz's inner pages, keyed by page.
+ *
+ * Each page asks for its own by key; the site keeps whatever is already in
+ * its markup when there is no row, so a page never loses its heading because
+ * nobody has filled one in.
+ */
+contentRouter.get(
+  '/site/page-headers',
+  handler(async (_req, res) => {
+    const rows = await prisma.pageHeader.findMany({
+      where: { deletedAt: null, isActive: true },
+      include: { image: true },
+    });
+
+    const headers: Record<string, { title: string; standfirst: string | null; image: string | null }> = {};
+    for (const r of rows) {
+      const media = r.image ? toMediaDto(r.image) : null;
+      headers[r.pageKey] = {
+        title: r.title,
+        standfirst: r.standfirst,
+        image: media?.lg ?? media?.md ?? null,
+      };
+    }
+
+    return ok(res, { headers });
+  }),
+);

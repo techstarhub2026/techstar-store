@@ -134,6 +134,7 @@ export function AdminLayout() {
             { to: '/admin/site/highlights', label: 'Highlight cards', icon: <LayoutGrid size={16} />, permission: 'service.read' },
             { to: '/admin/site/stats', label: 'Impact numbers', icon: <Hash size={16} />, permission: 'service.read' },
             { to: '/admin/site/offer', label: 'What We Offer', icon: <ListChecks size={16} />, permission: 'service.read' },
+            { to: '/admin/site/page-headers', label: 'Page headers', icon: <Newspaper size={16} />, permission: 'service.read' },
           ],
         },
         {

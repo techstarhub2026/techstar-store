@@ -59,6 +59,7 @@ model MediaFile {
   highlights    HighlightCard[]
   projects      Project[]
   galleryPhotos GalleryPhoto[]
+  pageHeaders   PageHeader[]
 
   @@index([checksumSha256])
   @@map("media_files")
@@ -1108,6 +1109,29 @@ model Event {
 
   @@index([startsAt])
   @@map("events")
+}
+
+/// The band at the top of each techstarhub.or.tz inner page — its title,
+/// standfirst and optional photograph. These were hard-coded into every
+/// page's markup, so changing a heading meant editing HTML; `pageKey` ties a
+/// row to one page ("events", "gallery", "board"…).
+model PageHeader {
+  id        Int       @id @default(autoincrement())
+  pageKey   String    @unique @db.VarChar(40)
+  title     String    @db.VarChar(160)
+  standfirst String?  @db.VarChar(600)
+  /// Shown within the page's content rather than behind the title — the
+  /// full-bleed photographs these replaced pushed the real content of every
+  /// page below the fold.
+  imageId   Int?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  image MediaFile? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@map("page_headers")
 }
 
 /// A photograph in techstarhub.or.tz's gallery. The page used to carry a

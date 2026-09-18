@@ -996,3 +996,83 @@ adminContentRouter.delete(
     return ok(res, { deleted: true });
   }),
 );
+
+// ════════════════════════════════════════════ WEBSITE — PAGE HEADERS ══
+// The band at the top of each inner page. Its title and standfirst were
+// hard-coded into every page's markup, so changing a heading meant editing
+// HTML. Rows are keyed by page, and seeded from what those pages already say.
+
+const pageHeaderBody = z.object({
+  pageKey: z.string().min(2).max(40).regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers and dashes'),
+  title: z.string().min(2, 'Title is required').max(160).transform(cleanName),
+  standfirst: z.string().max(600).optional().or(z.literal('')),
+  imageId: z.number().int().nullable().optional(),
+  isActive: z.boolean().default(true),
+});
+
+adminContentRouter.get(
+  '/page-headers',
+  requirePermission('service.read'),
+  handler(async (_req, res) => {
+    const rows = await prisma.pageHeader.findMany({
+      where: { deletedAt: null },
+      orderBy: [{ pageKey: 'asc' }],
+      include: { image: true },
+    });
+    return ok(res, rows.map((r) => ({ ...r, image: r.image ? toMediaDto(r.image) : null })));
+  }),
+);
+
+adminContentRouter.post(
+  '/page-headers',
+  requirePermission('service.create'),
+  validate({ body: pageHeaderBody }),
+  handler(async (req, res) => {
+    const b = req.body as z.infer<typeof pageHeaderBody>;
+    const row = await prisma.pageHeader.create({
+      data: {
+        pageKey: b.pageKey,
+        title: b.title,
+        standfirst: b.standfirst || null,
+        imageId: b.imageId ?? null,
+        isActive: b.isActive,
+      },
+    });
+    await audit(req, { action: 'page_header.create', entityType: 'page_header', entityId: row.id, entityLabel: row.pageKey });
+    return created(res, row);
+  }),
+);
+
+adminContentRouter.patch(
+  '/page-headers/:id',
+  requirePermission('service.update'),
+  validate({ body: pageHeaderBody.partial() }),
+  handler(async (req, res) => {
+    const id = Number(req.params.id);
+    const before = await prisma.pageHeader.findFirst({ where: { id, deletedAt: null } });
+    if (!before) throw new NotFoundError('Page header');
+    const b = req.body as Partial<z.infer<typeof pageHeaderBody>>;
+    const row = await prisma.pageHeader.update({
+      where: { id },
+      data: {
+        ...(b.title ? { title: b.title } : {}),
+        ...(b.standfirst !== undefined ? { standfirst: b.standfirst || null } : {}),
+        ...(b.imageId !== undefined ? { imageId: b.imageId } : {}),
+        ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
+      },
+    });
+    await audit(req, { action: 'page_header.update', entityType: 'page_header', entityId: id, entityLabel: row.pageKey });
+    return ok(res, row);
+  }),
+);
+
+adminContentRouter.delete(
+  '/page-headers/:id',
+  requirePermission('service.delete'),
+  handler(async (req, res) => {
+    const id = Number(req.params.id);
+    await prisma.pageHeader.update({ where: { id }, data: { deletedAt: new Date(), isActive: false } });
+    await audit(req, { action: 'page_header.delete', entityType: 'page_header', entityId: id });
+    return ok(res, { deleted: true });
+  }),
+);

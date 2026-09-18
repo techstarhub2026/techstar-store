@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  ArrowDown, ArrowUp, CalendarDays, Image as ImageIcon, Plus, SquarePen, Trash2, Users,
+  ArrowDown, ArrowUp, CalendarDays, Image as ImageIcon, Newspaper, Plus, SquarePen, Trash2, Users,
 } from 'lucide-react';
 import { ApiError, api } from '../lib/api';
 import type { MediaDto } from '../lib/types';
@@ -650,6 +650,133 @@ export function AdminGallery() {
             await api.del(`/admin/gallery-photos/${confirm.id}`);
             await refresh();
             toast({ tone: 'success', title: 'Photo removed' });
+          } finally { setBusy(false); setConfirm(null); }
+        }}
+        onCancel={() => setConfirm(null)} busy={busy} />
+    </>
+  );
+}
+
+// ═════════════════════════════════════════════════════ page headers ══
+
+/**
+ * The band at the top of each inner page on the website.
+ *
+ * Its title and standfirst used to live in each page's markup, so changing a
+ * heading meant editing HTML. The photograph is optional and appears within
+ * the page's content rather than behind the title — the full-bleed images
+ * these replaced pushed every page's real content below the fold.
+ */
+export function AdminPageHeaders() {
+  const qc = useQueryClient();
+  const toast = useUi((s) => s.toast);
+  const queryKey = ['admin', 'page-headers'];
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [confirm, setConfirm] = useState<any | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [image, setImage] = useState<MediaDto[]>([]);
+  const [form, setForm] = useState({ pageKey: '', title: '', standfirst: '', isActive: true });
+
+  const { data = [], isLoading } = useQuery({
+    queryKey,
+    queryFn: () => api.get<any[]>('/admin/page-headers'),
+  });
+
+  const refresh = () => qc.invalidateQueries({ queryKey });
+
+  const openForm = (row?: any) => {
+    setEditing(row ?? null);
+    setErrors({});
+    setImage(row?.image ? [row.image] : []);
+    setForm({
+      pageKey: row?.pageKey ?? '',
+      title: row?.title ?? '',
+      standfirst: row?.standfirst ?? '',
+      isActive: row?.isActive ?? true,
+    });
+    setOpen(true);
+  };
+
+  const save = async () => {
+    setErrors({});
+    setBusy(true);
+    try {
+      const payload = { ...form, imageId: image[0]?.id ?? null };
+      if (editing) await api.patch(`/admin/page-headers/${editing.id}`, payload);
+      else await api.post('/admin/page-headers', payload);
+      await refresh();
+      toast({ tone: 'success', title: editing ? 'Page header updated' : 'Page header added' });
+      setOpen(false);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrors(e.fieldErrors());
+        if (!e.details?.length) toast({ tone: 'danger', title: e.message });
+      }
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <>
+      <PageHeader
+        title="Page headers"
+        description="The title and standfirst at the top of each techstarhub.or.tz page."
+        actions={<Button onClick={() => openForm()}><Plus size={15} /> Add page header</Button>}
+      />
+      {isLoading ? <Skeleton h={220} /> : !data.length ? (
+        <EmptyState icon={<Newspaper size={44} />} title="No page headers yet"
+          action={<Button onClick={() => openForm()}>Add your first page header</Button>} />
+      ) : (
+        <div className="row g-3">
+          {data.map((h) => (
+            <div className="col-12 col-md-6 col-lg-4" key={h.id}>
+              <div className="ts-card h-100 p-3" style={{ opacity: h.isActive ? 1 : 0.55 }}>
+                <span className="ts-badge">{h.pageKey}</span>
+                <strong className="d-block mt-2" style={{ fontSize: 14.5 }}>{h.title}</strong>
+                <div className="ts-muted ts-clamp-2" style={{ fontSize: 12.5 }}>{h.standfirst}</div>
+                <div className="d-flex gap-1 mt-2">
+                  <button className="ts-iconbtn" aria-label="Edit" onClick={() => openForm(h)}><SquarePen size={15} /></button>
+                  <button className="ts-iconbtn" aria-label="Delete" onClick={() => setConfirm(h)}><Trash2 size={15} /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Modal open={open} onClose={() => setOpen(false)} size="lg"
+        title={editing ? 'Edit page header' : 'Add page header'}
+        footer={<>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => void save()} loading={busy}>Save</Button>
+        </>}>
+        <TextInput label="Page" value={form.pageKey} error={errors.pageKey}
+          onChange={(e) => setForm({ ...form, pageKey: e.target.value })}
+          disabled={Boolean(editing)}
+          hint="Which page this belongs to — e.g. events, gallery, news, board, staff."
+          required />
+        <TextInput label="Title" value={form.title} error={errors.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+        <TextArea label="Standfirst" value={form.standfirst} rows={3}
+          onChange={(e) => setForm({ ...form, standfirst: e.target.value })}
+          hint="The sentence below the title." />
+        <ImageUploader value={image} onChange={setImage} single max={1} label="Photograph (optional)" />
+        <label className="d-flex gap-2 align-items-center" style={{ fontSize: 14 }}>
+          <input type="checkbox" checked={form.isActive}
+            onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
+          Shown on the site
+        </label>
+      </Modal>
+
+      <ConfirmDialog open={Boolean(confirm)} title="Remove this page header?"
+        message={<>The page keeps whatever heading is already in its markup.</>}
+        onConfirm={async () => {
+          setBusy(true);
+          try {
+            await api.del(`/admin/page-headers/${confirm.id}`);
+            await refresh();
+            toast({ tone: 'success', title: 'Page header removed' });
           } finally { setBusy(false); setConfirm(null); }
         }}
         onCancel={() => setConfirm(null)} busy={busy} />
