@@ -20,7 +20,8 @@
     "db:seed:offer": "dotenv -e ../../.env -- tsx prisma/seed-home-offer.mts",
     "db:seed:team": "dotenv -e ../../.env -- tsx prisma/seed-team.mts",
     "team:photos": "tsx prisma/upload-team-photos.mts",
-    "seed:events-gallery": "tsx prisma/seed-site-events-gallery.mts"
+    "seed:events-gallery": "tsx prisma/seed-site-events-gallery.mts",
+    "seed:page-headers": "tsx prisma/seed-page-headers.mts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
