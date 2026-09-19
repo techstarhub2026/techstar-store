@@ -12,6 +12,11 @@
  *
  * Idempotent: a page already carrying a record is left alone, so a re-run
  * never overwrites something an operator has since changed.
+ *
+ * Where a page's photograph exists at both full and web resolution, this
+ * takes the web one. The originals run to several megabytes each and the
+ * media endpoint rejects them, which on the first run left five pages
+ * imported with no picture at all.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -38,19 +43,19 @@ interface SeedHeader {
 const HEADERS: SeedHeader[] = [
   { pageKey: 'about', title: 'About Us', image: 'assets/img/about-4.JPG',
     standfirst: 'Welcome to TechStar Innovation Hub, a forward-thinking and dynamic platform dedicated to empowering the next generation of innovators through STEM education in coding, Artificial Intelligence (AI), and the Internet of Things (IoT).' },
-  { pageKey: 'board', title: 'Our Board', image: 'assets/img/Projects/bootcamp1.JPG',
+  { pageKey: 'board', title: 'Our Board', image: 'assets/img/Projects/bootcamp1-web.jpg',
     standfirst: "The advisory and consulting board guiding TechStar Innovation Hub's strategy and direction." },
-  { pageKey: 'staff', title: 'Our Staff', image: 'assets/img/Projects/bootcamp1.JPG',
+  { pageKey: 'staff', title: 'Our Staff', image: 'assets/img/Projects/bootcamp1-web.jpg',
     standfirst: 'The team members who run TechStar Innovation Hub day to day — programs, partnerships, finance and technology.' },
   { pageKey: 'courses', title: 'Courses', image: 'assets/img/Projects/bootcamp.JPG',
     standfirst: 'Unlock new skills and knowledge with our wide range of courses designed for all ages and skill levels.' },
   { pageKey: 'events', title: 'Events', image: 'assets/img/arduino_day-web.jpg',
     standfirst: "Hackathons, workshops and school visits happening across Tanzania — see what's next below." },
-  { pageKey: 'gallery', title: 'Gallery', image: 'assets/img/Projects/bootcamp1.JPG',
+  { pageKey: 'gallery', title: 'Gallery', image: 'assets/img/Projects/bootcamp1-web.jpg',
     standfirst: 'Moments from our bootcamps, workshops and events across Tanzania.' },
-  { pageKey: 'news', title: 'News', image: 'assets/img/Projects/bootcamp1.JPG',
+  { pageKey: 'news', title: 'News', image: 'assets/img/Projects/bootcamp1-web.jpg',
     standfirst: 'Announcements, milestones and stories from TechStar Innovation Hub.' },
-  { pageKey: 'projects', title: 'Our Projects', image: 'assets/img/Projects/bootcamp1.JPG',
+  { pageKey: 'projects', title: 'Our Projects', image: 'assets/img/Projects/bootcamp1-web.jpg',
     standfirst: 'What TechStar Innovation Hub is building right now, and what we have already delivered.' },
   { pageKey: 'pricing', title: 'Pricing', image: 'assets/img/slide/slide-2.jpg',
     standfirst: 'Plans and programme fees for TechStar Innovation Hub.' },
@@ -110,8 +115,28 @@ async function main() {
   const existing = (await (await fetch(`${API}/admin/page-headers`, { headers: auth })).json() as { data: any[] }).data;
 
   for (const h of HEADERS) {
-    if (existing.some((row) => row.pageKey === h.pageKey)) {
-      console.log(`  = ${h.pageKey} already present`);
+    const already = existing.find((row) => row.pageKey === h.pageKey);
+
+    // A record whose upload failed the first time is still missing its
+    // photograph. Fill that in without touching any wording, which an
+    // operator may since have rewritten.
+    if (already) {
+      if (already.imageId || !h.image) {
+        console.log(`  = ${h.pageKey} already present`);
+        continue;
+      }
+
+      const recoveredId = await uploadImage(h.image, auth, h.title);
+      if (!recoveredId) continue;
+
+      const patch = await fetch(`${API}/admin/page-headers/${already.id}`, {
+        method: 'PATCH',
+        headers: { ...auth, 'content-type': 'application/json' },
+        body: JSON.stringify({ imageId: recoveredId }),
+      });
+      console.log(patch.ok
+        ? `  ~ ${h.pageKey} — photograph added`
+        : `  ! ${h.pageKey} — ${patch.status}: ${await patch.text()}`);
       continue;
     }
 
