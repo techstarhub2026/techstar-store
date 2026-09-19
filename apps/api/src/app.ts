@@ -43,9 +43,20 @@ export function createApp() {
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
   );
+  // The Railway addresses stay allowed alongside the real domains. A custom
+  // domain takes hours to propagate, and for that window the same store is
+  // reachable at both — pinning CORS to the new names alone would blank every
+  // page served from the old one until DNS caught up.
+  const allowedOrigins = [
+    config.APP_URL,
+    config.SITE_URL,
+    'https://store-production-1570.up.railway.app',
+    'https://site-production-001e.up.railway.app',
+  ].filter(Boolean);
+
   app.use(
     cors({
-      origin: config.isProd ? [config.APP_URL, config.SITE_URL] : true,
+      origin: config.isProd ? allowedOrigins : true,
       credentials: true,
     }),
   );
