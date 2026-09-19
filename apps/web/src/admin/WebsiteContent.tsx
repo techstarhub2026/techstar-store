@@ -677,7 +677,7 @@ export function AdminPageHeaders() {
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [image, setImage] = useState<MediaDto[]>([]);
-  const [form, setForm] = useState({ pageKey: '', title: '', standfirst: '', isActive: true });
+  const [form, setForm] = useState({ pageKey: '', title: '', standfirst: '', bgColor: '', isActive: true });
 
   const { data = [], isLoading } = useQuery({
     queryKey,
@@ -694,6 +694,7 @@ export function AdminPageHeaders() {
       pageKey: row?.pageKey ?? '',
       title: row?.title ?? '',
       standfirst: row?.standfirst ?? '',
+      bgColor: row?.bgColor ?? '',
       isActive: row?.isActive ?? true,
     });
     setOpen(true);
@@ -732,6 +733,29 @@ export function AdminPageHeaders() {
           {data.map((h) => (
             <div className="col-12 col-md-6 col-lg-4" key={h.id}>
               <div className="ts-card h-100 p-3" style={{ opacity: h.isActive ? 1 : 0.55 }}>
+                {/* What the page actually shows behind its head — the card
+                    listed only words, so there was no way to tell from here
+                    which photograph a page was carrying, or whether it had
+                    one at all. */}
+                <div
+                  className="mb-2 d-flex align-items-end justify-content-end"
+                  style={{
+                    height: 96,
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    background: h.bgColor || '#eef1f6',
+                    backgroundImage: h.image?.md || h.image?.lg
+                      ? `url(${h.image.md ?? h.image.lg})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  {!h.image && (
+                    <span className="ts-muted m-auto" style={{ fontSize: 11.5 }}>
+                      {h.bgColor ? h.bgColor : 'No photograph'}
+                    </span>
+                  )}
+                </div>
                 <span className="ts-badge">{h.pageKey}</span>
                 <strong className="d-block mt-2" style={{ fontSize: 14.5 }}>{h.title}</strong>
                 <div className="ts-muted ts-clamp-2" style={{ fontSize: 12.5 }}>{h.standfirst}</div>
@@ -762,6 +786,35 @@ export function AdminPageHeaders() {
           onChange={(e) => setForm({ ...form, standfirst: e.target.value })}
           hint="The sentence below the title." />
         <ImageUploader value={image} onChange={setImage} single max={1} label="Photograph (optional)" />
+
+        <div className="mb-3">
+          <label className="ts-label d-block">Background colour (optional)</label>
+          <div className="d-flex gap-2 align-items-center">
+            <input
+              type="color"
+              value={/^#[0-9a-fA-F]{6}$/.test(form.bgColor) ? form.bgColor : '#0b2f6b'}
+              onChange={(e) => setForm({ ...form, bgColor: e.target.value })}
+              style={{ width: 44, height: 38, padding: 2, borderRadius: 8, border: '1px solid var(--ts-border, #d9dee7)' }}
+              aria-label="Pick a background colour"
+            />
+            <input
+              className="ts-input"
+              value={form.bgColor}
+              placeholder="#0b2f6b"
+              onChange={(e) => setForm({ ...form, bgColor: e.target.value })}
+              style={{ maxWidth: 150 }}
+            />
+            {form.bgColor && (
+              <Button variant="ghost" onClick={() => setForm({ ...form, bgColor: '' })}>Clear</Button>
+            )}
+          </div>
+          {errors.bgColor && <div className="ts-err">{errors.bgColor}</div>}
+          <div className="ts-muted" style={{ fontSize: 12.5, marginTop: 4 }}>
+            Backs the head where there is no photograph, and tints the one behind it where there is.
+            Leave empty for the site's own colour.
+          </div>
+        </div>
+
         <label className="d-flex gap-2 align-items-center" style={{ fontSize: 14 }}>
           <input type="checkbox" checked={form.isActive}
             onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />

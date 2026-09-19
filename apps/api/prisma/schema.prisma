@@ -1120,10 +1120,12 @@ model PageHeader {
   pageKey   String    @unique @db.VarChar(40)
   title     String    @db.VarChar(160)
   standfirst String?  @db.VarChar(600)
-  /// Shown within the page's content rather than behind the title — the
-  /// full-bleed photographs these replaced pushed the real content of every
-  /// page below the fold.
+  /// Sits behind the page's head, at that head's own height — the full-bleed
+  /// band these replaced pushed the real content of every page below the fold.
   imageId   Int?
+  /// Backs the head where no photograph is set, and tints the scrim over one
+  /// where there is. Null leaves the site's own default.
+  bgColor   String?   @db.VarChar(9)
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

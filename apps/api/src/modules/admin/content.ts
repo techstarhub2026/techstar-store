@@ -1007,6 +1007,10 @@ const pageHeaderBody = z.object({
   title: z.string().min(2, 'Title is required').max(160).transform(cleanName),
   standfirst: z.string().max(600).optional().or(z.literal('')),
   imageId: z.number().int().nullable().optional(),
+  // A hex colour, or empty to fall back to the site's own default. Anything
+  // else is refused rather than passed through into a style attribute.
+  bgColor: z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Use a hex colour such as #0b2f6b')
+    .nullable().optional().or(z.literal('')),
   isActive: z.boolean().default(true),
 });
 
@@ -1035,6 +1039,7 @@ adminContentRouter.post(
         title: b.title,
         standfirst: b.standfirst || null,
         imageId: b.imageId ?? null,
+        bgColor: b.bgColor || null,
         isActive: b.isActive,
       },
     });
@@ -1058,6 +1063,7 @@ adminContentRouter.patch(
         ...(b.title ? { title: b.title } : {}),
         ...(b.standfirst !== undefined ? { standfirst: b.standfirst || null } : {}),
         ...(b.imageId !== undefined ? { imageId: b.imageId } : {}),
+        ...(b.bgColor !== undefined ? { bgColor: b.bgColor || null } : {}),
         ...(b.isActive !== undefined ? { isActive: b.isActive } : {}),
       },
     });

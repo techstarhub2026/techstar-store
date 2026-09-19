@@ -681,13 +681,16 @@ contentRouter.get(
       include: { image: true },
     });
 
-    const headers: Record<string, { title: string; standfirst: string | null; image: string | null }> = {};
+    const headers: Record<string, {
+      title: string; standfirst: string | null; image: string | null; bgColor: string | null;
+    }> = {};
     for (const r of rows) {
       const media = r.image ? toMediaDto(r.image) : null;
       headers[r.pageKey] = {
         title: r.title,
         standfirst: r.standfirst,
         image: media?.lg ?? media?.md ?? null,
+        bgColor: r.bgColor,
       };
     }
 
